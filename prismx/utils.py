@@ -7,6 +7,7 @@ import json
 import os
 import re
 import math
+import feather
 
 def quantile_normalize(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -97,3 +98,9 @@ def normalize(exp: pd.DataFrame, stepSize: int=2000, transpose: bool=False) -> p
         qn.iloc[rfrom:rto,:] = exp_stack.unstack().fillna(0)
     return(qn)
 
+def loadCorrelation(correlationFolder: str, suffix: str):
+    cc = pd.DataFrame(pd.read_feather(correlationFolder+"/correlation_"+str(suffix)+".f").set_index("index"), dtype=np.float32)
+    return(cc)
+
+def loadPrediction(predictionFolder: str, i: int):
+    return pd.DataFrame(pd.read_feather(predictionFolder+"/prediction_"+str(i)+".f").set_index("index"), dtype=np.float32)

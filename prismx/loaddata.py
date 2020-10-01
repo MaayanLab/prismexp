@@ -33,7 +33,7 @@ def printLibraries():
         print(str(i)+" - "+libs[i])
 
 def getGenes(correlationFolder: str) -> List[str]:
-    cc = pd.read_feather(correlationFolder+"/correlation_0.f")
+    cc = pd.read_feather(correlationFolder+"/correlation_0.f").set_index("index")
     genes = [x.upper() for x in cc.columns]
     cc = 0
     return(genes)

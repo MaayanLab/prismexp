@@ -7,21 +7,18 @@ from typing import List
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
-from prismx.utils import readGMT
+from prismx.utils import readGMT, loadCorrelation, loadPrediction
 
 def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: str, falseSampleCount: int=50000) -> List:
     correlation_files = os.listdir(correlationFolder)
-    correlation = pd.read_feather(correlationFolder+"/"+correlation_files[0])
-    backgroundGenes = [x.upper() for x in correlation.columns]
+    correlation = loadCorrelation(correlation_files, 0)
+    backgroundGenes = correlation.columns
     library, rev_library, ugenes = readGMT(gmtFile, backgroundGenes)
     df_true = pd.DataFrame()
     lk = list(range(0, len(correlation_files)-1))
     lk.append("global")
     for i in lk:
-        predictions = pd.read_feather(predictionFolder+"/prediction_"+str(i)+".f")
-        predictions.index = backgroundGenes
-        predictions = predictions.fillna(0)
-        predictions.columns = list(library.keys())
+        predictions = loadPrediction(predictionFolder, i)
         pred = []
         keys = [value for value in predictions.columns if value in library.keys()]
         setname = []
@@ -48,10 +45,7 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
                 samp_gene.append(rgene)
     df_false = pd.DataFrame()
     for i in lk:
-        predictions = pd.read_feather(predictionFolder+"/prediction_"+str(i)+".f")
-        predictions.index = backgroundGenes
-        predictions = predictions.fillna(0)
-        predictions.columns = list(library.keys())
+        predictions = loadPredictions(predictionFolder, i)
         pred = []
         keys = [value for value in predictions.columns if value in library.keys()]
         setname = []

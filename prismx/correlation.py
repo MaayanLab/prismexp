@@ -42,13 +42,14 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
     cc = cc.astype(np.float32)
     cc_internal = np.corrcoef(qq.transpose())
     qq = 0
-    avg_cor = (np.triu(cc_internal,1).sum())/(cc_internal.shape[0]*(cc_internal.shape[0]-1)/2)
     cc_internal = 0
     correlation = pd.DataFrame(cc, index=genes[geneidx], columns=genes[geneidx], dtype=np.float16)
+    correlation.index = [x.upper() for x in genes[geneidx]]
+    correlation.columns = [x.upper() for x in genes[geneidx]]
     cc = 0
     correlation = correlation.fillna(0)
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
-    return([correlation, avg_cor])
+    return(correlation)
 
 def createClustering(h5file: str, geneidx: List[int], geneCount: int=1000, clusterCount: int=50) -> pd.DataFrame:
     '''
@@ -65,7 +66,8 @@ def createClustering(h5file: str, geneidx: List[int], geneCount: int=1000, clust
     f = h5.File(h5file, 'r')
     expression = f['data/expression']
     samples = f['meta/Sample_geo_accession']
-    genes = hykGeneSelection(h5file, geneidx)
+    #genes = hykGeneSelection(h5file, geneidx)
+    genes = random.sample(geneidx, geneCount)
     genes.sort()
     exp = 0     # keep memory footprint low
     exp = expression[:, genes]

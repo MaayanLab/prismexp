@@ -38,7 +38,7 @@ Creating the predictions requires the gene-gene correlation matrices as a prereq
 
 ## Code example
 
-The following example will download the ARCHS4 gene expression and build 50 gene expression clusters. This process will, depending on the used hardware, take considerable amount of time. It also requires about 4GB of diskspace per gene expression cluster. (50*4 ~ 200GB). Additional to the 50 gene-gene matrices the algorithm will also compute a coorelation matrix across clusters. Memory consumption will depend on clustering, but should stay below 16GB.
+The following example will download the ARCHS4 gene expression and build 50 gene expression clusters. This process will, depending on the used hardware, take considerable amount of time. It also requires about 1GB of diskspace per gene expression cluster. Additional to the 50 gene-gene matrices the algorithm will also compute a correlation matrix across clusters. Memory consumption will depend on clustering, but should stay below 8GB.
 
 ### Python3
 
@@ -54,10 +54,10 @@ import os
 urllib.request.urlretrieve("https://mssm-seq-matrix.s3.amazonaws.com/mouse_matrix.h5", "mouse_matrix.h5")
 
 correlationFolder = "correlation_folder"
-clusterNumber = 50
+clusterNumber = 200
 
-os.mkdir(outFolder)
-avg_cor = px.createCorrelationMatrices("mouse_matrix.h5", outFolder, clusterCount=clusterNumber, sampleCount=5000, verbose=True)
+os.mkdir(correlationFolder)
+px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=clusterNumber, sampleCount=5000, verbose=True)
 ```
 
 ### II) Calculate average correlation of genes to gene sets for given gene set library
@@ -108,7 +108,7 @@ libs = px.listLibraries()
 
 # choose a gene set library from Enrichr
 i = 1
-outname = newlibs[i]
+outname = libs[i]
 gmtFile = px.loadLibrary(libs[i])
 
 outfolder = "prismxresult"

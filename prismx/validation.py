@@ -4,7 +4,7 @@ from typing import Dict, List
 from progress.bar import Bar
 import os
 import pickle
-from prismx.utils import readGMT
+from prismx.utils import readGMT, loadCorrelation, loadPrediction
 from prismx.loaddata import getGenes
 
 def calculateSetAUC(prediction: pd.DataFrame, library: Dict, minLibSize: int=1) -> List[float]:
@@ -45,14 +45,12 @@ def benchmarkGMT(gmtFile: str, correlationFolder: str, predictionFolder: str, pr
     setAUC = pd.DataFrame()
     if verbose: bar = Bar('AUC calculation', max=len(lk))
     for i in lk:
-        prediction = pd.read_feather(predictionFolder+"/prediction_"+str(i)+".f")
-        prediction.index = genes
+        prediction = loadPrediction(predictionFolder, i)
         geneAUC[i] = calculateGeneAUC(prediction, revLibrary)
         setAUC[i] = calculateSetAUC(prediction, library)[0]
         if verbose: bar.next()
     if verbose: bar.finish()
-    prediction = pd.read_feather(prismxPrediction)
-    prediction.index = genes
+    prediction = pd.read_feather(prismxPrediction).set_index("index")
     geneAUC["prismx"] = calculateGeneAUC(prediction, revLibrary)
     geneAUC.index = uniqueGenes
     setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
@@ -67,11 +65,10 @@ def benchmarkGMTfast(gmtFile: str, correlationFolder: str, predictionFolder: str
     prediction_files = os.listdir(predictionFolder)
     geneAUC = pd.DataFrame()
     setAUC = pd.DataFrame()
-    prediction = pd.read_feather(predictionFolder+"/prediction_global.f")
-    prediction.index = genes
+    prediction = loadPrediction(predictionFolder, "global")
     geneAUC["global"] = calculateGeneAUC(prediction, revLibrary)
     setAUC["global"] = calculateSetAUC(prediction, library)[0]
-    prediction = pd.read_feather(prismxPrediction)
+    prediction = pd.read_feather(prismxPrediction).set_index("index")
     prediction.index = genes
     geneAUC["prismx"] = calculateGeneAUC(prediction, revLibrary)
     geneAUC.index = uniqueGenes

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import feather
 import time
+import pickle
 import os
 from progress.bar import Bar
 from typing import List
@@ -17,7 +18,7 @@ from prismx.loaddata import listLibraries, loadExpression, loadLibrary, printLib
 from prismx.prismxprediction import predictGMT, prismxPredictions
 from prismx.validation import benchmarkGMT, benchmarkGMTfast
 
-def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=5000, correlationMatrixCount: int=50, clusterGeneCount: int=500, sampleCount: int=5000, correlationSampleCount: int=0, verbose: bool=True):
+def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=5000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, correlationSampleCount: int=0, verbose: bool=True):
     '''
     Write a set of correlation matrices, by partitioning gene expression into clusters and applying Pearson
     correlation for pairs of genes. It will also create an additional matrix for global correlation.
@@ -40,23 +41,21 @@ def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=
     tstart = time.time()
     os.makedirs(outputFolder, exist_ok=True)
     clustering = createClustering(h5file, filteredGenes, clusterGeneCount, clusterCount)
+    pickle.dump(clustering, open("clustering.pkl", "wb"))
     elapsed = round((time.time()-tstart)/60,2)
     if verbose: print("   -> completed in "+str(elapsed)+"min")
     if verbose: print("3. Calcualate "+str(clusterCount)+" correlation matrices")
     tstart = time.time()
     mats = list(range(0, clusterCount))
     mats.append("global")
-    avgCor = list()
     j = 0
     if verbose: bar = Bar('Processing correlation', max=len(mats))
     for i in range(0, len(mats)):
-        corMat, ac = calculateCorrelation(h5file, clustering, filteredGenes, clusterID=mats[i], globalSampleCount=sampleCount, maxSampleCount=correlationSampleCount)
-        avgCor.append(ac)
+        corMat = calculateCorrelation(h5file, clustering, filteredGenes, clusterID=mats[i], globalSampleCount=sampleCount, maxSampleCount=correlationSampleCount)
         corDF = pd.DataFrame(corMat)
         corMat = 0
-        corDF = corDF.reset_index(drop=True)
         corDF.columns = corDF.columns.astype(str)
-        corDF.to_feather(outputFolder+"/correlation_"+str(mats[i])+".f")
+        corDF.reset_index().to_feather(outputFolder+"/correlation_"+str(mats[i])+".f")
         corDF = 0
         j = j+1
         if verbose: bar.next()

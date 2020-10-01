@@ -9,8 +9,8 @@ from typing import List
 from progress.bar import Bar
 from sklearn.ensemble import RandomForestClassifier
 
-from prismx.utils import readGMT
-from prismx.prediction import correlationScores, loadPredictionsRange, loadPrediction
+from prismx.utils import readGMT, loadCorrelation, loadPrediction
+from prismx.prediction import correlationScores, loadPredictionsRange
 
 def predictGMT(model, gmtFile: str, correlationFolder: str, predictionFolder: str, outFolder: str, predictionName: str, stepSize: int=500, intersect: bool=False, verbose: bool=False):
     os.makedirs(outFolder, exist_ok=True)
@@ -31,7 +31,7 @@ def prismxPredictions(model: str, predictionFolder: str, predictionName: str, ou
         predictions = 0
         if verbose: bar.next()
     if verbose: bar.finish()
-    prism.to_feather(outFolder+"/"+predictionName+".f")
+    prism.reset_index().to_feather(outFolder+"/"+predictionName+".f")
 
 def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.DataFrame], verbose: bool=False) -> pd.DataFrame:
     model = pickle.load(open(model, 'rb'))
