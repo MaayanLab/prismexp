@@ -4,16 +4,16 @@
 
 ## Package for gene function predictions by unsupervised gene expression partitioning
 
-Gene co-expression is a commonly used feature in many machine learning applications. The elucidation of gene function frequently relies on the use of correlation structures, and the performance of the predictions relies on the chosen gene expression data. In some applications, correlations derived from tissue-specific gene expression outperform correlations derived from global gene expression. However, the identification of the optimal tissue may not always be trivial, and the constraint of a single tissue might be too limiting in some circumstances. To address this problem, we introduce and validate a new statistical approach, Automated Sharding of Massive Co-expression RNA-seq Data (find fun acronym), for accurate gene function prediction. We apply FunAcronym on ARCHS4 gene expression to predict a wide variety of gene properties, such as pathway memberships, phenotype associations, and protein-protein interactions. FunAcronym outperforms single correlation matrix approaches on all tested domains. The proposed method can enhance existing machine learning methods using gene correlation information and will require only minor adjustments to existing algorithms.
+Gene co-expression is a commonly used feature in many machine learning applications. The elucidation of gene function frequently relies on the use of correlation structures, and the performance of the predictions relies on the chosen gene expression data. In some applications, correlations derived from tissue-specific gene expression outperform correlations derived from global gene expression. However, the identification of the optimal tissue may not always be trivial, and the constraint of a single tissue might be too limiting in some circumstances. To address this problem, we introduce and validate a new statistical approach, Automated Sharding of Massive Co-expression RNA-seq Data (PrismEXP), for accurate gene function prediction. We apply PrismEXP on ARCHS4 gene expression to predict a wide variety of gene properties, such as pathway memberships, phenotype associations, and protein-protein interactions. PrismEXP outperforms single correlation matrix approaches on all tested domains. The proposed method can enhance existing machine learning methods using gene correlation information and will require only minor adjustments to existing algorithms.
 
 This Python3 package allows the generation of correlation matrices needed for the prediction of gene function from GMT files. The memory requirements depend on the number of genes used and the number of gene expression profiles.
 
-Default settings and ARCHS4 mouse gene expression should require less than 16GB of memory. The file formats used are hdf5 and feather. Gene expression has to be provided in H5 format. Gene expression should be stored as a matrix under "data/expression", gene symbols under "meta/genes", and sample identifieres under "meta/Sample_geo_accession"
+Default settings and ARCHS4 mouse gene expression should require less than 8GB of memory. The file formats used are hdf5 and feather. Gene expression has to be provided in H5 format. Gene expression should be stored as a matrix under "data/expression", gene symbols under "meta/genes", and sample identifieres under "meta/Sample_geo_accession"
 
 ---
 **NOTE**
 
-PrismX requires a large gene expression repository. The code expects gene expression as gene counts. Data compatible with PrismX can be downloaded from the ARCHS4 website.<br><br>
+PrismEXP requires a large gene expression repository. The code expects gene expression as gene counts. Data compatible with PrismX can be downloaded from the ARCHS4 website.<br><br>
 Mouse Data (284907 samples): https://mssm-seq-matrix.s3.amazonaws.com/mouse_matrix.h5<br>
 Human Data (238522 samples): https://mssm-seq-matrix.s3.amazonaws.com/human_matrix.h5
 
@@ -93,3 +93,17 @@ pickle.dump(model, open("gobp_model.pkl", 'wb'))
 ```
 
 Once the model is trained it can be applied on any gene set library of choice. Models trained with GO: BP were tested on all gene set libraries in Enrichr and show on average for all gene set libraries.
+
+### IV) Predict gene functions
+
+```python
+import prismx as px
+import pickle
+
+# reuse matrices from step I and step II
+correlationFolder = "correlation_folder"
+predictionFolder = "prediction_folder"
+libs = px.listLibraries()
+
+px.predictGMT("gobp_model_"+str(clustn)+".pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=200, intersect=True, verbose=True)
+```
