@@ -44,6 +44,8 @@ The following example will download the ARCHS4 gene expression and build 50 gene
 
 ### I) Compute correlation matrices
 
+The choice of clusters will impact the overall quality of gene function predictions. The predictions improve proportional to the log of the number of clusters. Adding more clusters will increase the runtime of the algorithm. If possible we recommend 200-300 clusters. Beyond 300 clusters improvements are marginal.
+
 ```python
 import urllib.request
 import prismx as px
