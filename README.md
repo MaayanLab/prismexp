@@ -42,7 +42,7 @@ The following example will download the ARCHS4 gene expression and build 50 gene
 
 ### Python3
 
-Compute correlation matrices
+### I) Compute correlation matrices
 
 ```python
 import urllib.request
@@ -58,7 +58,7 @@ os.mkdir(outFolder)
 avg_cor = px.createCorrelationMatrices("mouse_matrix.h5", outFolder, clusterCount=clusterNumber, sampleCount=5000, verbose=True)
 ```
 
-Calculate average correlation of genes to gene sets for given gene set library
+### II) Calculate average correlation of genes to gene sets for given gene set library
 
 ```python
 import prismx as px
@@ -74,7 +74,7 @@ gmtFile = px.loadLibrary(libs[110])
 px.correlationScores(gmtFile, correlationFolder, predictionFolder, verbose=True)
 ```
 
-Train model on GO: Biological Processes gene set library
+### III) Train model on GO: Biological Processes gene set library
 
 ```python
 import prismx as px
@@ -92,3 +92,4 @@ model = px.trainModel(predictionFolder, correlationFolder, gmtFile, trainingSize
 pickle.dump(model, open("gobp_model.pkl", 'wb'))
 ```
 
+Once the model is trained it can be applied on any gene set library of choice. Models trained with GO: BP were tested on all gene set libraries in Enrichr and show on average for all gene set libraries.
