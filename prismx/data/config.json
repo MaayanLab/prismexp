@@ -1,0 +1,7 @@
+{
+    "LIBRARY_LIST_URL": "https://maayanlab.cloud/speedrichr/api/listlibs",
+    "LIBRARY_DOWNLOAD_URL": "https://maayanlab.cloud/Enrichr/geneSetLibrary?mode=text&libraryName=",
+    "ARCHS4_S3_BUCKET": "https://mssm-seq-matrix.s3.amazonaws.com",
+    "ARCHS4_MOUSE_MD5": "9ffd33b8ea9df13db8f5eabcdc6b14c8",
+    "ARCHS4_HUMAN_MD5": ""
+}

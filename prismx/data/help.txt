@@ -1,0 +1,48 @@
+############ Example Test Data ############
+#      fast and low memory footprint 	  #
+###########################################
+
+import prismx as px
+import os
+
+outFolder="correlation_folder"
+os.makedirs(outFolder, exist_ok=True)
+avg_cor = px.createCorrelationMatrices(px.testData(), outFolder, clusterCount=5, sampleCount=1000, verbose=True)
+
+
+############### ARCHS4 data ###############
+# Real world usage. High memory footprint #
+# Will require some time to finish	  #
+###########################################
+
+import urllib.request
+import prismx as px
+import os
+
+urllib.request.urlretrieve("https://mssm-seq-matrix.s3.amazonaws.com/mouse_matrix.h5", "mouse_matrix.h5")
+
+outFolder="correlation_folder"
+avg_cor = px.createCorrelationMatrices("mouse_matrix.h5", outFolder, clusterCount=300, sampleCount=5000, verbose=True)
+
+
+############### ARCHS4 data ###############
+# get correlation scores for each         #
+# correlation matrix            	  #
+###########################################
+
+import prismx as px
+px.correlationScores(px.testGMT(), "correlation_folder", "prediction_folder", verbose=True)
+
+
+########### Train PrismX model ######3#####
+# extract positive samples                #
+# sample negative samples                 #
+#                                         #
+###########################################
+
+import prismx as px
+model = px.trainModel("prediction_folder", "correlation_folder", px.testGMT(), trainingSize=200000, testTrainSplit=0.1, samplePositive=20000, sampleNegative=80000, randomState=42, verbose=True)
+
+
+
+
