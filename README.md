@@ -1,6 +1,6 @@
 <img align="left" width="200" src="https://mssm-prismx.s3.amazonaws.com/images/prismxsmall.png">
 
-# PrismX
+# PrismEXP
 
 ## Package for gene function predictions by unsupervised gene expression partitioning
 
@@ -98,12 +98,18 @@ Once the model is trained it can be applied on any gene set library of choice. M
 
 ```python
 import prismx as px
-import pickle
 
 # reuse matrices from step I and step II
 correlationFolder = "correlation_folder"
 predictionFolder = "prediction_folder"
 libs = px.listLibraries()
 
-px.predictGMT("gobp_model_"+str(clustn)+".pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=200, intersect=True, verbose=True)
+# choose a gene set library from Enrichr
+i = 1
+outname = newlibs[i]
+gmtFile = px.loadLibrary(libs[i])
+
+outfolder = "prismxresult"
+
+px.predictGMT("gobp_model.pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=200, intersect=False, verbose=True)
 ```
