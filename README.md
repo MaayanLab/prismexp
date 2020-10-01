@@ -42,6 +42,8 @@ The following example will download the ARCHS4 gene expression and build 50 gene
 
 ### Python3
 
+Compute correlation matrices
+
 ```python
 import urllib.request
 import prismx as px
@@ -49,7 +51,44 @@ import os
 
 urllib.request.urlretrieve("https://mssm-seq-matrix.s3.amazonaws.com/mouse_matrix.h5", "mouse_matrix.h5")
 
-outFolder="correlation_folder"
+correlationFolder = "correlation_folder"
+clusterNumber = 50
+
 os.mkdir(outFolder)
-avg_cor = px.createCorrelationMatrices("mouse_matrix.h5", outFolder, clusterCount=50, sampleCount=5000, verbose=True)
+avg_cor = px.createCorrelationMatrices("mouse_matrix.h5", outFolder, clusterCount=clusterNumber, sampleCount=5000, verbose=True)
 ```
+
+Calculate average correlation of genes to gene sets for given gene set library
+
+```python
+import prismx as px
+
+# reuse correlation matrices from first step
+correlationFolder = "correlation_folder"
+predictionFolder = "prediction_folder"
+libs = px.listLibraries()
+
+# select GO: Biological Processes
+gmtFile = px.loadLibrary(libs[110])
+
+px.correlationScores(gmtFile, correlationFolder, predictionFolder, verbose=True)
+```
+
+Train model on GO: Biological Processes gene set library
+
+```python
+import prismx as px
+import pickle
+
+# reuse matrices from step I and step II
+correlationFolder = "correlation_folder"
+predictionFolder = "prediction_folder"
+libs = px.listLibraries()
+
+# select GO: Biological Processes (same as last step)
+gmtFile = px.loadLibrary(libs[110])
+
+model = px.trainModel(predictionFolder, correlationFolder, gmtFile, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
+pickle.dump(model, open("gobp_model.pkl", 'wb'))
+```
+
