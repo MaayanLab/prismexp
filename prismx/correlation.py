@@ -11,7 +11,7 @@ from prismx.filter import hykGeneSelection
 
 np.seterr(divide='ignore', invalid='ignore')
 
-def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[int], clusterID: str="global", globalSampleCount: int=5000, maxSampleCount: int=0) -> List:
+def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[int], clusterID: str="global", globalSampleCount: int=5000, maxSampleCount: int=2000) -> List:
     '''
     Returns correlation matrix for specified samples
 
