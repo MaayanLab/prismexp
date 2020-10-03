@@ -11,7 +11,7 @@ from prismx.utils import readGMT, loadCorrelation, loadPrediction
 
 def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: str, falseSampleCount: int=50000) -> List:
     correlation_files = os.listdir(correlationFolder)
-    correlation = loadCorrelation(correlation_files, 0)
+    correlation = loadCorrelation(correlationFolder, 0)
     backgroundGenes = correlation.columns
     library, rev_library, ugenes = readGMT(gmtFile, backgroundGenes)
     df_true = pd.DataFrame()

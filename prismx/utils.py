@@ -98,7 +98,7 @@ def normalize(exp: pd.DataFrame, stepSize: int=2000, transpose: bool=False) -> p
         qn.iloc[rfrom:rto,:] = exp_stack.unstack().fillna(0)
     return(qn)
 
-def loadCorrelation(correlationFolder: str, suffix: str):
+def loadCorrelation(correlationFolder: str, suffix: int):
     cc = pd.DataFrame(pd.read_feather(correlationFolder+"/correlation_"+str(suffix)+".f").set_index("index"), dtype=np.float32)
     return(cc)
 

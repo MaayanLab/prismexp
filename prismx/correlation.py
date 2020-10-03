@@ -51,7 +51,7 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
     return(correlation)
 
-def createClustering(h5file: str, geneidx: List[int], geneCount: int=1000, clusterCount: int=50) -> pd.DataFrame:
+def createClustering(h5file: str, geneidx: List[int], geneCount: int=500, clusterCount: int=50) -> pd.DataFrame:
     '''
     Returns cluster association for all samples in input expression h5 file
 
@@ -71,6 +71,7 @@ def createClustering(h5file: str, geneidx: List[int], geneCount: int=1000, clust
     genes.sort()
     exp = 0     # keep memory footprint low
     exp = expression[:, genes]
+    f.close()
     qq = normalize(exp, stepSize=100, transpose=True)
     kmeans = KMeans(n_clusters=clusterCount, random_state=42).fit(qq.transpose())
     qq = 0      # keep memory footprint low
