@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
 from prismx.utils import readGMT, loadCorrelation, loadPrediction
+from prismx.prediction import loadPredictions
 
 def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: str, falseSampleCount: int=50000) -> List:
     correlation_files = os.listdir(correlationFolder)
