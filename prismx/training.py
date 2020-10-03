@@ -28,7 +28,7 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
             for val in vals:
                 setname.append(val)
                 genename.append(se)
-                pred.append(predictions.loc[val, se])
+                pred.append(predictions.loc[val.encode('UTF-8'), se])
         df_true.loc[:,i] = pred
     df_true2 = pd.concat([pd.DataFrame(genename), pd.DataFrame(setname),df_true, pd.DataFrame(np.ones(len(setname)))], axis=1)
     samp_set = []
