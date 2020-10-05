@@ -46,4 +46,5 @@ def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.D
             print(str(i) + " - " + str(round(time.time()-start)))
         df.fillna(0, inplace=True)
         prism[predictions[0].columns[i]] = model.predict_proba(df)[:,1]
+        prism.index = predictions[0].index
     return prism
