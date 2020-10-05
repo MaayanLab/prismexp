@@ -7,13 +7,14 @@ import pickle
 from prismx.utils import readGMT, loadCorrelation, loadPrediction
 from prismx.loaddata import getGenes
 
-def calculateSetAUC(prediction: pd.DataFrame, library: Dict, minLibSize: int=1) -> List[float]:
+def calculateSetAUC(prediction: pd.DataFrame, library: Dict, minLibSize: int=1) -> pd.DataFrame:
     aucs = []
     setnames = []
     idx = prediction.index
     for se in library:
-        gold = [i in library[se] for i in idx]
         if len(library[se]) >= minLibSize:
+            lenc = [x.encode('utf-8') for x in library[se]]
+            gold = [i in lenc for i in idx]
             fpr, tpr, _ = roc_curve(list(gold), list(prediction.loc[:,se]))
             roc_auc = auc(fpr, tpr)
             aucs.append(roc_auc)
@@ -26,8 +27,9 @@ def calculateGeneAUC(prediction: pd.DataFrame, rev_library: Dict, minLibSize: in
     idx = prediction.index
     for se in rev_library:
         gold = [i in rev_library[se] for i in prediction.columns]
-        if len(rev_library[se]) >= minLibSize and se in idx:
-            fpr, tpr, _ = roc_curve(list(gold), list(prediction.loc[se,:]))
+        sen = se.encode('utf-8')
+        if len(rev_library[se]) >= minLibSize and sen in idx:
+            fpr, tpr, _ = roc_curve(list(gold), list(prediction.loc[sen,:]))
             roc_auc = auc(fpr, tpr)
             aucs.append(roc_auc)
     return(aucs)
@@ -62,14 +64,14 @@ def benchmarkGMTfast(gmtFile: str, correlationFolder: str, predictionFolder: str
     if intersect:
         ugenes = list(set(sum(library.values(), [])))
         genes = list(set(ugenes) & set(genes))
+    genes = [x.encode('utf-8') for x in genes]
     prediction_files = os.listdir(predictionFolder)
     geneAUC = pd.DataFrame()
     setAUC = pd.DataFrame()
-    prediction = loadPrediction(predictionFolder, "global")
+    prediction = loadPrediction(predictionFolder, "global").loc[genes,:]
     geneAUC["global"] = calculateGeneAUC(prediction, revLibrary)
     setAUC["global"] = calculateSetAUC(prediction, library)[0]
-    prediction = pd.read_feather(prismxPrediction).set_index("index")
-    prediction = prediction.loc[genes,:]
+    prediction = pd.read_feather(prismxPrediction).set_index("index").loc[genes,:]
     geneAUC["prismx"] = calculateGeneAUC(prediction, revLibrary)
     geneAUC.index = uniqueGenes
     setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
