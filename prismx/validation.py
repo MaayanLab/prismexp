@@ -69,7 +69,7 @@ def benchmarkGMTfast(gmtFile: str, correlationFolder: str, predictionFolder: str
     geneAUC["global"] = calculateGeneAUC(prediction, revLibrary)
     setAUC["global"] = calculateSetAUC(prediction, library)[0]
     prediction = pd.read_feather(prismxPrediction).set_index("index")
-    prediction.index = genes
+    prediction = prediction.loc[genes,:]
     geneAUC["prismx"] = calculateGeneAUC(prediction, revLibrary)
     geneAUC.index = uniqueGenes
     setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
