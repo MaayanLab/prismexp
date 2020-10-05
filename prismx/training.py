@@ -46,7 +46,7 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
                 samp_gene.append(rgene)
     df_false = pd.DataFrame()
     for i in lk:
-        predictions = loadPredictions(predictionFolder, i)
+        predictions = loadPrediction(predictionFolder, i)
         pred = []
         keys = [value for value in predictions.columns if value in library.keys()]
         setname = []
