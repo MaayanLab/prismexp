@@ -65,7 +65,7 @@ def createClustering(h5file: str, geneidx: List[int], geneCount: int=500, cluste
     '''
     f = h5.File(h5file, 'r')
     expression = f['data/expression']
-    samples = f['meta/Sample_geo_accession']
+    samples = list(f['meta/Sample_geo_accession'])
     #genes = hykGeneSelection(h5file, geneidx)
     genes = random.sample(geneidx, geneCount)
     genes.sort()
@@ -73,6 +73,7 @@ def createClustering(h5file: str, geneidx: List[int], geneCount: int=500, cluste
     exp = expression[:, genes]
     f.close()
     qq = normalize(exp, stepSize=100, transpose=True)
+    exp = 0
     kmeans = KMeans(n_clusters=clusterCount, random_state=42).fit(qq.transpose())
     qq = 0      # keep memory footprint low
     clustering = kmeans.labels_
