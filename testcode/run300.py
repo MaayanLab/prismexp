@@ -14,14 +14,14 @@ outfolder = "prismxresult"
 
 clustn = 300
 
-px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=clustn, sampleCount=5000, correlationSampleCount=5000, verbose=True)
+#px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=clustn, sampleCount=5000, correlationSampleCount=5000, verbose=True)
 
 libs = px.listLibraries()
 gmtFile = px.loadLibrary(libs[111], overwrite=True)
-px.correlationScores(gmtFile, correlationFolder, predictionFolder, verbose=True)
+#px.correlationScores(gmtFile, correlationFolder, predictionFolder, verbose=True)
 
-model = px.trainModel(predictionFolder, correlationFolder, gmtFile, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
-pickle.dump(model, open("gobp_model_300.pkl", 'wb'))
+#model = px.trainModel(predictionFolder, correlationFolder, gmtFile, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
+#pickle.dump(model, open("gobp_model_300.pkl", 'wb'))
 
 
 f = open("validationscore"+str(clustn)+".txt", 'r')

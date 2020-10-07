@@ -19,6 +19,7 @@ def correlationScores(gmtFile: str, correlationFolder: str, outFolder: str, inte
     if intersect:
         ugenes = list(set(sum(library.values(), [])))
         ugenes = list(set(ugenes) & set(backgroundGenes))
+        ugenes = [x.decode("UTF-8") for x in ugenes]
         if verbose:
             print("overlapping genes: "+str(len(ugenes)))
     lk = list(range(0, len(correlation_files)-1))
