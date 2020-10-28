@@ -35,10 +35,11 @@ def prismxPredictions(model: str, predictionFolder: str, predictionName: str, ou
 
 def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.DataFrame], verbose: bool=False) -> pd.DataFrame:
     model = pickle.load(open(model, 'rb'))
-    for i in range(0, len(predictions[0].columns)):
+    for i in range(0, predictions[0].shape[1]):
         start = time.time()
         df = pd.DataFrame()
         k = 0
+        print(i)
         for pp in predictions:
             df[k] = pp.iloc[:,i]
             k = k + 1
@@ -48,3 +49,4 @@ def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.D
         prism[predictions[0].columns[i]] = model.predict_proba(df)[:,1]
         prism.index = predictions[0].index
     return prism
+

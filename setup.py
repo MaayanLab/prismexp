@@ -31,7 +31,8 @@ setuptools.setup(
         'itertools',
         'pickle',
         'typing',
-        'progress'
+        'progress',
+        'qnorm'
     ],
     python_requires='>=3.6',
 )

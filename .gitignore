@@ -1,6 +1,11 @@
-.DS_Store
+*.DS_Store*
 *.pkl
 *.txt
 *.f
 *.pyc
 *.h5
+*.tsv
+figures/*
+testdata/*
+*.pdf
+prismx/data/GO_B*

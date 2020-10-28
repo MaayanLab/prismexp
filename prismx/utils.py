@@ -8,6 +8,7 @@ import os
 import re
 import math
 import feather
+import qnorm
 
 def quantile_normalize(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -83,19 +84,6 @@ def normalize(exp: pd.DataFrame, stepSize: int=2000, transpose: bool=False) -> p
     sampleNumber = exp.shape[1]
     geneNumber = exp.shape[0]
     exp = pd.DataFrame(np.log2(exp+1))
-    exp_sorted = pd.DataFrame(np.sort(exp.values, axis=0), 
-                                index=exp.index, 
-                                columns=exp.columns)
-    exp_mean = exp_sorted.mean(axis=1)
-    exp_sorted=0
-    exp = exp.rank(method="min")
-    qn = pd.DataFrame(np.zeros(shape=(geneNumber,sampleNumber)))
-    for i in range(0, stepNumber):
-        rfrom=i*stepSize
-        rto = min(geneNumber, (i+1)*stepSize)
-        exp_stack = exp.iloc[rfrom:rto,:].stack()
-        exp_stack = exp_stack.map(exp_mean)
-        qn.iloc[rfrom:rto,:] = exp_stack.unstack().fillna(0)
     return(qn)
 
 def loadCorrelation(correlationFolder: str, suffix: int):

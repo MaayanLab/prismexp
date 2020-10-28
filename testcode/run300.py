@@ -27,6 +27,9 @@ gmtFile = px.loadLibrary(libs[111], overwrite=True)
 f = open("validationscore"+str(clustn)+".txt", 'r')
 libraries = [x.split("\t")[0] for x in f.readlines()]
 newlibs = list(set(libs).difference(set(libraries)))
+newlibs.sort()
+#newlibs.reverse()
+newlibs = newlibs[50:60]
 
 for i in range(0, len(newlibs)):
     try:
