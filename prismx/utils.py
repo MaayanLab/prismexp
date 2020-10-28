@@ -80,11 +80,9 @@ def help():
 
 def normalize(exp: pd.DataFrame, stepSize: int=2000, transpose: bool=False) -> pd.DataFrame:
     if transpose: exp = exp.transpose()
-    stepNumber = math.ceil(exp.shape[0]/stepSize)
-    sampleNumber = exp.shape[1]
-    geneNumber = exp.shape[0]
     exp = pd.DataFrame(np.log2(exp+1))
-    return(qn)
+    exp = qnorm.quantile_normalize(exp)
+    return(exp)
 
 def loadCorrelation(correlationFolder: str, suffix: int):
     cc = pd.DataFrame(pd.read_feather(correlationFolder+"/correlation_"+str(suffix)+".f").set_index("index"), dtype=np.float32)
