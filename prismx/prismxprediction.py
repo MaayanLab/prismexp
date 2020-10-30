@@ -39,7 +39,6 @@ def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.D
         start = time.time()
         df = pd.DataFrame()
         k = 0
-        print(i)
         for pp in predictions:
             df[k] = pp.iloc[:,i]
             k = k + 1

@@ -199,3 +199,31 @@ for i in ll:
 
 worse.index = setname
 
+f1 = pd.read_csv("logs/v300flubber.txt", sep="\t")
+f2 = pd.read_csv("logs/v300zebra.txt", sep="\t")
+f3 = pd.read_csv("logs/v300minji.txt", sep="\t")
+
+f1.index = f1.iloc[:,0]
+f2.index = f2.iloc[:,0]
+f3.index = f3.iloc[:,0]
+
+ff = f1.append(f2).append(f3)
+ff = ff.drop_duplicates()
+ff = ff.sort_index()
+ff.to_csv("logs/validationscore300.txt", sep="\t")
+
+
+
+score5 = pd.DataFrame()
+score10 = pd.DataFrame()
+score25 = pd.DataFrame()
+score50 = pd.DataFrame()
+score100 = pd.DataFrame()
+score300 = pd.DataFrame()
+for i in range(0, len(inter)):
+    score5[inter[i]] = f5.iloc[list(f5.index).index(inter[i]), :][1:]
+    score10[inter[i]] = f10.iloc[list(f10.index).index(inter[i]), :][1:]
+    score25[inter[i]] = f25.iloc[list(f25.index).index(inter[i]), :][1:]
+    score50[inter[i]] = f50.iloc[list(f50.index).index(inter[i]), :][1:]
+    score100[inter[i]] = f100.iloc[list(f100.index).index(inter[i]), :][1:]
+    score300[inter[i]] = f300.iloc[list(f300.index).index(inter[i]), :][1:]

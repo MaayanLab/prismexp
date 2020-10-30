@@ -5,6 +5,7 @@ import math
 import random
 import pickle
 import time
+import feather
 
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
@@ -20,6 +21,12 @@ from prismx.utils import readGMT, loadCorrelation, loadPrediction
 from prismx.prediction import correlationScores, loadPredictionsRange
 from sklearn.manifold import TSNE
 
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_samples, silhouette_score
+from sklearn.preprocessing import MinMaxScaler
+from sklearn import mixture
+from sklearn.metrics.cluster import homogeneity_score
+from scipy import stats
 
 gene_auc = pd.read_csv("testdata/gene_auc.tsv", sep="\t", index_col=0)
 set_auc = pd.read_csv("testdata/set_auc.tsv", sep="\t", index_col=0)
@@ -147,6 +154,86 @@ samples_all = pd.concat([true_all, false_all])
 
 tt = TSNE(n_components=2).fit_transform(samples_all.iloc[:,0:301])
 
+k = 60
+clusterer = KMeans(n_clusters=k, random_state=10)
+cluster_labels = clusterer.fit_predict(samples_all.iloc[:,0:301])
+
+colors = np.array([x for x in 'bgrcmykbgrcmykbgrcmykbgrcmyk'])
+colors = np.hstack([colors] * 20)
+
+plt.scatter(tt[:,0], tt[:,1], s=0.7, alpha=0.5, c=colors[cluster_labels])
+plt.savefig("figures/cluster_features_high.pdf")
+plt.close()
+
+
+truth = [1]*true_all.shape[0]
+res = truth+([0]*(tt.shape[0]-len(truth)))
+
+homogeneity_score(cluster_labels, samples_all.iloc[:,301])
+
+homogeneity_score(cluster_labels, samples_all.iloc[:,300])
+
+
+stats.ttest_ind(samples_all.iloc[:true_all.shape[0],301], samples_all.iloc[true_all.shape[0]:,301], equal_var = False)
+stats.ttest_ind(samples_all.iloc[:true_all.shape[0],300], samples_all.iloc[true_all.shape[0]:,300], equal_var = False)
+
+pk = pd.DataFrame()
+pk["pred"] = samples_all.iloc[:,301]
+pk["lab"] = res
+
+for cl in [1,0]:
+    # Subset to the airline
+    subset = pk[pk['lab'] == cl]
+    # Draw the density plot
+    sns.distplot(subset['pred'], hist = False, kde = True,
+                 kde_kws = {'shade': True, 'linewidth': 3},
+                 label = cl)
+
+# Plot formatting
+plt.legend(prop={'size': 16}, title = 'Class')
+plt.xlabel('PrismEXP score')
+plt.ylabel('Density')
+plt.savefig("figures/density_pred_prismx.pdf")
+plt.close()
+
+
+
+pk = pd.DataFrame()
+pk["pred"] = samples_all.iloc[:,0]
+pk["lab"] = res
+
+for cl in [1,0]:
+    # Subset to the airline
+    subset = pk[pk['lab'] == cl]
+    # Draw the density plot
+    sns.distplot(subset['pred'], hist = False, kde = True,
+                 kde_kws = {'shade': True, 'linewidth': 3},
+                 label = cl)
+
+# Plot formatting
+plt.legend(prop={'size': 16}, title = 'Class')
+plt.xlabel('global score')
+plt.ylabel('Density')
+plt.savefig("figures/density_pred_global.pdf")
+plt.close()
+
+
+[g]
+
+
+colp = sns.color_palette("hls", 60)
+
+plt.scatter(tt[:,0], tt[:,1], s=0.7, alpha=0.5, c=colp[cluster_labels])
+plt.savefig("figures/cluster_features_high.pdf")
+plt.close()
+
+
+for k in range(30, 60):
+    clusterer = KMeans(n_clusters=k, random_state=10)
+    cluster_labels = clusterer.fit_predict(tt)
+    silhouette_avg = silhouette_score(tt, cluster_labels)
+    print(silhouette_avg)
+
 
 plt.figure(figsize=(7,6))
 plt.scatter(tt[:true_all.shape[0],0], tt[:true_all.shape[0],1], s=0.7, alpha=0.5, color="red")
@@ -157,7 +244,7 @@ colors = {'true samples':'red', 'false samples':'black'}
 labels = list(colors.keys())
 handles = [plt.Rectangle((0,0),1,1, color=colors[label]) for label in labels]
 plt.legend(handles, labels)
-plt.savefig("figures/tsne_features.pdf")
+plt.savefig("figures/tsne_features2.pdf")
 plt.close()
 
 sc = samples_all.iloc[:,301]
@@ -168,7 +255,7 @@ plt.xlabel("T1", fontsize=15)
 plt.ylabel("T2", fontsize=15)
 cbar = plt.colorbar()
 cbar.set_label("PrismEXP score", fontsize=15)
-plt.savefig("figures/tsne_features_heat.pdf")
+plt.savefig("figures/tsne_features_heat4.pdf")
 plt.close()
 
 
@@ -177,33 +264,134 @@ plt.xlabel("T1", fontsize=15)
 plt.ylabel("T2", fontsize=15)
 cbar = plt.colorbar()
 cbar.set_label("global avg correlation", fontsize=15)
-plt.savefig("figures/tsne_features_heat_global.pdf")
+plt.savefig("figures/tsne_features_heat_global4.pdf")
 plt.close()
 
-plt.figure(figsize=(24, 8))
+
+plt.figure(figsize=(7, 6))
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
 
 ax1.scatter(tt[:true_all.shape[0],0], tt[:true_all.shape[0],1], s=0.7, alpha=0.5, color="red")
 ax1.scatter(tt[true_all.shape[0]:,0], tt[true_all.shape[0]:,1], s=0.7, alpha=0.5, color="black")
-ax1.xlabel("T1", fontsize=15)
-ax1.ylabel("T2", fontsize=15)
-colors = {'true samples':'red', 'false samples':'black'}         
+plt.xlabel("T1", fontsize=15)
+plt.ylabel("T2", fontsize=15)
+colors = {'true samples':'red', 'false samples':'black'}
 labels = list(colors.keys())
 handles = [plt.Rectangle((0,0),1,1, color=colors[label]) for label in labels]
-ax1.legend(handles, labels)
+plt.legend(handles, labels, ax=ax1)
 
-ax2.scatter(tt[:,0], tt[:,1], s=0.7, alpha=0.5, c=samples_all.iloc[:,300])
-ax2.xlabel("T1", fontsize=15)
-ax2.ylabel("T2", fontsize=15)
-cbar = ax2.colorbar()
+ok1 = ax2.scatter(tt[:,0], tt[:,1], s=0.7, alpha=0.5, c=samples_all.iloc[:,300])
+plt.xlabel("T1", fontsize=15)
+plt.ylabel("T2", fontsize=15)
+cbar = plt.colorbar(ok1, ax=ax2)
 cbar.set_label("global avg correlation", fontsize=15)
 
-ax3.scatter(tt[:,0], tt[:,1], s=0.7, alpha=0.5, c=samples_all.iloc[:,301])
-ax3.xlabel("T1", fontsize=15)
-ax3.ylabel("T2", fontsize=15)
-cbar = ax3.colorbar()
+ok2 = ax3.scatter(tt[:,0], tt[:,1], s=0.7, alpha=0.5, c=samples_all.iloc[:,301])
+plt.xlabel("T1", fontsize=15)
+plt.ylabel("T2", fontsize=15)
+cbar = plt.colorbar(ok2, ax=ax3)
 cbar.set_label("PrismEXP score", fontsize=15)
 
-plt.savefig("figures/combined_featurespace.pdf")
+plt.savefig("figures/combined_featurespace2.pdf")
 plt.close()
+
+
+clusterer = mixture.GaussianMixture(n_components=n_clusters)
+#clusterer = KMeans(n_clusters=n_clusters, random_state=10)
+cluster_labels = clusterer.fit_predict(X)
+
+silhouette_avg = silhouette_score(X, cluster_labels)
+
+
+
+pp = pd.DataFrame()
+K = [10,12,14,16,18,20,22,24,26]
+for k in K:
+    sc = []
+    for i in range(10):
+        clusterer = mixture.GaussianMixture(n_components=n_clusters)
+        #clusterer = KMeans(n_clusters=n_clusters, random_state=10)
+        cluster_labels = clusterer.fit_predict(X)
+        sc.append(silhouette_score(X, cluster_labels))
+    print(sc)
+    pp[k] = sc
+
+
+
+
+
+
+X = tt
+n_clusters = 26
+
+fig, (ax1, ax2) = plt.subplots(1, 2)
+fig.set_size_inches(18, 7)
+# The 1st subplot is the silhouette plot
+# The silhouette coefficient can range from -1, 1 but in this example all
+# lie within [-0.1, 1]
+ax1.set_xlim([-0.1, 1])
+# The (n_clusters+1)*10 is for inserting blank space between silhouette
+# plots of individual clusters, to demarcate them clearly.
+ax1.set_ylim([0, len(X) + (n_clusters + 1) * 10])
+# Initialize the clusterer with n_clusters value and a random generator
+# seed of 10 for reproducibility.
+clusterer = KMeans(n_clusters=n_clusters, random_state=10)
+clusterer = mixture.GaussianMixture(n_components=n_clusters, random_state=10)
+cluster_labels = clusterer.fit_predict(X)
+# The silhouette_score gives the average value for all the samples.
+# This gives a perspective into the density and separation of the formed
+# clusters
+silhouette_avg = silhouette_score(X, cluster_labels)
+print("For n_clusters =", n_clusters,
+        "The average silhouette_score is :", silhouette_avg)
+
+# Compute the silhouette scores for each sample
+sample_silhouette_values = silhouette_samples(X, cluster_labels)
+y_lower = 10
+for i in range(n_clusters):
+    # Aggregate the silhouette scores for samples belonging to
+    # cluster i, and sort them
+    ith_cluster_silhouette_values = \
+        sample_silhouette_values[cluster_labels == i]
+    ith_cluster_silhouette_values.sort()
+    size_cluster_i = ith_cluster_silhouette_values.shape[0]
+    y_upper = y_lower + size_cluster_i
+    color = cm.nipy_spectral(float(i) / n_clusters)
+    ax1.fill_betweenx(np.arange(y_lower, y_upper),
+                        0, ith_cluster_silhouette_values,
+                        facecolor=color, edgecolor=color, alpha=0.7)
+    # Label the silhouette plots with their cluster numbers at the middle
+    ax1.text(-0.05, y_lower + 0.5 * size_cluster_i, str(i))
+    # Compute the new y_lower for next plot
+    y_lower = y_upper + 10  # 10 for the 0 samples
+
+ax1.set_title("The silhouette plot for the various clusters.")
+ax1.set_xlabel("The silhouette coefficient values")
+ax1.set_ylabel("Cluster label")
+# The vertical line for average silhouette score of all the values
+ax1.axvline(x=silhouette_avg, color="red", linestyle="--")
+ax1.set_yticks([])  # Clear the yaxis labels / ticks
+ax1.set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
+# 2nd Plot showing the actual clusters formed
+colors = cm.nipy_spectral(cluster_labels.astype(float) / n_clusters)
+ax2.scatter(X[:, 0], X[:, 1], marker='.', s=30, lw=0, alpha=0.7,
+            c=colors, edgecolor='k')
+
+# Labeling the clusters
+centers = clusterer.cluster_centers_
+# Draw white circles at cluster centers
+ax2.scatter(centers[:, 0], centers[:, 1], marker='o',
+            c="white", alpha=1, s=200, edgecolor='k')
+for i, c in enumerate(centers):
+    ax2.scatter(c[0], c[1], marker='$%d$' % i, alpha=1,
+                s=50, edgecolor='k')
+
+ax2.set_title("The visualization of the clustered data.")
+ax2.set_xlabel("Feature space for the 1st feature")
+ax2.set_ylabel("Feature space for the 2nd feature")
+plt.suptitle(("Silhouette analysis for KMeans clustering on sample data "
+                "with n_clusters = %d" % n_clusters),
+                fontsize=14, fontweight='bold')
+
+plt.savefig("figures/silhouette.pdf")
 

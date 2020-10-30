@@ -40,9 +40,7 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
     exp = 0
     cc = np.corrcoef(qq)
     cc = cc.astype(np.float32)
-    cc_internal = np.corrcoef(qq.transpose())
     qq = 0
-    cc_internal = 0
     correlation = pd.DataFrame(cc, index=genes[geneidx], columns=genes[geneidx], dtype=np.float16)
     correlation.index = [x.upper() for x in genes[geneidx]]
     correlation.columns = [x.upper() for x in genes[geneidx]]

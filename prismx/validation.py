@@ -47,12 +47,12 @@ def benchmarkGMT(gmtFile: str, correlationFolder: str, predictionFolder: str, pr
     setAUC = pd.DataFrame()
     if verbose: bar = Bar('AUC calculation', max=len(lk))
     for i in lk:
-        prediction = loadPrediction(predictionFolder, i)
+        prediction = loadPrediction(predictionFolder, i).loc[genes,:]
         geneAUC[i] = calculateGeneAUC(prediction, revLibrary)
         setAUC[i] = calculateSetAUC(prediction, library)[0]
         if verbose: bar.next()
     if verbose: bar.finish()
-    prediction = pd.read_feather(prismxPrediction).set_index("index")
+    prediction = pd.read_feather(prismxPrediction).set_index("index").loc[genes,:]
     geneAUC["prismx"] = calculateGeneAUC(prediction, revLibrary)
     geneAUC.index = uniqueGenes
     setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
