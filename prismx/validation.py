@@ -77,6 +77,8 @@ def benchmarkGMTfast(gmtFile: str, correlationFolder: str, predictionFolder: str
     setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
     return([geneAUC, setAUC])
 
+
+
 def benchmarkGMTfastPx(gmtFile: str, correlationFolder: str, predictionFolder: str, prismxPrediction: str, minLibSize: int=1, intersect: bool=False, verbose=False):
     genes = getGenes(correlationFolder)
     library, revLibrary, uniqueGenes = readGMT(gmtFile, genes, verbose=verbose)
