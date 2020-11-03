@@ -76,3 +76,19 @@ def benchmarkGMTfast(gmtFile: str, correlationFolder: str, predictionFolder: str
     geneAUC.index = uniqueGenes
     setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
     return([geneAUC, setAUC])
+
+def benchmarkGMTfastPx(gmtFile: str, correlationFolder: str, predictionFolder: str, prismxPrediction: str, minLibSize: int=1, intersect: bool=False, verbose=False):
+    genes = getGenes(correlationFolder)
+    library, revLibrary, uniqueGenes = readGMT(gmtFile, genes, verbose=verbose)
+    if intersect:
+        ugenes = list(set(sum(library.values(), [])))
+        genes = list(set(ugenes) & set(genes))
+    uniqueGenes = [x.encode('utf-8') for x in uniqueGenes]
+    prediction_files = os.listdir(predictionFolder)
+    geneAUC = pd.DataFrame()
+    setAUC = pd.DataFrame()
+    prediction = pd.read_feather(prismxPrediction).set_index("index").loc[uniqueGenes,:]
+    geneAUC["prismx"] = calculateGeneAUC(prediction, revLibrary)
+    geneAUC.index = uniqueGenes
+    setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
+    return([geneAUC, setAUC])
