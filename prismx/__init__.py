@@ -16,7 +16,7 @@ from prismx.training import trainModel
 from prismx.utils import getConfig, help, readGMT, normalize
 from prismx.loaddata import listLibraries, loadExpression, loadLibrary, printLibraries, getGenes
 from prismx.prismxprediction import predictGMT, prismxPredictions
-from prismx.validation import benchmarkGMT, benchmarkGMTfast
+from prismx.validation import benchmarkGMT, benchmarkGMTfast, benchmarkGMTfastPx
 
 def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=5000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, correlationSampleCount: int=5000, verbose: bool=True):
     '''
