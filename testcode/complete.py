@@ -13,8 +13,8 @@ t3 = 0
 def runPrismX(clusterCount: int):
     #urllib.request.urlretrieve("https://mssm-seq-matrix.s3.amazonaws.com/mouse_matrix.h5", "mouse_matrix.h5")
     start = time.time()
-    correlationFolder = "correlation_"+str(clusterCount)+"_folder"
-    predictionFolder = "prediction_"+str(clusterCount)+"_folder"
+    correlationFolder = "correlation_"+str(clusterCount)+"_folder_q"
+    predictionFolder = "prediction_"+str(clusterCount)+"_folder_q"
     libs = px.listLibraries()
     gmtFile = px.loadLibrary(libs[110])
     px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=clusterCount, sampleCount=5000, correlationSampleCount=5000, verbose=True)
@@ -122,16 +122,17 @@ plt.close()
 
 import prismx as px
 
-correlationFolder = "correlation_folder"
-predictionFolder = "prediction_folder"
+correlationFolder = "correlation_folder_300_q"
+predictionFolder = "prediction_folder_300_q"
 
 # download/initialize gmt file
 px.printLibraries()
 libs = px.listLibraries()
-gmtFile = px.loadLibrary(libs[110])
+gmtFile = px.loadLibrary(libs[111])
+clusterCount = 300
 
 # apply gene filtering, expression clustering and correlation calculations
-px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=50, sampleCount=5000, 
+px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=clusterCount, sampleCount=5000, 
             correlationSampleCount=5000, verbose=True)
 
 # average correlation scores for a given gmt file
@@ -141,28 +142,28 @@ px.correlationScores(gmtFile, correlationFolder, predictionFolder, verbose=True)
 model = px.trainModel(predictionFolder, correlationFolder, gmtFile, trainingSize=300000, 
             testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
 
+pickle.dump(model, open("gobp_model_"+str(clusterCount)+"_q.pkl", 'wb'))
 
 
-import prismx as px
+outfolder = "prismxresult_q"
 
-# select gmt file
-px.printLibraries()
-libs = px.listLibraries()
 
-gauc= []
-sauc=[]
+gmtFile = px.loadLibrary(libs[111])
+outname = libs[111]
 
-for i in []:
-    gmtFile = px.loadLibrary(libs[63])
-    # set output configuration
-    outname = libs[i]
-    correlationFolder = "correlation_100_folder"
-    predictionFolder = "prediction_100"
-    outfolder = "prismxresult_100"
-    # calculate PrismX predictions with pretrained model
-    px.predictGMT("gobp_model_100.pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=1000, verbose=True)
-    # benchmark the prediction quality
-    geneAUC, setAUC = px.benchmarkGMT(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", verbose=True)
-    gauc.append(geneAUC.iloc[:,-1].mean())
-    sauc.append(setAUC.iloc[:,-1].mean())
+# calculate PrismX predictions with pretrained model
+px.predictGMT("gobp_model_q.pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=1000, verbose=False)
+# benchmark the prediction quality
+geneAUC, setAUC = px.benchmarkGMTfast(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", verbose=True)
+
+
+
+gmtFile = px.loadLibrary(libs[43])
+outname = libs[43]
+
+
+# calculate PrismX predictions with pretrained model
+px.predictGMT("gobp_model_q.pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=1000, verbose=False)
+# benchmark the prediction quality
+geneAUC, setAUC = px.benchmarkGMTfast(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", verbose=True)
 
