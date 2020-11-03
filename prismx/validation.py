@@ -64,7 +64,7 @@ def benchmarkGMTfast(gmtFile: str, correlationFolder: str, predictionFolder: str
     if intersect:
         ugenes = list(set(sum(library.values(), [])))
         genes = list(set(ugenes) & set(genes))
-    genes = [x.encode('utf-8') for x in genes]
+    uniqueGenes = [x.encode('utf-8') for x in uniqueGenes]
     prediction_files = os.listdir(predictionFolder)
     geneAUC = pd.DataFrame()
     setAUC = pd.DataFrame()
