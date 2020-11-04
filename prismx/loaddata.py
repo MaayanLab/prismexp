@@ -17,14 +17,15 @@ def loadExpression(species: str, overwrite: bool = False) -> str :
 def listLibraries():
     return(loadJSON(getConfig()["LIBRARY_LIST_URL"])["library"])
 
-def loadLibrary(library: str, overwrite: bool = False) -> str:
+def loadLibrary(library: str, overwrite: bool = False, verbose: bool = False) -> str:
     if not path.exists(getDataPath()+library or overwrite):
         print("Download Enrichr geneset library")
         urllib.request.urlretrieve(getConfig()["LIBRARY_DOWNLOAD_URL"]+library, getDataPath()+library)
     else:
         print("File cached. To reload use loadLibrary(\""+library+"\", overwrite=True) instead.")
     lib, rlib, ugenes = readGMT(getDataPath()+library)
-    print("# genesets: "+str(len(lib))+"\n# unique genes: "+str(len(ugenes)))
+    if verbose:
+        print("# genesets: "+str(len(lib))+"\n# unique genes: "+str(len(ugenes)))
     return(getDataPath()+library)
 
 def printLibraries():
