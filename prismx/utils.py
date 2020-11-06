@@ -29,13 +29,15 @@ def readGMT(gmtFile: str, backgroundGenes: List[str] = [""], verbose=False) -> L
     file = open(gmtFile, 'r')
     lines = file.readlines()
     library = {}
+    backgroundSet = {}
     if len(backgroundGenes) > 1:
         backgroundGenes = [x.upper() for x in backgroundGenes]
+        backgroundSet = set(backgroundGenes)
     for line in lines:
         sp = line.strip().upper().split("\t")
         sp2 = [re.sub(",.*", "",value) for value in sp[2:]]
         if len(backgroundGenes) > 1:
-            library[sp[0]] = [value for value in sp2 if value in backgroundGenes]
+            library[sp[0]] = list(set(sp2).intersection(backgroundSet))
         else:
             library[sp[0]] = sp2
     ugenes = list(set(list(itertools.chain.from_iterable(library.values()))))
