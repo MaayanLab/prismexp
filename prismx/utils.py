@@ -25,7 +25,7 @@ def quantile_normalize(df: pd.DataFrame) -> pd.DataFrame:
     df_qn = df.rank(method="min").stack().astype(int).map(df_mean).unstack()
     return(df_qn)
 
-def readGMT(gmtFile: str, backgroundGenes: List[str] = [""], verbose=False) -> List:
+def readGMT(gmtFile: str, backgroundGenes: List[str]=[], verbose=False) -> List:
     file = open(gmtFile, 'r')
     lines = file.readlines()
     library = {}
@@ -36,7 +36,7 @@ def readGMT(gmtFile: str, backgroundGenes: List[str] = [""], verbose=False) -> L
     for line in lines:
         sp = line.strip().upper().split("\t")
         sp2 = [re.sub(",.*", "",value) for value in sp[2:]]
-        if len(backgroundGenes) > 1:
+        if len(backgroundGenes) > 2:
             geneset = list(set(sp2).intersection(backgroundSet))
             if len(geneset) > 0:
                 library[sp[0]] = geneset
