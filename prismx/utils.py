@@ -41,7 +41,8 @@ def readGMT(gmtFile: str, backgroundGenes: List[str]=[], verbose=False) -> List:
             if len(geneset) > 0:
                 library[sp[0]] = geneset
         else:
-            library[sp[0]] = sp2
+            if len(sp2) > 0:
+                library[sp[0]] = sp2
     ugenes = list(set(list(itertools.chain.from_iterable(library.values()))))
     ugenes.sort()
     rev_library = {}
