@@ -5,6 +5,7 @@ import math
 import random
 import pickle
 import time
+import multiprocessing
 from typing import List
 from progress.bar import Bar
 from sklearn.ensemble import RandomForestClassifier
@@ -48,4 +49,3 @@ def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.D
         prism[predictions[0].columns[i]] = model.predict_proba(df)[:,1]
         prism.index = predictions[0].index
     return prism
-
