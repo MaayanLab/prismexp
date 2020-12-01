@@ -8,7 +8,7 @@ from progress.bar import Bar
 from prismx.utils import readGMT, loadCorrelation, loadPrediction
 from prismx.loaddata import getGenes
 
-def correlationScores(gmtFile: str, correlationFolder: str, outFolder: str, intersect: bool=False, verbose: bool=False):
+def correlationScoresOld(gmtFile: str, correlationFolder: str, outFolder: str, intersect: bool=False, verbose: bool=False):
     os.makedirs(outFolder, exist_ok=True)
     correlation_files = os.listdir(correlationFolder)
     cct = pd.read_feather(correlationFolder+"/"+correlation_files[0]).set_index("index")
@@ -28,6 +28,32 @@ def correlationScores(gmtFile: str, correlationFolder: str, outFolder: str, inte
     for i in lk:
         getAverageCorrelation(correlationFolder, i, library, outFolder, intersect=intersect, ugenes = ugenes)
         if verbose: bar.next()
+    if verbose: bar.finish()
+
+def correlationScores(gmtFile: str, correlationFolder: str, outFolder: str, intersect: bool=False, verbose: bool=False):
+    os.makedirs(outFolder, exist_ok=True)
+    correlation_files = os.listdir(correlationFolder)
+    cct = pd.read_feather(correlationFolder+"/"+correlation_files[0])
+    backgroundGenes = [x.upper() for x in cct.columns]
+    cct = 0
+    ugenes = []
+    library, revLibrary, uniqueGenes = readGMT(gmtFile, backgroundGenes, verbose=verbose)
+    if intersect:
+        ugenes = list(set(sum(library.values(), [])))
+        ugenes = list(set(ugenes) & set(getGenes(correlationFolder)))
+        if verbose:
+            print("overlapping genes: "+str(len(ugenes)))
+    lk = list(range(0, len(correlation_files)-1))
+    lk.append("global")
+    if verbose: bar = Bar('Processing average correlation', max=len(lk))
+    params = list()
+    for ll in lk:
+        params.append((correlationFolder, ll, library, outFolder, intersect, ugenes))
+    process_pool = multiprocessing.Pool(8)
+    process_pool.starmap(getAverageCorrelation, params)
+    #for i in lk:
+    #    getAverageCorrelation(correlationFolder, i, library, outFolder, intersect=intersect, ugenes = ugenes)
+    #    if verbose: bar.next()
     if verbose: bar.finish()
 
 def getAverageCorrelation(correlationFolder: str, i: int, library: Dict, outFolder: str, intersect: bool=False, ugenes: List=[]):
