@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 from progress.bar import Bar
+import multiprocessing
 
 from prismx.utils import readGMT, loadCorrelation, loadPrediction
 from prismx.loaddata import getGenes
