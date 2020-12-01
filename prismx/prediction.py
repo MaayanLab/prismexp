@@ -34,14 +34,15 @@ def correlationScoresOld(gmtFile: str, correlationFolder: str, outFolder: str, i
 def correlationScores(gmtFile: str, correlationFolder: str, outFolder: str, intersect: bool=False, verbose: bool=False):
     os.makedirs(outFolder, exist_ok=True)
     correlation_files = os.listdir(correlationFolder)
-    cct = pd.read_feather(correlationFolder+"/"+correlation_files[0])
-    backgroundGenes = [x.upper() for x in cct.columns]
+    cct = pd.read_feather(correlationFolder+"/"+correlation_files[0]).set_index("index")
+    backgroundGenes = cct.columns
     cct = 0
     ugenes = []
     library, revLibrary, uniqueGenes = readGMT(gmtFile, backgroundGenes, verbose=verbose)
     if intersect:
         ugenes = list(set(sum(library.values(), [])))
-        ugenes = list(set(ugenes) & set(getGenes(correlationFolder)))
+        ugenes = list(set(ugenes) & set(backgroundGenes))
+        ugenes = [x.encode("UTF-8") for x in ugenes]
         if verbose:
             print("overlapping genes: "+str(len(ugenes)))
     lk = list(range(0, len(correlation_files)-1))
