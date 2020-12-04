@@ -28,7 +28,7 @@ def prismxPredictions(model: str, predictionFolder: str, predictionName: str, ou
         rfrom = i*stepSize
         rto = min((i+1)*stepSize, predictionSize)
         predictions = loadPredictionsRange(predictionFolder, rfrom, rto)
-        makePredictionsRange(model, prism, predictions)
+        prism = makePredictionsRange(model, prism, predictions)
         predictions = 0
         if verbose: bar.next()
     if verbose: bar.finish()
@@ -47,9 +47,7 @@ def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.D
         if verbose:
             print(str(i) + " - " + str(round(time.time()-start)))
         df.fillna(0, inplace=True)
-        print(i)
         predList.append(model.predict_proba(df)[:,1])
-        print("ok")
         #prism[predictions[0].columns[i]] = model.predict_proba(df)[:,1]
     #prism.index = predictions[0].index
     prismTemp = pd.DataFrame(predList).transpose()
@@ -58,8 +56,11 @@ def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.D
     prismTemp.columns = predictions[0].columns
     prismTemp.index = predictions[0].index
     print("got here")
+    print(prism.shape[1])
     if prism.shape[1] == 0:
+        print("was empty")
         prism = prismTemp
     else:
+        print("concat")
         prism = pd.concat(prism, prismTemp, axis=1)
-    return prism
+    return(prism)
