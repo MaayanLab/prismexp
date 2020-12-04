@@ -51,7 +51,10 @@ def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.D
         #prism[predictions[0].columns[i]] = model.predict_proba(df)[:,1]
         #prism.index = predictions[0].index
     prismTemp = pd.DataFrame(predList).transpose()
+    print(prismTemp.shape)
+    print(prism.shape)
     prismTemp.columns = predictions[0].columns
     prismTemp.index = predictions[0].index
+    print("got here")
     prism = pd.concat(prism, prismTemp, axis=1)
     return prism
