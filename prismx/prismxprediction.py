@@ -39,15 +39,8 @@ def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.D
     predList = []
     for i in range(0, predictions[0].shape[1]):
         start = time.time()
-        df = pd.DataFrame()
-        k = 0
-        for pp in predictions:
-            df[k] = pp.iloc[:,i]
-            k = k + 1
-        if verbose:
-            print(str(i) + " - " + str(round(time.time()-start)))
-        df.fillna(0, inplace=True)
-        predList.append(model.predict_proba(df)[:,1])
+        predictions.fillna(0, inplace=True)
+        predList.append(model.predict_proba(predictions)[:,1])
         #prism[predictions[0].columns[i]] = model.predict_proba(df)[:,1]
     #prism.index = predictions[0].index
     prismTemp = pd.DataFrame(predList).transpose()
@@ -64,3 +57,4 @@ def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.D
         print("concat")
         prism = pd.concat(prism, prismTemp, axis=1)
     return(prism)
+
