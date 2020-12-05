@@ -51,7 +51,7 @@ def correlationScores(gmtFile: str, correlationFolder: str, outFolder: str, inte
     params = list()
     for ll in lk:
         params.append((correlationFolder, ll, library, outFolder, intersect, ugenes))
-    process_pool = multiprocessing.Pool(5)
+    process_pool = multiprocessing.Pool(4)
     process_pool.starmap(getAverageCorrelation, params)
     #for i in lk:
     #    getAverageCorrelation(correlationFolder, i, library, outFolder, intersect=intersect, ugenes = ugenes)
