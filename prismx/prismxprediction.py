@@ -54,5 +54,8 @@ def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.D
     if prism.shape[1] == 0:
         prism = prismTemp
     else:
+        print(prism.shape)
+        print(prismTemp.shape)
         prism = pd.concat(prism, prismTemp, axis=1)
+        print(prism.shape)
     return(prism)
