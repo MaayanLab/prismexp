@@ -36,6 +36,7 @@ def readGMT(gmtFile: str, backgroundGenes: List[str]=[], verbose=False) -> List:
     for line in lines:
         sp = line.strip().upper().split("\t")
         sp2 = [re.sub(",.*", "",value) for value in sp[2:]]
+        sp2 = [x for x in sp2 if x] 
         if len(backgroundGenes) > 2:
             geneset = list(set(sp2).intersection(backgroundSet))
             if len(geneset) > 0:
