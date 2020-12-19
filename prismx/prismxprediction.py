@@ -9,6 +9,7 @@ import multiprocessing
 from typing import List
 from progress.bar import Bar
 from sklearn.ensemble import RandomForestClassifier
+from scipy.stats import zscore
 
 from prismx.utils import readGMT, loadCorrelation, loadPrediction
 from prismx.prediction import correlationScores, loadPredictionsRange
@@ -19,7 +20,7 @@ def predictGMT(model, gmtFile: str, correlationFolder: str, predictionFolder: st
     correlationScores(gmtFile, correlationFolder, predictionFolder, intersect=intersect, verbose=verbose)
     prismxPredictions(model, predictionFolder, predictionName, outFolder, stepSize, verbose=verbose)
 
-def prismxPredictions(model: str, predictionFolder: str, predictionName: str, outFolder: str, stepSize: int=500, verbose: bool=False):
+def prismxPredictions(model: str, predictionFolder: str, predictionName: str, outFolder: str, stepSize: int=500, verbose: bool=False, normalize=True):
     predictionSize = loadPrediction(predictionFolder, 0).shape[1]
     prism = pd.DataFrame()
     stepNumber = math.ceil(predictionSize/stepSize)
@@ -32,6 +33,8 @@ def prismxPredictions(model: str, predictionFolder: str, predictionName: str, ou
         predictions = 0
         if verbose: bar.next()
     if verbose: bar.finish()
+    if normalize:
+        prism.prism.apply(zscore)
     prism.reset_index().to_feather(outFolder+"/"+predictionName+".f")
 
 def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.DataFrame], verbose: bool=False) -> pd.DataFrame:
