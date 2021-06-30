@@ -27,9 +27,7 @@ setuptools.setup(
         'scikit-learn',
         'feather-format',
         'h5py',
-        'os',
         'pickle',
-        'typing',
         'progress',
         'qnorm'
     ],
