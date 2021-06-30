@@ -28,7 +28,6 @@ setuptools.setup(
         'feather-format',
         'h5py',
         'os',
-        'itertools',
         'pickle',
         'typing',
         'progress'
