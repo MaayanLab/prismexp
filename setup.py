@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="prismx-lachmann12",
-    version="0.7.",
+    name="prismexp",
+    version="0.1.",
     author="Alexander Lachmann",
     author_email="alexander.lachmann@mssm.edu",
     description="Package to for gene function predictions by unsupervised gene expression partitioning.",
