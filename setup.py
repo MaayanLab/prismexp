@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="prismexp",
+    name="prismx",
     version="0.1.",
     author="Alexander Lachmann",
     author_email="alexander.lachmann@mssm.edu",
