@@ -21,11 +21,11 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
     for i in lk:
         predictions = loadPrediction(predictionFolder, i)
         pred = []
-        keys = [value for value in predictions.columns if value in library.keys()]
+        keys = list(predictions.columns)
         setname = []
         genename = []
         for se in keys:
-            vals = [value for value in backgroundGenes if value in library[se]]
+            vals = library[se]
             for val in vals:
                 setname.append(val)
                 genename.append(se)
@@ -48,7 +48,6 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
     for i in lk:
         predictions = loadPrediction(predictionFolder, i)
         pred = []
-        keys = [value for value in predictions.columns if value in library.keys()]
         setname = []
         genename = []
         for k in range(0,len(samp_set)):
@@ -83,6 +82,4 @@ def trainModel(predictionFolder: str, correlationFolder: str, gmtFile: str, trai
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=testTrainSplit, random_state=randomState)
     model = RandomForestClassifier(random_state=randomState)
     model.fit(X_train, y_train)
-    pred_train = model.predict(X_train)
-    pred_train = model.predict(X_train)
     return(model)
