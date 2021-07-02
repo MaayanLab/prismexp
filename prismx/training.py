@@ -6,6 +6,7 @@ import random
 from typing import List
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from progress.bar import Bar
 
 from prismx.utils import readGMT, loadCorrelation, loadPrediction
 from prismx.prediction import loadPredictions
@@ -18,6 +19,7 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
     df_true = pd.DataFrame()
     lk = list(range(0, len(correlation_files)-1))
     lk.append("global")
+    bar = Bar('Retrieve training data', max=2*len(lk))
     for i in lk:
         predictions = loadPrediction(predictionFolder, i)
         pred = []
@@ -31,6 +33,7 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
                 genename.append(se)
                 pred.append(predictions.loc[val.encode('UTF-8'), se])
         df_true.loc[:,i] = pred
+        bar.next()
     df_true2 = pd.concat([pd.DataFrame(genename), pd.DataFrame(setname),df_true, pd.DataFrame(np.ones(len(setname)))], axis=1)
     samp_set = []
     samp_gene = []
@@ -45,6 +48,7 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
                 samp_set.append(rkey)
                 samp_gene.append(rgene)
     df_false = pd.DataFrame()
+    Bar('Retrieve false samples ', max=len(lk))
     for i in lk:
         predictions = loadPrediction(predictionFolder, i)
         pred = []
@@ -58,6 +62,7 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
             pred.append(predictions.loc[val.encode('UTF-8'), se])
         df_false.loc[:,i] = pred
     df_false2 = pd.concat([pd.DataFrame(setname), pd.DataFrame(genename),df_false,pd.DataFrame(np.zeros(len(setname)))], axis=1)
+    bar.finish()
     return([df_true2, df_false2.iloc[random.sample(range(0, df_false2.shape[0]), falseSampleCount), :]])
 
 def balanceData(df_true: pd.DataFrame, df_false: pd.DataFrame, trueCount: int, falseCount: int) -> str:
