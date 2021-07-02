@@ -24,6 +24,7 @@ def prismxPredictions(model: str, predictionFolder: str, predictionName: str, ou
     predictionSize = loadPrediction(predictionFolder, 0).shape[1]
     prism = pd.DataFrame()
     stepNumber = math.ceil(predictionSize/stepSize)
+    model = pickle.load(open(model, 'rb'))
     if verbose: bar = Bar('Processing predictions', max=stepNumber)
     for i in range(0, stepNumber):
         rfrom = i*stepSize
@@ -38,7 +39,7 @@ def prismxPredictions(model: str, predictionFolder: str, predictionName: str, ou
     prism.reset_index().to_feather(outFolder+"/"+predictionName+".f")
 
 def makePredictionsRange(model: str, prism: pd.DataFrame, predictions: List[pd.DataFrame], verbose: bool=False) -> pd.DataFrame:
-    model = pickle.load(open(model, 'rb'))
+    
     predList = []
     for i in range(0, predictions[0].shape[1]):
         start = time.time()
