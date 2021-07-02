@@ -61,6 +61,7 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
             genename.append(val)
             pred.append(predictions.loc[val.encode('UTF-8'), se])
         df_false.loc[:,i] = pred
+        bar.next()
     df_false2 = pd.concat([pd.DataFrame(setname), pd.DataFrame(genename),df_false,pd.DataFrame(np.zeros(len(setname)))], axis=1)
     bar.finish()
     return([df_true2, df_false2.iloc[random.sample(range(0, df_false2.shape[0]), falseSampleCount), :]])
