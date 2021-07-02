@@ -19,7 +19,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     package_data={
-        "data": ["*"]
+        "data": ["data/*"]
     },
     install_requires=[
         'pandas',
