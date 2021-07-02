@@ -85,7 +85,7 @@ def help():
         data = f.read()
         print(data)
 
-def normalize(exp: pd.DataFrame, stepSize: int=2000, transpose: bool=False) -> pd.DataFrame:
+def normalize(exp: pd.DataFrame, transpose: bool=False) -> pd.DataFrame:
     if transpose: exp = exp.transpose()
     exp = pd.DataFrame(np.log2(exp+1))
     exp = qnorm.quantile_normalize(exp)

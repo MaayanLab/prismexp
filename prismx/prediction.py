@@ -68,7 +68,7 @@ def getAverageCorrelation(correlationFolder: str, i: int, library: Dict, outFold
             preds.append(correlation.loc[:, library[ll]].mean(axis=1))
     predictions = pd.concat(preds, axis=1)
     predictions.columns = list(library.keys())
-    predictions = pd.DataFrame(predictions.fillna(0), dtype=np.float32)
+    predictions = pd.DataFrame(predictions.fillna(0), dtype=np.float16)
     predictions = predictions.reset_index()
     predictions.columns = predictions.columns.astype(str)
     predictions.to_feather(outFolder+"/prediction_"+str(i)+".f")
