@@ -7,7 +7,6 @@ from typing import List
 import sys
 
 from prismx.utils import quantile_normalize, normalize
-from prismx.filter import hykGeneSelection
 
 np.seterr(divide='ignore', invalid='ignore')
 
@@ -36,7 +35,7 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
         if maxSampleCount > 2: samplesidx = random.sample(set(samplesidx), min(len(samplesidx), maxSampleCount))
     samplesidx.sort()
     exp = expression[geneidx,:][:, samplesidx]
-    qq = normalize(exp, transpose=True)
+    qq = normalize(exp, transpose=False)
     exp = 0
     cc = np.corrcoef(qq)
     cc = cc.astype(np.float32)
