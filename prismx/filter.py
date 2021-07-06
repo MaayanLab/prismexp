@@ -22,10 +22,10 @@ def filterGenes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.01,
     '''
     f = h5.File(h5file, 'r')
     expression = f['data/expression']
-    filterSamples = min(expression.shape[1], filterSamples)
-    rsamples = sorted(random.sample(range(0, expression.shape[1]), filterSamples))
+    filterSamples = min(expression.shape[0], filterSamples)
+    rsamples = sorted(random.sample(range(expression.shape[1]), filterSamples))
     exp = pd.DataFrame(expression[:, rsamples])
-    kk = exp[exp > readThreshold].count()
+    kk = exp[exp > readThreshold].count(axis=1)
     f.close()
     return([idx for idx, val in enumerate(kk) if val >= len(rsamples)*sampleThreshold])
 
