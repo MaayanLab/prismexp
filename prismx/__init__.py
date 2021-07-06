@@ -56,6 +56,8 @@ def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=
         corMat.reset_index().to_feather(outputFolder+"/correlation_"+str(mats[i])+".f")
         j = j+1
         if verbose: bar.next()
+    elapsed = round((time.time()-tstart)/60,2)
+    if verbose: print("   -> completed in "+str(elapsed)+"min")
     if verbose: bar.finish()
 
 def testData() -> str:

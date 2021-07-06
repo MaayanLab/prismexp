@@ -22,8 +22,8 @@ def filterGenes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.01,
     '''
     f = h5.File(h5file, 'r')
     expression = f['data/expression']
-    genes = f['meta/genes']
-    samples = f['meta/Sample_geo_accession']
+    genes = f['meta/genes/genes']
+    samples = f['meta/samples/geo_accession']
     filterSamples = min(len(samples), filterSamples)
     rsamples = random.sample(range(0, len(samples)), filterSamples)
     rsamples.sort()
