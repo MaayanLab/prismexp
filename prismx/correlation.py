@@ -70,7 +70,7 @@ def createClustering(h5file: str, geneidx: List[int], geneCount: int=500, cluste
     exp = expression[genes, :]
     f.close()
     qq = normalize(exp, transpose=False)
-    qq = zscore(qq, axis=0)
+    qq = zscore(qq, axis=1).fillna(0)
     exp = 0
     kmeans = KMeans(n_clusters=clusterCount, random_state=42).fit(qq.transpose())
     qq = 0      # keep memory footprint low
