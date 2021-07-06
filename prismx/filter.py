@@ -8,7 +8,7 @@ from sklearn.cluster import KMeans
 from prismx.utils import normalize
 
 
-def filterGenes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=1000) -> List[int]:
+def filterGenes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.02, filterSamples: int=2000) -> List[int]:
     '''
     Returns filtered genes with sufficient read support
         Parameters:
