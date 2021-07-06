@@ -26,8 +26,8 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
     '''
     f = h5.File(h5file, 'r')
     expression = f['data/expression']
-    samples = f['meta/Sample_geo_accession']
-    genes = f['meta/genes']
+    samples = f['meta/samples/geo_accession']
+    genes = f['meta/genes/genes']
     if clusterID == "global":
         globalSampleCount = min(globalSampleCount, len(samples))
         samplesidx = random.sample(range(0, len(samples)), globalSampleCount)
@@ -35,7 +35,7 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
         samplesidx = np.where(clustering.loc[:,"clusterID"] == int(clusterID))[0]
         if maxSampleCount > 2: samplesidx = random.sample(set(samplesidx), min(len(samplesidx), maxSampleCount))
     samplesidx.sort()
-    exp = expression[samplesidx,:][:, geneidx]
+    exp = expression[geneidx,:][:, samplesidx]
     qq = normalize(exp, transpose=True)
     exp = 0
     cc = np.corrcoef(qq)
