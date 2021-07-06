@@ -5,10 +5,10 @@ import random
 import numpy as np
 from sklearn.cluster import KMeans
 
-from prismx.utils import quantile_normalize, normalize
+from prismx.utils import normalize
 
 
-def filterGenes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000) -> List[int]:
+def filterGenes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=1000) -> List[int]:
     '''
     Returns filtered genes with sufficient read support
         Parameters:
@@ -28,7 +28,7 @@ def filterGenes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.01,
     kk = exp[exp > readThreshold].count(axis=1)
     del exp
     f.close()
-    return([idx for idx, val in enumerate(kk) if val >= len(rsamples)*sampleThreshold])
+    return([idx for idx, val in enumerate(kk) if val >= len(random_samples)*sampleThreshold])
 
 def geneClustering(h5file: str, geneidx: List[int], clusterCount: int=100, sampleCount: int=3000) -> pd.DataFrame:
     '''
