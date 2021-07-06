@@ -1,4 +1,5 @@
 from sklearn.cluster import KMeans
+from scipy.stats import zscore
 import h5py as h5
 import numpy as np
 import pandas as pd
@@ -48,7 +49,7 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
     return(correlation)
 
-def createClustering(h5file: str, geneidx: List[int], geneCount: int=500, clusterCount: int=50) -> pd.DataFrame:
+def createClustering(h5file: str, geneidx: List[int], geneCount: int=500, clusterCount: int=50, deterministic: bool=True) -> pd.DataFrame:
     '''
     Returns cluster association for all samples in input expression h5 file
 
@@ -60,15 +61,16 @@ def createClustering(h5file: str, geneidx: List[int], geneCount: int=500, cluste
             Returns:
                     sample cluster mapping (pandas.DataFrame)
     '''
+    if deterministic:
+        random.seed(42)
     f = h5.File(h5file, 'r')
     expression = f['data/expression']
     samples = list(f['meta/samples/geo_accession'])
-    genes = random.sample(geneidx, geneCount)
-    genes.sort()
-    exp = 0     # keep memory footprint low
+    genes = sorted(random.sample(geneidx, geneCount))
     exp = expression[genes, :]
     f.close()
     qq = normalize(exp, transpose=False)
+    qq = zscore(qq, axis=0)
     exp = 0
     kmeans = KMeans(n_clusters=clusterCount, random_state=42).fit(qq.transpose())
     qq = 0      # keep memory footprint low
