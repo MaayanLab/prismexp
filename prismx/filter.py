@@ -42,8 +42,8 @@ def geneClustering(h5file: str, geneidx: List[int], clusterCount: int=100, sampl
     '''
     f = h5.File(h5file, 'r')
     expression = f['data/expression']
-    samples = f['meta/Sample_geo_accession']
-    genes = f['meta/genes']
+    samples = f['meta/samples/geo_accession']
+    genes = f['meta/genes/genes']
     sampleCount = min(len(samples), sampleCount)
     clusterCount = min(len(genes), clusterCount)
     sampleidx = random.sample(range(0, len(samples)), sampleCount)
