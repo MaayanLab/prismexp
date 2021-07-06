@@ -11,7 +11,7 @@ from prismx.utils import quantile_normalize, normalize
 
 np.seterr(divide='ignore', invalid='ignore')
 
-def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[int], clusterID: str="global", globalSampleCount: int=5000, maxSampleCount: int=2000) -> List:
+def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[int], clusterID: str="global", maxSampleCount: int=2000) -> List:
     '''
     Returns correlation matrix for specified samples
 
@@ -25,26 +25,25 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
                     average sample correlation
     '''
     f = h5.File(h5file, 'r')
-    expression = f['data/expression']
     samples = f['meta/samples/geo_accession']
     genes = f['meta/genes/genes']
     if clusterID == "global":
-        globalSampleCount = min(globalSampleCount, len(samples))
-        samplesidx = random.sample(range(0, len(samples)), globalSampleCount)
+        globalSampleCount = min(maxSampleCount, len(samples))
+        samplesidx = random.sample(range(len(samples)), globalSampleCount)
     else:
         samplesidx = np.where(clustering.loc[:,"clusterID"] == int(clusterID))[0]
         if maxSampleCount > 2: samplesidx = random.sample(set(samplesidx), min(len(samplesidx), maxSampleCount))
     samplesidx.sort()
-    exp = expression[geneidx,:][:, samplesidx]
+    exp = f['data/expression'][geneidx,:][:, samplesidx]
     qq = normalize(exp, transpose=False)
     exp = 0
     cc = np.corrcoef(qq)
-    cc = cc.astype(np.float32)
     qq = 0
     correlation = pd.DataFrame(cc, index=genes[geneidx], columns=genes[geneidx], dtype=np.float16)
     correlation.index = [x.upper() for x in genes[geneidx]]
     correlation.columns = [x.upper() for x in genes[geneidx]]
     cc = 0
+    f.close()
     correlation = correlation.fillna(0)
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
     return(correlation)
