@@ -12,10 +12,10 @@ from typing import List
 from prismx.filter import filterGenes
 from prismx.correlation import createClustering, calculateCorrelation
 from prismx.feature import correlation_scores
-from prismx.training import train_model
+from prismx.training import train
 from prismx.utils import get_config, help, read_gmt, normalize
 from prismx.loaddata import list_libraries, download_expression, load_library, print_libraries, get_genes
-from prismx.prediction import predict_gmt, prismx_predictions
+from prismx.prediction import predict, prismx_predictions
 from prismx.validation import benchmarkGMT, benchmarkGMTfast, benchmarkGMTfastPx
 
 def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, verbose: bool=True):

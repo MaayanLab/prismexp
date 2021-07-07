@@ -81,7 +81,7 @@ def balance_data(df_true: pd.DataFrame, df_false: pd.DataFrame, true_count: int,
     y = df_combined.iloc[:,df_combined.shape[1]-1]
     return(X, y)
 
-def train_model(workdir: str, gmt_file: str, training_size: int=200000, test_train_split: float=0.1, sample_positive: int=20000, sample_negative: int=80000, random_state: int=42, verbose: bool=False):
+def train(workdir: str, gmt_file: str, training_size: int=200000, test_train_split: float=0.1, sample_positive: int=20000, sample_negative: int=80000, random_state: int=42, verbose: bool=False):
     df_true, df_false = create_training_data(workdir, gmt_file, training_size)
     X, y = balance_data(df_true, df_false, sample_positive, sample_negative)
     true_count = np.sum(y)

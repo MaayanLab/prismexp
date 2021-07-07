@@ -14,7 +14,7 @@ from scipy.stats import zscore
 from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.feature import correlation_scores, load_features_range
 
-def predict_gmt(model, gmt_file: str, workdir: str, prediction_name: str, step_size: int=500, intersect: bool=False, verbose: bool=False):
+def predict(model, gmt_file: str, workdir: str, prediction_name: str, step_size: int=500, intersect: bool=False, verbose: bool=False):
     correlation_scores(gmt_file, workdir, intersect=intersect, verbose=verbose)
     prismx_predictions(model, workdir, prediction_name, step_size, verbose=verbose)
 
