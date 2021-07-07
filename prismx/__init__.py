@@ -18,7 +18,7 @@ from prismx.loaddata import listLibraries, loadExpression, loadLibrary, printLib
 from prismx.prismxprediction import predictGMT, prismxPredictions
 from prismx.validation import benchmarkGMT, benchmarkGMTfast, benchmarkGMTfastPx
 
-def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, correlationSampleCount: int=5000, verbose: bool=True):
+def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, correlationSampleCount: int=5000, verbose: bool=True):
     '''
     Write a set of correlation matrices, by partitioning gene expression into clusters and applying Pearson
     correlation for pairs of genes. It will also create an additional matrix for global correlation.
@@ -45,13 +45,13 @@ def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=
     if verbose: print("   -> completed in "+str(elapsed)+"min")
     if verbose: print("3. Calcualate "+str(clusterCount)+" correlation matrices")
     tstart = time.time()
-    mats = list(range(0, clusterCount))
+    mats = list(range(clusterCount))
     mats.append("global")
     j = 0
     os.makedirs(outputFolder+"/correlation", exist_ok=True)
     if verbose: bar = Bar('Processing correlation', max=len(mats))
     for i in range(0, len(mats)):
-        cor_mat = calculateCorrelation(h5file, clustering, filteredGenes, clusterID=mats[i], globalSampleCount=sampleCount, maxSampleCount=correlationSampleCount)
+        cor_mat = calculateCorrelation(h5file, clustering, filteredGenes, clusterID=mats[i], maxSampleCount=correlationSampleCount)
         cor_mat.columns = cor_mat.columns.astype(str)
         cor_mat.reset_index().to_feather(outputFolder+"/correlation/correlation_"+str(mats[i])+".f")
         j = j+1
