@@ -14,9 +14,11 @@ from scipy.stats import zscore
 from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.feature import correlation_scores, load_features_range
 
-def predict(model, gmt_file: str, workdir: str, prediction_name: str, step_size: int=500, intersect: bool=False, verbose: bool=False):
+def predict(workdir: str, gmt_file: str, model=0, step_size: int=500, intersect: bool=False, verbose: bool=False):
+    if model == 0:
+        model = pickle.load(workdir+"/model.pkl")
     correlation_scores(gmt_file, workdir, intersect=intersect, verbose=verbose)
-    prismx_predictions(model, workdir, prediction_name, step_size, verbose=verbose)
+    prismx_predictions(model, workdir, os.path.basename(gmt_file), step_size, verbose=verbose)
 
 def prismx_predictions(model: str, workdir: str, prediction_name: str, step_size: int=500, verbose: bool=False, normalize=True):
     os.makedirs(workdir+"/predictions", exist_ok=True)
