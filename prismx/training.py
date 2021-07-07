@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from progress.bar import Bar
 
-from prismx.utils import read_gmt, load_correlation, loadPrediction
+from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.feature import load_features
 
 def createTrainingData(workdir: str, gmt_file: str, falseSampleCount: int=50000) -> List:
