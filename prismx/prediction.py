@@ -50,7 +50,7 @@ def make_predictions_range(model: str, prism: pd.DataFrame, predictions: List[pd
         if verbose:
             print(str(i) + " - " + str(round(time.time()-start)))
         df.fillna(0, inplace=True)
-        pred_list.append(model.predict_proba(df)[:,1])
+        pred_list.append(model.predict(df))
     prism_temp = pd.DataFrame(pred_list).transpose()
     prism_temp.columns = predictions[0].columns
     prism_temp.index = predictions[0].index
