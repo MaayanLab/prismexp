@@ -10,7 +10,7 @@ from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.loaddata import get_genes
 
 
-def correlation_scores(gmt_file: str, workdir: str, intersect: bool=False, verbose: bool=False):
+def correlation_scores(gmt_file: str, workdir: str, intersect: bool=False, threads: int=4, verbose: bool=False):
     os.makedirs(workdir+"/features", exist_ok=True)
     correlation_files = os.listdir(workdir+"/correlation")
     cct = load_correlation(workdir, 0)
@@ -30,7 +30,7 @@ def correlation_scores(gmt_file: str, workdir: str, intersect: bool=False, verbo
     params = list()
     for ll in lk:
         params.append((workdir, ll, library, intersect, ugenes))
-    process_pool = multiprocessing.Pool(4)
+    process_pool = multiprocessing.Pool(threads)
     process_pool.starmap(get_average_correlation, params)
     if verbose: bar.finish()
 
