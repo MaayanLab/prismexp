@@ -52,7 +52,7 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
     df_false = pd.DataFrame()
     Bar('Retrieve false samples ', max=len(lk))
     for i in lk:
-        feature = load_features(workdir, i)
+        feature = load_feature(workdir, i)
         features = []
         setname = []
         genename = []
