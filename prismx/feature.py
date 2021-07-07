@@ -13,7 +13,7 @@ from prismx.loaddata import get_genes
 def correlation_scores(gmt_file: str, workdir: str, intersect: bool=False, verbose: bool=False):
     os.makedirs(workdir+"/features", exist_ok=True)
     correlation_files = os.listdir(workdir+"/correlation")
-    cct = pd.read_feather(workdir+"/correlation/"+correlation_files[0]).set_index("index")
+    cct = load_correlation(workdir, 0)
     background_genes = cct.columns
     cct = 0
     ugenes = []
@@ -35,7 +35,7 @@ def correlation_scores(gmt_file: str, workdir: str, intersect: bool=False, verbo
     if verbose: bar.finish()
 
 def get_average_correlation(workdir: str, i: int, library: Dict, intersect: bool=False, ugenes: List=[]):
-    correlation = load_correlation(workdir+"/correlation", i)
+    correlation = load_correlation(workdir, i)
     preds = []
     for ll in list(library.keys()):
         if intersect:
