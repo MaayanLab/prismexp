@@ -11,7 +11,7 @@ from progress.bar import Bar
 from sklearn.ensemble import RandomForestClassifier
 from scipy.stats import zscore
 
-from prismx.utils import read_gmt, load_correlation, load_features
+from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.feature import correlation_scores, load_features_range
 
 def predict_gmt(model, gmt_file: str, workdir: str, prediction_name: str, step_size: int=500, intersect: bool=False, verbose: bool=False):
@@ -20,7 +20,7 @@ def predict_gmt(model, gmt_file: str, workdir: str, prediction_name: str, step_s
 
 def prismx_predictions(model: str, workdir: str, prediction_name: str, step_size: int=500, verbose: bool=False, normalize=True):
     os.makedirs(workdir+"/predictions", exist_ok=True)
-    prediction_size = load_features(workdir, 0).shape[1]
+    prediction_size = load_feature(workdir, 0).shape[1]
     prism = pd.DataFrame()
     step_number = math.ceil(prediction_size/step_size)
     model = pickle.load(open(model, 'rb'))
