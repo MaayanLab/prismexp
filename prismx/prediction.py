@@ -12,12 +12,12 @@ from sklearn.ensemble import RandomForestClassifier
 from scipy.stats import zscore
 
 from prismx.utils import read_gmt, load_correlation, load_feature
-from prismx.feature import correlation_scores, load_features_range
+from prismx.feature import features, load_features_range
 
 def predict(workdir: str, gmt_file: str, model=0, step_size: int=500, intersect: bool=False, verbose: bool=False):
     if model == 0:
         model = pickle.load(open(workdir+"/model.pkl", "rb"))
-    correlation_scores(gmt_file, workdir, intersect=intersect, verbose=verbose)
+    features(gmt_file, workdir, intersect=intersect, verbose=verbose)
     prismx_predictions(model, workdir, os.path.basename(gmt_file), step_size, verbose=verbose)
 
 def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int=500, verbose: bool=False, normalize=True):
