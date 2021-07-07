@@ -16,7 +16,7 @@ from prismx.feature import correlation_scores, load_features_range
 
 def predict(workdir: str, gmt_file: str, model=0, step_size: int=500, intersect: bool=False, verbose: bool=False):
     if model == 0:
-        model = pickle.load(workdir+"/model.pkl")
+        model = pickle.load(workdir+"/model.pkl", "rb")
     correlation_scores(gmt_file, workdir, intersect=intersect, verbose=verbose)
     prismx_predictions(model, workdir, os.path.basename(gmt_file), step_size, verbose=verbose)
 
