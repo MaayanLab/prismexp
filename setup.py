@@ -29,7 +29,8 @@ setuptools.setup(
         'feather-format',
         'h5py',
         'progress',
-        'qnorm'
+        'qnorm',
+        'lightgbm'
     ],
     python_requires='>=3.6',
 )
