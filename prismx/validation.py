@@ -4,7 +4,7 @@ from typing import Dict, List
 from progress.bar import Bar
 import os
 import pickle
-from prismx.utils import read_gmt, load_correlation, loadPrediction
+from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.loaddata import get_genes
 
 def calculateSetAUC(prediction: pd.DataFrame, library: Dict, minLibSize: int=1) -> pd.DataFrame:
