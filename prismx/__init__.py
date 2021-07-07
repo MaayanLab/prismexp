@@ -12,7 +12,7 @@ from typing import List
 from prismx.filter import filterGenes
 from prismx.correlation import createClustering, calculateCorrelation
 from prismx.feature import correlation_scores
-from prismx.training import trainModel
+from prismx.training import train_model
 from prismx.utils import get_config, help, read_gmt, normalize
 from prismx.loaddata import list_libraries, download_expression, load_library, print_libraries, get_genes
 from prismx.prediction import predict_gmt, prismx_predictions
