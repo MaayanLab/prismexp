@@ -18,6 +18,7 @@ from prismx.loaddata import listLibraries, loadExpression, loadLibrary, printLib
 from prismx.prismxprediction import predictGMT, prismxPredictions
 from prismx.validation import benchmarkGMT, benchmarkGMTfast, benchmarkGMTfastPx
 
+
 def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, verbose: bool=True):
     '''
     Write a set of correlation matrices, by partitioning gene expression into clusters and applying Pearson
