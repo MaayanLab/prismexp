@@ -10,7 +10,7 @@ from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.loaddata import get_genes
 
 
-def correlation_scores(gmt_file: str, workdir: str, intersect: bool=False, threads: int=4, verbose: bool=False):
+def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=4, verbose: bool=False):
     os.makedirs(workdir+"/features", exist_ok=True)
     correlation_files = os.listdir(workdir+"/correlation")
     cct = load_correlation(workdir, 0)

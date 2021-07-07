@@ -11,7 +11,7 @@ from typing import List
 
 from prismx.filter import filterGenes
 from prismx.correlation import createClustering, calculateCorrelation
-from prismx.feature import correlation_scores
+from prismx.feature import features
 from prismx.training import train
 from prismx.utils import get_config, help, read_gmt, normalize
 from prismx.loaddata import list_libraries, download_expression, load_library, print_libraries, get_genes

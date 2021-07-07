@@ -20,12 +20,11 @@ def predict(workdir: str, gmt_file: str, model=0, step_size: int=500, intersect:
     correlation_scores(gmt_file, workdir, intersect=intersect, verbose=verbose)
     prismx_predictions(model, workdir, os.path.basename(gmt_file), step_size, verbose=verbose)
 
-def prismx_predictions(model: str, workdir: str, prediction_name: str, step_size: int=500, verbose: bool=False, normalize=True):
+def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int=500, verbose: bool=False, normalize=True):
     os.makedirs(workdir+"/predictions", exist_ok=True)
     prediction_size = load_feature(workdir, 0).shape[1]
     prism = pd.DataFrame()
     step_number = math.ceil(prediction_size/step_size)
-    model = pickle.load(open(model, 'rb'))
     if verbose: bar = Bar('Processing predictions', max=step_number)
     for i in range(0, step_number):
         rfrom = i*step_size
