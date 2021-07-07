@@ -23,7 +23,7 @@ def runPrismX():
     px.correlation_scores(gmt_file, correlationFolder, predictionFolder, verbose=True)
     t2 = time.time()-start
     print("T2: "+str(t2))
-    model = px.trainModel(predictionFolder, correlationFolder, gmt_file, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
+    model = px.trainModel(predictionFolder, correlationFolder, gmt_file, training_size=300000, test_train_split=0.1, sample_positive=40000, sample_negative=200000, random_state=42, verbose=True)
     pickle.dump(model, open("gobp_model_300.pkl", 'wb'))
     t3 = time.time() - start
     print("T3: "+str(t3))
@@ -138,8 +138,8 @@ px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=
 px.correlation_scores(gmt_file, correlationFolder, predictionFolder, verbose=True)
 
 # build a training data set and train model
-model = px.trainModel(predictionFolder, correlationFolder, gmt_file, trainingSize=300000, 
-            testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
+model = px.trainModel(predictionFolder, correlationFolder, gmt_file, training_size=300000, 
+            test_train_split=0.1, sample_positive=40000, sample_negative=200000, random_state=42, verbose=True)
 
 
 

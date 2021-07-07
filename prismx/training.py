@@ -3,17 +3,19 @@ import numpy as np
 import os
 import math
 import random
+import pickle
 from typing import List, Tuple
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from lightgbm import LGBMRegressor
 from progress.bar import Bar
 
 from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.feature import load_features
 
-def createTrainingData(workdir: str, gmt_file: str, falseSampleCount: int=50000) -> List:
+def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50000) -> List:
     correlation_files = os.listdir(workdir+"/correlation")
-    correlation = load_correlation(workdir+"/correlation", 0)
+    correlation = load_correlation(workdir, 0)
     background_genes = list(correlation.columns)
     library, rev_library, ugenes = read_gmt(gmt_file, background_genes)
     df_true = pd.DataFrame()
@@ -38,11 +40,11 @@ def createTrainingData(workdir: str, gmt_file: str, falseSampleCount: int=50000)
     samp_set = []
     samp_gene = []
     npw = np.array(df_true2.iloc[:, 0])
-    falseGeneCount = math.ceil(falseSampleCount/len(background_genes))
+    false_gene_count = math.ceil(false_sample_count/len(background_genes))
     for i in background_genes:
         rkey = random.sample(keys,1)[0]
         ww = np.where(npw == rkey)[0]
-        for j in range(0, falseGeneCount):
+        for j in range(0, false_gene_count):
             rgene = random.sample(background_genes,1)[0]
             if rgene not in df_true2.iloc[ww, 1]:
                 samp_set.append(rkey)
@@ -64,14 +66,14 @@ def createTrainingData(workdir: str, gmt_file: str, falseSampleCount: int=50000)
         bar.next()
     df_false2 = pd.concat([pd.DataFrame(setname), pd.DataFrame(genename),df_false,pd.DataFrame(np.zeros(len(setname)))], axis=1)
     bar.finish()
-    return([df_true2, df_false2.iloc[random.sample(range(0, df_false2.shape[0]), falseSampleCount), :]])
+    return([df_true2, df_false2.iloc[random.sample(range(0, df_false2.shape[0]), false_sample_count), :]])
 
-def balanceData(df_true: pd.DataFrame, df_false: pd.DataFrame, trueCount: int, falseCount: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    trueCount = min(trueCount, df_true.shape[0])
-    falseCount = min(falseCount, df_false.shape[0])
-    rtrue = random.sample(list(range(0, df_true.shape[0])), trueCount)
+def balance_data(df_true: pd.DataFrame, df_false: pd.DataFrame, true_count: int, false_count: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    true_count = min(true_count, df_true.shape[0])
+    false_count = min(false_count, df_false.shape[0])
+    rtrue = random.sample(list(range(0, df_true.shape[0])), true_count)
     rtrue.sort()
-    rfalse = random.sample(list(range(0, df_false.shape[0])), falseCount)
+    rfalse = random.sample(list(range(0, df_false.shape[0])), false_count)
     rfalse.sort()
     df_combined = pd.concat([df_true.iloc[rtrue,:], df_false.iloc[rfalse,:]])
     df_combined = df_combined.reset_index()
@@ -79,13 +81,16 @@ def balanceData(df_true: pd.DataFrame, df_false: pd.DataFrame, trueCount: int, f
     y = df_combined.iloc[:,df_combined.shape[1]-1]
     return(X, y)
 
-def trainModel(workdir: str, gmt_file: str, trainingSize: int=200000, testTrainSplit: float=0.1, samplePositive: int=20000, sampleNegative: int=80000, randomState: int=42, verbose: bool=False):
-    df_true, df_false = createTrainingData(workdir, gmt_file, trainingSize)
-    X, y = balanceData(df_true, df_false, samplePositive, sampleNegative)
-    trueCount = np.sum(y)
-    falseCount = len(y)-trueCount
-    if verbose: print("positive samples: "+str(round(trueCount))+"\nnegative samples: "+str(round(falseCount)))
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=testTrainSplit, random_state=randomState)
-    model = RandomForestClassifier(random_state=randomState)
+def train_model(workdir: str, gmt_file: str, training_size: int=200000, test_train_split: float=0.1, sample_positive: int=20000, sample_negative: int=80000, random_state: int=42, verbose: bool=False):
+    df_true, df_false = create_training_data(workdir, gmt_file, training_size)
+    X, y = balance_data(df_true, df_false, sample_positive, sample_negative)
+    true_count = np.sum(y)
+    false_count = len(y)-true_count
+    if verbose: print("positive samples: "+str(round(true_count))+"\nnegative samples: "+str(round(false_count)))
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_train_split, random_state=random_state)
+    model = LGBMRegressor(seed=42)
     model.fit(X_train, y_train)
+    pickle.dump(model, open(workdir+"/model.pkl", 'wb'))
+    #model = RandomForestClassifier(random_state=random_state)
+    #model.fit(X_train, y_train)
     return(model)

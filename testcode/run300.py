@@ -20,7 +20,7 @@ libs = px.list_libraries()
 gmt_file = px.load_library(libs[111], overwrite=True)
 #px.correlation_scores(gmt_file, correlationFolder, predictionFolder, verbose=True)
 
-#model = px.trainModel(predictionFolder, correlationFolder, gmt_file, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
+#model = px.trainModel(predictionFolder, correlationFolder, gmt_file, training_size=300000, test_train_split=0.1, sample_positive=40000, sample_negative=200000, random_state=42, verbose=True)
 #pickle.dump(model, open("gobp_model_300.pkl", 'wb'))
 
 
