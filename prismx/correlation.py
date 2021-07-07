@@ -28,8 +28,7 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
     samples = f['meta/samples/geo_accession']
     genes = f['meta/genes/genes']
     if clusterID == "global":
-        globalSampleCount = min(maxSampleCount, len(samples))
-        samplesidx = sorted(random.sample(range(len(samples)), globalSampleCount))
+        samplesidx = sorted(random.sample(range(len(samples)), min(maxSampleCount, len(samples))))
     else:
         samplesidx = np.where(clustering.loc[:,"clusterID"] == int(clusterID))[0]
         if maxSampleCount > 2: samplesidx = sorted(random.sample(set(samplesidx), min(len(samplesidx), maxSampleCount)))
@@ -37,13 +36,13 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
     qq = normalize(exp, transpose=False)
     exp = 0
     cc = np.corrcoef(qq)
+    cc = np.nan_to_num(cc)
     qq = 0
     correlation = pd.DataFrame(cc, index=genes[geneidx], columns=genes[geneidx], dtype=np.float16)
     correlation.index = [x.upper() for x in genes[geneidx]]
     correlation.columns = [x.upper() for x in genes[geneidx]]
     f.close()
     cc = 0
-    correlation = correlation.fillna(0)
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
     return(correlation)
 
