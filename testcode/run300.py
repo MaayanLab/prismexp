@@ -16,11 +16,11 @@ clustn = 300
 
 #px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=clustn, sampleCount=5000, correlationSampleCount=5000, verbose=True)
 
-libs = px.listLibraries()
-gmtFile = px.loadLibrary(libs[111], overwrite=True)
-#px.correlationScores(gmtFile, correlationFolder, predictionFolder, verbose=True)
+libs = px.list_libraries()
+gmt_file = px.load_library(libs[111], overwrite=True)
+#px.correlation_scores(gmt_file, correlationFolder, predictionFolder, verbose=True)
 
-#model = px.trainModel(predictionFolder, correlationFolder, gmtFile, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
+#model = px.trainModel(predictionFolder, correlationFolder, gmt_file, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
 #pickle.dump(model, open("gobp_model_300.pkl", 'wb'))
 
 
@@ -34,16 +34,16 @@ newlibs = newlibs[50:60]
 for i in range(0, len(newlibs)):
     try:
         print(newlibs[i])
-        gmtFile = px.loadLibrary(newlibs[i])
+        gmt_file = px.load_library(newlibs[i])
         print("loaded")
-        g1, g2, g3 = px.readGMT(gmtFile)
+        g1, g2, g3 = px.read_gmt(gmt_file)
         # set output configuration
         outname = newlibs[i]
         if len(g1) < 14000:
             # calculate PrismX predictions with pretrained model
-            px.predictGMT("gobp_model_"+str(clustn)+".pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=200, intersect=True, verbose=True)
+            px.predict_gmt("gobp_model_"+str(clustn)+".pkl", gmt_file, correlationFolder, predictionFolder, outfolder, outname, step_size=200, intersect=True, verbose=True)
             # benchmark the prediction quality
-            geneAUC, setAUC = px.benchmarkGMTfast(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
+            geneAUC, setAUC = px.benchmarkGMTfast(gmt_file, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
             gv = geneAUC.iloc[:,1].mean()
             sv = setAUC.iloc[:,1].mean()
             gl_gv = geneAUC.iloc[:,0].mean()

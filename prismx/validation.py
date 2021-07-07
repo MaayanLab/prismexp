@@ -4,8 +4,8 @@ from typing import Dict, List
 from progress.bar import Bar
 import os
 import pickle
-from prismx.utils import readGMT, loadCorrelation, loadPrediction
-from prismx.loaddata import getGenes
+from prismx.utils import read_gmt, load_correlation, loadPrediction
+from prismx.loaddata import get_genes
 
 def calculateSetAUC(prediction: pd.DataFrame, library: Dict, minLibSize: int=1) -> pd.DataFrame:
     aucs = []
@@ -34,9 +34,9 @@ def calculateGeneAUC(prediction: pd.DataFrame, rev_library: Dict, minLibSize: in
             aucs.append(roc_auc)
     return(aucs)
 
-def benchmarkGMT(gmtFile: str, correlationFolder: str, predictionFolder: str, prismxPrediction: str, minLibSize: int=1, intersect: bool=False, verbose=False):
-    genes = getGenes(correlationFolder)
-    library, revLibrary, uniqueGenes = readGMT(gmtFile, genes, verbose=verbose)
+def benchmarkGMT(gmt_file: str, correlationFolder: str, predictionFolder: str, prismxPrediction: str, minLibSize: int=1, intersect: bool=False, verbose=False):
+    genes = get_genes(correlationFolder)
+    library, rev_library, unique_genes = read_gmt(gmt_file, genes, verbose=verbose)
     if intersect:
         ugenes = list(set(sum(library.values(), [])))
         genes = list(set(ugenes) & set(genes))
@@ -48,49 +48,49 @@ def benchmarkGMT(gmtFile: str, correlationFolder: str, predictionFolder: str, pr
     if verbose: bar = Bar('AUC calculation', max=len(lk))
     for i in lk:
         prediction = loadPrediction(predictionFolder, i).loc[genes,:]
-        geneAUC[i] = calculateGeneAUC(prediction, revLibrary)
+        geneAUC[i] = calculateGeneAUC(prediction, rev_library)
         setAUC[i] = calculateSetAUC(prediction, library)[0]
         if verbose: bar.next()
     if verbose: bar.finish()
     prediction = pd.read_feather(prismxPrediction).set_index("index").loc[genes,:]
-    geneAUC["prismx"] = calculateGeneAUC(prediction, revLibrary)
-    geneAUC.index = uniqueGenes
+    geneAUC["prismx"] = calculateGeneAUC(prediction, rev_library)
+    geneAUC.index = unique_genes
     setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
     return([geneAUC, setAUC])
 
-def benchmarkGMTfast(gmtFile: str, correlationFolder: str, predictionFolder: str, prismxPrediction: str, minLibSize: int=1, intersect: bool=False, verbose=False):
-    genes = getGenes(correlationFolder)
-    library, revLibrary, uniqueGenes = readGMT(gmtFile, genes, verbose=verbose)
+def benchmarkGMTfast(gmt_file: str, correlationFolder: str, predictionFolder: str, prismxPrediction: str, minLibSize: int=1, intersect: bool=False, verbose=False):
+    genes = get_genes(correlationFolder)
+    library, rev_library, unique_genes = read_gmt(gmt_file, genes, verbose=verbose)
     if intersect:
         ugenes = list(set(sum(library.values(), [])))
         genes = list(set(ugenes) & set(genes))
-    uniqueGenes = [x.encode('utf-8') for x in uniqueGenes]
+    unique_genes = [x.encode('utf-8') for x in unique_genes]
     prediction_files = os.listdir(predictionFolder)
     geneAUC = pd.DataFrame()
     setAUC = pd.DataFrame()
-    prediction = loadPrediction(predictionFolder, "global").loc[uniqueGenes,:]
-    geneAUC["global"] = calculateGeneAUC(prediction, revLibrary)
+    prediction = loadPrediction(predictionFolder, "global").loc[unique_genes,:]
+    geneAUC["global"] = calculateGeneAUC(prediction, rev_library)
     setAUC["global"] = calculateSetAUC(prediction, library)[0]
-    prediction = pd.read_feather(prismxPrediction).set_index("index").loc[uniqueGenes,:]
-    geneAUC["prismx"] = calculateGeneAUC(prediction, revLibrary)
-    geneAUC.index = uniqueGenes
+    prediction = pd.read_feather(prismxPrediction).set_index("index").loc[unique_genes,:]
+    geneAUC["prismx"] = calculateGeneAUC(prediction, rev_library)
+    geneAUC.index = unique_genes
     setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
     return([geneAUC, setAUC])
 
 
 
-def benchmarkGMTfastPx(gmtFile: str, correlationFolder: str, predictionFolder: str, prismxPrediction: str, minLibSize: int=1, intersect: bool=False, verbose=False):
-    genes = getGenes(correlationFolder)
-    library, revLibrary, uniqueGenes = readGMT(gmtFile, genes, verbose=verbose)
+def benchmarkGMTfastPx(gmt_file: str, correlationFolder: str, predictionFolder: str, prismxPrediction: str, minLibSize: int=1, intersect: bool=False, verbose=False):
+    genes = get_genes(correlationFolder)
+    library, rev_library, unique_genes = read_gmt(gmt_file, genes, verbose=verbose)
     if intersect:
         ugenes = list(set(sum(library.values(), [])))
         genes = list(set(ugenes) & set(genes))
-    uniqueGenes = [x.encode('utf-8') for x in uniqueGenes]
+    unique_genes = [x.encode('utf-8') for x in unique_genes]
     prediction_files = os.listdir(predictionFolder)
     geneAUC = pd.DataFrame()
     setAUC = pd.DataFrame()
-    prediction = pd.read_feather(prismxPrediction).set_index("index").loc[uniqueGenes,:]
-    geneAUC["prismx"] = calculateGeneAUC(prediction, revLibrary)
-    geneAUC.index = uniqueGenes
+    prediction = pd.read_feather(prismxPrediction).set_index("index").loc[unique_genes,:]
+    geneAUC["prismx"] = calculateGeneAUC(prediction, rev_library)
+    geneAUC.index = unique_genes
     setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
     return([geneAUC, setAUC])

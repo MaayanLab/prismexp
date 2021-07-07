@@ -3,27 +3,27 @@ import numpy as np
 import os
 import math
 import random
-from typing import List
+from typing import List, Tuple
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from progress.bar import Bar
 
-from prismx.utils import readGMT, loadCorrelation, loadPrediction
-from prismx.prediction import loadPredictions
+from prismx.utils import read_gmt, load_correlation, loadPrediction
+from prismx.feature import load_features
 
-def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: str, falseSampleCount: int=50000) -> List:
-    correlation_files = os.listdir(correlationFolder)
-    correlation = loadCorrelation(correlationFolder, 0)
-    backgroundGenes = list(correlation.columns)
-    library, rev_library, ugenes = readGMT(gmtFile, backgroundGenes)
+def createTrainingData(workdir: str, gmt_file: str, falseSampleCount: int=50000) -> List:
+    correlation_files = os.listdir(workdir+"/correlation")
+    correlation = load_correlation(workdir+"/correlation", 0)
+    background_genes = list(correlation.columns)
+    library, rev_library, ugenes = read_gmt(gmt_file, background_genes)
     df_true = pd.DataFrame()
     lk = list(range(0, len(correlation_files)-1))
     lk.append("global")
     bar = Bar('Retrieve training data', max=2*len(lk))
     for i in lk:
-        predictions = loadPrediction(predictionFolder, i)
-        pred = []
-        keys = list(predictions.columns)
+        feature = load_features(workdir, i)
+        features = []
+        keys = list(feature.columns)
         setname = []
         genename = []
         for se in keys:
@@ -31,27 +31,27 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
             for val in vals:
                 setname.append(val)
                 genename.append(se)
-                pred.append(predictions.loc[val.encode('UTF-8'), se])
-        df_true.loc[:,i] = pred
+                features.append(feature.loc[val.encode('UTF-8'), se])
+        df_true.loc[:,i] = features
         bar.next()
     df_true2 = pd.concat([pd.DataFrame(genename), pd.DataFrame(setname),df_true, pd.DataFrame(np.ones(len(setname)))], axis=1)
     samp_set = []
     samp_gene = []
     npw = np.array(df_true2.iloc[:, 0])
-    falseGeneCount = math.ceil(falseSampleCount/len(backgroundGenes))
-    for i in backgroundGenes:
+    falseGeneCount = math.ceil(falseSampleCount/len(background_genes))
+    for i in background_genes:
         rkey = random.sample(keys,1)[0]
         ww = np.where(npw == rkey)[0]
         for j in range(0, falseGeneCount):
-            rgene = random.sample(backgroundGenes,1)[0]
+            rgene = random.sample(background_genes,1)[0]
             if rgene not in df_true2.iloc[ww, 1]:
                 samp_set.append(rkey)
                 samp_gene.append(rgene)
     df_false = pd.DataFrame()
     Bar('Retrieve false samples ', max=len(lk))
     for i in lk:
-        predictions = loadPrediction(predictionFolder, i)
-        pred = []
+        feature = load_features(workdir, i)
+        features = []
         setname = []
         genename = []
         for k in range(0,len(samp_set)):
@@ -59,14 +59,14 @@ def createTrainingData(predictionFolder: str, correlationFolder: str, gmtFile: s
             val = samp_gene[k]
             setname.append(se)
             genename.append(val)
-            pred.append(predictions.loc[val.encode('UTF-8'), se])
-        df_false.loc[:,i] = pred
+            features.append(feature.loc[val.encode('UTF-8'), se])
+        df_false.loc[:,i] = features
         bar.next()
     df_false2 = pd.concat([pd.DataFrame(setname), pd.DataFrame(genename),df_false,pd.DataFrame(np.zeros(len(setname)))], axis=1)
     bar.finish()
     return([df_true2, df_false2.iloc[random.sample(range(0, df_false2.shape[0]), falseSampleCount), :]])
 
-def balanceData(df_true: pd.DataFrame, df_false: pd.DataFrame, trueCount: int, falseCount: int) -> str:
+def balanceData(df_true: pd.DataFrame, df_false: pd.DataFrame, trueCount: int, falseCount: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
     trueCount = min(trueCount, df_true.shape[0])
     falseCount = min(falseCount, df_false.shape[0])
     rtrue = random.sample(list(range(0, df_true.shape[0])), trueCount)
@@ -79,8 +79,8 @@ def balanceData(df_true: pd.DataFrame, df_false: pd.DataFrame, trueCount: int, f
     y = df_combined.iloc[:,df_combined.shape[1]-1]
     return(X, y)
 
-def trainModel(predictionFolder: str, correlationFolder: str, gmtFile: str, trainingSize: int=200000, testTrainSplit: float=0.1, samplePositive: int=20000, sampleNegative: int=80000, randomState: int=42, verbose: bool=False):
-    df_true, df_false = createTrainingData(predictionFolder, correlationFolder, gmtFile, trainingSize)
+def trainModel(workdir: str, gmt_file: str, trainingSize: int=200000, testTrainSplit: float=0.1, samplePositive: int=20000, sampleNegative: int=80000, randomState: int=42, verbose: bool=False):
+    df_true, df_false = createTrainingData(workdir, gmt_file, trainingSize)
     X, y = balanceData(df_true, df_false, samplePositive, sampleNegative)
     trueCount = np.sum(y)
     falseCount = len(y)-trueCount

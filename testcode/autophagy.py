@@ -18,8 +18,8 @@ from sklearn.metrics import roc_auc_score, roc_curve, auc
 
 import prismx as px
 
-from prismx.utils import readGMT, loadCorrelation, loadPrediction
-from prismx.prediction import correlationScores, loadPredictionsRange
+from prismx.utils import read_gmt, load_correlation, loadPrediction
+from prismx.prediction import correlation_scores, loadPredictionsRange
 from sklearn.manifold import TSNE
 
 
@@ -45,8 +45,8 @@ def rank(arr):
                 break
     return rank_list
 
-gene_auc = pd.read_csv("testdata/gene_auc.tsv", sep="\t", index_col=0)
-set_auc = pd.read_csv("testdata/set_auc.tsv", sep="\t", index_col=0)
+gene_auc = pd.read_csv("test_data/gene_auc.tsv", sep="\t", index_col=0)
+set_auc = pd.read_csv("test_data/set_auc.tsv", sep="\t", index_col=0)
 
 diff = gene_auc.iloc[:,5] - gene_auc.iloc[:,0]
 diff.sort_values(0,ascending=False).iloc[0:20]
@@ -70,22 +70,22 @@ outfolder = "prismxresult"
 
 clustn = 300
 
-libs = px.listLibraries()
-gmtFile = px.loadLibrary(libs[111], overwrite=True)
+libs = px.list_libraries()
+gmt_file = px.load_library(libs[111], overwrite=True)
 
 outname = libs[111]
-#px.predictGMT("gobp_model_"+str(clustn)+".pkl", gmtFile, correlationFolder, predictionFolder, outfolder, libs[111], stepSize=200, intersect=True, verbose=True)
+#px.predict_gmt("gobp_model_"+str(clustn)+".pkl", gmt_file, correlationFolder, predictionFolder, outfolder, libs[111], step_size=200, intersect=True, verbose=True)
 
 gop = pd.read_feather("prismxresult/GO_Biological_Process_2018.f")
 gop = gop.set_index("index")
-geneAUC, setAUC = px.benchmarkGMTfast(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
+geneAUC, setAUC = px.benchmarkGMTfast(gmt_file, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
 
 diff_gene = geneAUC.iloc[:,1]-geneAUC.iloc[:,0]
 diff_set = setAUC.iloc[:,1]-setAUC.iloc[:,0]
 sort_d = diff_set.sort_values(0)
 
-autorif = pd.read_csv("testdata/autophagy_autorif.tsv", sep="\t")
-generif = pd.read_csv("testdata/autophagy_generif.tsv", sep="\t")
+autorif = pd.read_csv("test_data/autophagy_autorif.tsv", sep="\t")
+generif = pd.read_csv("test_data/autophagy_generif.tsv", sep="\t")
 
 ff = list(filter(lambda x:'AUTOPHAG' in x, setAUC.index))
 
@@ -95,7 +95,7 @@ up = loadPrediction("prediction_folder_300_umap", "global")
 
 idx = [x.decode("UTF-8") for x in up.index]
 
-dict, rdict, ugenes = px.readGMT(gmtFile, backgroundGenes=idx)
+dict, rdict, ugenes = px.read_gmt(gmt_file, background_genes=idx)
 dgenes = ugenes
 ugenes = [x.encode("UTF-8") for x in ugenes]
 
@@ -131,13 +131,13 @@ gop.loc[:,ff]
 pglobal = pd.read_feather("prediction_folder_300_umap/prediction_global.f").set_index("index").loc[:,ff]
 pglobal.index = [x.decode("UTF-8") for x in pglobal.index]
 
-generif = pd.read_csv("testdata/autophagy_generif.tsv", sep="\t")
+generif = pd.read_csv("test_data/autophagy_generif.tsv", sep="\t")
 generif = generif.set_index("Gene")
-autorif = pd.read_csv("testdata/autophagy_autorif.tsv", sep="\t")
+autorif = pd.read_csv("test_data/autophagy_autorif.tsv", sep="\t")
 autorif = autorif.set_index("Gene")
 
 
-crisp = pd.read_csv("testdata/crispr_screen.tsv", sep="\t").iloc[:,1]
+crisp = pd.read_csv("test_data/crispr_screen.tsv", sep="\t").iloc[:,1]
 crispr = crisp.iloc[:,2]
 crispr.index = crisp.iloc[:,0]
 
@@ -147,7 +147,7 @@ cs3 = "embr201845889-sup-0002-datasetev1.tsv"
 cs4 = "elife-50034-supp8-v2.tsv"
 cs5 = "elife-17290-fig4-data1-v1.tsv"
 
-cs_path = "testdata/crispr_screen/"
+cs_path = "test_data/crispr_screen/"
 
 #=============== 1 ===============
 
@@ -326,7 +326,7 @@ for f in ff:
 
 
     #print(imp.iloc[1:30,:])
-    #imp.to_csv("testdata/"+f.replace(" ","_").replace(":","_")+".tsv", sep="\t")
+    #imp.to_csv("test_data/"+f.replace(" ","_").replace(":","_")+".tsv", sep="\t")
 
 
 

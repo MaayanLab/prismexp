@@ -6,6 +6,6 @@
 *.h5
 *.tsv
 figures/*
-testdata/*
+test_data/*
 *.pdf
 prismx/data/GO_B*

@@ -19,8 +19,8 @@ from sklearn.metrics import roc_auc_score, roc_curve, auc
 
 import prismx as px
 
-from prismx.utils import readGMT, loadCorrelation, loadPrediction
-from prismx.prediction import correlationScores, loadPredictionsRange
+from prismx.utils import read_gmt, load_correlation, loadPrediction
+from prismx.prediction import correlation_scores, loadPredictionsRange
 from sklearn.manifold import TSNE
 
 
@@ -29,8 +29,8 @@ def intersection(lst1, lst2):
     return lst3 
 
 
-gene_auc = pd.read_csv("testdata/gene_auc.tsv", sep="\t", index_col=0)
-set_auc = pd.read_csv("testdata/set_auc.tsv", sep="\t", index_col=0)
+gene_auc = pd.read_csv("test_data/gene_auc.tsv", sep="\t", index_col=0)
+set_auc = pd.read_csv("test_data/set_auc.tsv", sep="\t", index_col=0)
 
 diff = gene_auc.iloc[:,5] - gene_auc.iloc[:,0]
 diff.sort_values(0,ascending=False).iloc[0:20]
@@ -54,15 +54,15 @@ outfolder = "prismxresult"
 
 clustn = 300
 
-libs = px.listLibraries()
-gmtFile = px.loadLibrary(libs[111], overwrite=True)
+libs = px.list_libraries()
+gmt_file = px.load_library(libs[111], overwrite=True)
 
 outname = libs[111]
-#px.predictGMT("gobp_model_"+str(clustn)+".pkl", gmtFile, correlationFolder, predictionFolder, outfolder, libs[111], stepSize=200, intersect=True, verbose=True)
+#px.predict_gmt("gobp_model_"+str(clustn)+".pkl", gmt_file, correlationFolder, predictionFolder, outfolder, libs[111], step_size=200, intersect=True, verbose=True)
 
 gop = pd.read_feather("prismxresult/GO_Biological_Process_2018.f")
 gop = gop.set_index("index")
-geneAUC, setAUC = px.benchmarkGMTfast(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
+geneAUC, setAUC = px.benchmarkGMTfast(gmt_file, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
 
 diff_gene = geneAUC.iloc[:,1]-geneAUC.iloc[:,0]
 diff_set = setAUC.iloc[:,1]-setAUC.iloc[:,0]
@@ -80,7 +80,7 @@ ax.annotate("text", (0.8, 0.2), xytext=(0.8+0.05, 0.2+0.3),
 plt.savefig("figures/tempimp.pdf")
 plt.close()
 
-dict, rdict, ugenes = px.readGMT(gmtFile)
+dict, rdict, ugenes = px.read_gmt(gmt_file)
 dict[sort_d.index[-1]]
 
 i = 1

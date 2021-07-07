@@ -16,7 +16,7 @@ for i in range(0, len(correlation_files)):
     f.close()
 
 
-def loadCorrelation(gene):
+def load_correlation(gene):
     f = h5.File("h5/correlation_2.h5", "r")
     genes = np.array(f["meta/genes"]).astype(np.str)
     idx = list(genes).index(gene)
@@ -25,7 +25,7 @@ def loadCorrelation(gene):
     return(cor)
 
 start = time.time()
-coco = loadCorrelation("SOX2")
+coco = load_correlation("SOX2")
 print(time.time() - start)
 
 
@@ -45,7 +45,7 @@ def loadGenesS3():
         genes = np.array(f["meta/genes"]).astype(np.str)
     return genes
 
-def loadCorrelationS3(gene, genes, cormat, results):
+def load_correlationS3(gene, genes, cormat, results):
     cor = 0
     s3 = s3fs.S3FileSystem(anon=True)
     with h5.File(s3.open("s3://mssm-prismx/correlation_"+str(cormat)+".h5", 'rb'), 'r', lib_version='latest') as f:
@@ -56,7 +56,7 @@ def loadCorrelationS3(gene, genes, cormat, results):
 genes = loadGenesS3()
 
 start = time.time()
-coco = loadCorrelationS3("MAPK1", genes)
+coco = load_correlationS3("MAPK1", genes)
 print(time.time() - start)
 
 
@@ -71,7 +71,7 @@ cormats = list(range(0,50))
 cormats.append("global")
 results = pd.DataFrame(np.zeros(shape=(len(genes), len(cormats))), columns=cormats)
 for i in cormats:
-    pool.apply_async(loadCorrelationS3, ("P53", genes, i, results))
+    pool.apply_async(load_correlationS3, ("P53", genes, i, results))
 
 pool.close()
 pool.join()
@@ -83,7 +83,7 @@ start = time.time()
 pool = Pool(10)
 results = pd.DataFrame(np.zeros(shape=(len(genes), 20)), columns=genes[1000:1020])
 for gene in genes[1000:1010]:
-    results[gene] = pool.apply_async(loadCorrelationS3, (gene, genes,)).get()
+    results[gene] = pool.apply_async(load_correlationS3, (gene, genes,)).get()
 
 pool.close()
 pool.join()
@@ -91,7 +91,7 @@ print(time.time() - start)
 
 start = time.time()
 for gene in genes[2000:2050]:
-    loadCorrelationS3(gene, genes, results)
+    load_correlationS3(gene, genes, results)
 
 print(time.time() - start)
 

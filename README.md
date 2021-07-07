@@ -68,12 +68,12 @@ import prismx as px
 # reuse correlation matrices from first step
 correlationFolder = "correlation_folder"
 predictionFolder = "prediction_folder"
-libs = px.listLibraries()
+libs = px.list_libraries()
 
 # select GO: Biological Processes
-gmtFile = px.loadLibrary(libs[110])
+gmt_file = px.load_library(libs[110])
 
-px.correlationScores(gmtFile, correlationFolder, predictionFolder, verbose=True)
+px.correlation_scores(gmt_file, correlationFolder, predictionFolder, verbose=True)
 ```
 
 ### III) Train model on GO: Biological Processes gene set library
@@ -85,12 +85,12 @@ import pickle
 # reuse matrices from step I and step II
 correlationFolder = "correlation_folder"
 predictionFolder = "prediction_folder"
-libs = px.listLibraries()
+libs = px.list_libraries()
 
 # select GO: Biological Processes (same as last step)
-gmtFile = px.loadLibrary(libs[110])
+gmt_file = px.load_library(libs[110])
 
-model = px.trainModel(predictionFolder, correlationFolder, gmtFile, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
+model = px.trainModel(predictionFolder, correlationFolder, gmt_file, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
 pickle.dump(model, open("gobp_model.pkl", 'wb'))
 ```
 
@@ -104,14 +104,14 @@ import prismx as px
 # reuse matrices from step I and step II
 correlationFolder = "correlation_folder"
 predictionFolder = "prediction_folder"
-libs = px.listLibraries()
+libs = px.list_libraries()
 
 # choose a gene set library from Enrichr
 i = 1
 outname = libs[i]
-gmtFile = px.loadLibrary(libs[i])
+gmt_file = px.load_library(libs[i])
 
 outfolder = "prismxresult"
 
-px.predictGMT("gobp_model.pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=200, intersect=False, verbose=True)
+px.predict_gmt("gobp_model.pkl", gmt_file, correlationFolder, predictionFolder, outfolder, outname, step_size=200, intersect=False, verbose=True)
 ```

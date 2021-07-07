@@ -11,11 +11,11 @@ from typing import List
 
 from prismx.filter import filterGenes
 from prismx.correlation import createClustering, calculateCorrelation
-from prismx.prediction import correlationScores
+from prismx.feature import correlation_scores
 from prismx.training import trainModel
-from prismx.utils import getConfig, help, readGMT, normalize
-from prismx.loaddata import listLibraries, loadExpression, loadLibrary, printLibraries, getGenes
-from prismx.prismxprediction import predictGMT, prismxPredictions
+from prismx.utils import get_config, help, read_gmt, normalize
+from prismx.loaddata import list_libraries, download_expression, load_library, print_libraries, get_genes
+from prismx.prediction import predict_gmt, prismx_predictions
 from prismx.validation import benchmarkGMT, benchmarkGMTfast, benchmarkGMTfastPx
 
 def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, verbose: bool=True):
@@ -34,12 +34,12 @@ def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=
     '''
     if verbose: print("1. Filter genes")
     tstart = time.time()
-    filteredGenes = filterGenes(h5file, readThreshold, sampleThreshold, filterSamples)
+    filtered_genes = filterGenes(h5file, readThreshold, sampleThreshold, filterSamples)
     elapsed = round((time.time()-tstart)/60, 2)
-    if verbose: print("   -> completed in "+str(elapsed)+"min / #genes="+str(len(filteredGenes)))
+    if verbose: print("   -> completed in "+str(elapsed)+"min / #genes="+str(len(filtered_genes)))
     if verbose: print("2. Cluster samples")
     tstart = time.time()
-    clustering = createClustering(h5file, filteredGenes, clusterGeneCount, clusterCount)
+    clustering = createClustering(h5file, filtered_genes, clusterGeneCount, clusterCount)
     pickle.dump(clustering, open(outputFolder+"/clustering.pkl", "wb"))
     elapsed = round((time.time()-tstart)/60,2)
     if verbose: print("   -> completed in "+str(elapsed)+"min")
@@ -51,7 +51,7 @@ def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=
     os.makedirs(outputFolder+"/correlation", exist_ok=True)
     if verbose: bar = Bar('Processing correlation', max=len(mats))
     for i in range(0, len(mats)):
-        cor_mat = calculateCorrelation(h5file, clustering, filteredGenes, clusterID=mats[i], maxSampleCount=sampleCount)
+        cor_mat = calculateCorrelation(h5file, clustering, filtered_genes, clusterID=mats[i], maxSampleCount=sampleCount)
         cor_mat.columns = cor_mat.columns.astype(str)
         cor_mat.reset_index().to_feather(outputFolder+"/correlation/correlation_"+str(mats[i])+".f")
         j = j+1
@@ -60,7 +60,7 @@ def createCorrelationMatrices(h5file: str, outputFolder: str, clusterCount: int=
     if verbose: print("   -> completed in "+str(elapsed)+"min")
     if verbose: bar.finish()
 
-def testData() -> str:
+def test_data() -> str:
     path = os.path.join(
         os.path.dirname(__file__),
         'data/expression_sample.h5'

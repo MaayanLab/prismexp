@@ -17,8 +17,8 @@ import pandas as pd
 
 import prismx as px
 
-from prismx.utils import readGMT, loadCorrelation, loadPrediction
-from prismx.prediction import correlationScores, loadPredictionsRange
+from prismx.utils import read_gmt, load_correlation, loadPrediction
+from prismx.prediction import correlation_scores, loadPredictionsRange
 from sklearn.manifold import TSNE
 
 from sklearn.cluster import KMeans
@@ -28,8 +28,8 @@ from sklearn import mixture
 from sklearn.metrics.cluster import homogeneity_score
 from scipy import stats
 
-gene_auc = pd.read_csv("testdata/gene_auc.tsv", sep="\t", index_col=0)
-set_auc = pd.read_csv("testdata/set_auc.tsv", sep="\t", index_col=0)
+gene_auc = pd.read_csv("test_data/gene_auc.tsv", sep="\t", index_col=0)
+set_auc = pd.read_csv("test_data/set_auc.tsv", sep="\t", index_col=0)
 
 diff = gene_auc.iloc[:,5] - gene_auc.iloc[:,0]
 diff.sort_values(0,ascending=False).iloc[0:20]
@@ -53,21 +53,21 @@ outfolder = "prismxresult"
 
 clustn = 300
 
-libs = px.listLibraries()
-gmtFile = px.loadLibrary(libs[111], overwrite=True)
+libs = px.list_libraries()
+gmt_file = px.load_library(libs[111], overwrite=True)
 
 outname = libs[111]
-#px.predictGMT("gobp_model_"+str(clustn)+".pkl", gmtFile, correlationFolder, predictionFolder, outfolder, libs[111], stepSize=200, intersect=True, verbose=True)
+#px.predict_gmt("gobp_model_"+str(clustn)+".pkl", gmt_file, correlationFolder, predictionFolder, outfolder, libs[111], step_size=200, intersect=True, verbose=True)
 
 gop = pd.read_feather("prismxresult/GO_Biological_Process_2018.f")
 gop = gop.set_index("index")
-geneAUC, setAUC = px.benchmarkGMTfast(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
+geneAUC, setAUC = px.benchmarkGMTfast(gmt_file, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
 
 diff_gene = geneAUC.iloc[:,1]-geneAUC.iloc[:,0]
 diff_set = setAUC.iloc[:,1]-setAUC.iloc[:,0]
 diff_set.sort_values(0)
 
-dic, rdic, ugenes = px.readGMT(gmtFile, backgroundGenes=diff_gene.index)
+dic, rdic, ugenes = px.read_gmt(gmt_file, background_genes=diff_gene.index)
 
 def intersection(lst1, lst2): 
     lst3 = [value for value in lst1 if value in lst2]

@@ -51,7 +51,7 @@ genes = hykGeneSelection(h5file, geneidx)
 genes.sort()
 exp = 0     # keep memory footprint low
 exp = expression[:, genes]
-qq = normalize(exp, stepSize=100, transpose=True)
+qq = normalize(exp, step_size=100, transpose=True)
 kmeans = KMeans(n_clusters=clusterCount, random_state=42).fit(qq.transpose())
 qq = 0      # keep memory footprint low
 clustering = kmeans.labels_
