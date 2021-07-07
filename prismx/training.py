@@ -23,7 +23,7 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
     lk.append("global")
     bar = Bar('Retrieve training data', max=2*len(lk))
     for i in lk:
-        feature = load_features(workdir, i)
+        feature = load_feature(workdir, i)
         features = []
         keys = list(feature.columns)
         setname = []
