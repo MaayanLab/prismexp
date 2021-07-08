@@ -35,7 +35,7 @@ def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int
         if verbose: bar.next()
     if verbose: bar.finish()
     if normalize:
-        prism.prism.apply(zscore)
+        prism = prism.apply(zscore)
     prism.reset_index().to_feather(workdir+"/predictions/"+prediction_name+".f")
 
 def make_predictions_range(model: str, prism: pd.DataFrame, predictions: List[pd.DataFrame], verbose: bool=False) -> pd.DataFrame:
