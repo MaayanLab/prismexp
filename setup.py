@@ -30,7 +30,8 @@ setuptools.setup(
         'h5py',
         'progress',
         'qnorm',
-        'lightgbm'
+        'lightgbm',
+        'gseapy'
     ],
     python_requires='>=3.6',
 )

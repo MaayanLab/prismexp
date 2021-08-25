@@ -40,7 +40,9 @@ def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: in
     if verbose: print("2. Cluster samples")
     tstart = time.time()
     clustering = createClustering(h5file, filtered_genes, clusterGeneCount, clusterCount)
-    pickle.dump(clustering, open(outputFolder+"/clustering.pkl", "wb"))
+    tclust = clustering.iloc[:,1]
+    tclust.index = [x.decode("UTF-8") for x in tclust.index]
+    tclust.to_csv(outputFolder+"/clustering.tsv", sep="\t")
     elapsed = round((time.time()-tstart)/60,2)
     if verbose: print("   -> completed in "+str(elapsed)+"min")
     if verbose: print("3. Calculate "+str(clusterCount)+" correlation matrices")

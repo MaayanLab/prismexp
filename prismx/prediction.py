@@ -14,13 +14,13 @@ from scipy.stats import zscore
 from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.feature import features, load_features_range
 
-def predict(workdir: str, gmt_file: str, model=0, step_size: int=500, intersect: bool=False, verbose: bool=False):
+def predict(workdir: str, gmt_file: str, model=0, step_size: int=1000, intersect: bool=False, verbose: bool=False):
     if model == 0:
         model = pickle.load(open(workdir+"/model.pkl", "rb"))
     features(gmt_file, workdir, intersect=intersect, verbose=verbose)
     prismx_predictions(model, workdir, os.path.basename(gmt_file), step_size, verbose=verbose)
 
-def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int=500, verbose: bool=False, normalize=True):
+def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int=1000, verbose: bool=False, normalize=True):
     os.makedirs(workdir+"/predictions", exist_ok=True)
     prediction_size = load_feature(workdir, 0).shape[1]
     prism = pd.DataFrame()
@@ -57,8 +57,5 @@ def make_predictions_range(model: str, prism: pd.DataFrame, predictions: List[pd
     if prism.shape[1] == 0:
         prism = prism_temp
     else:
-        print(prism.shape)
-        print(prism_temp.shape)
         prism = pd.concat((prism, prism_temp), axis=1)
-        print(prism.shape)
     return(prism)
