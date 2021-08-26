@@ -46,7 +46,7 @@ def bridge_gsea(signature, library, predictions):
     pre_res = gseapy.prerank(rnk=signature, gene_sets=library, processes=8, permutation_num=1000, outdir='test/prerank_report_kegg', format='png', seed=1)
     gsea_res = pre_res.res2d
     bridge_library = bridge_genesets(predictions, gsea_res.index, library, pred_gene_number=50)
-    pre_res = gseapy.prerank(rnk=signature, gene_sets=bridge_library, processes=8, permutation_num=1000, outdir='test/prerank_report_kegg', format='png', seed=1)
+    pre_res = gseapy.prerank(rnk=signature, gene_sets=bridge_library, processes=8, permutation_num=100, outdir='test/prerank_report_kegg', format='png', seed=1)
     bridge_gsea_res = pre_res.res2d
     combined_enrichment = pd.concat([gsea_res, bridge_gsea_res], join="inner", axis=1)
     coln = np.array(combined_enrichment.columns)
