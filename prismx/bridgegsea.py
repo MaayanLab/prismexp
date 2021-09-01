@@ -74,10 +74,83 @@ def plot_enrichment(enrichment):
     ax.set_ylabel('bridged NES', fontsize=20)
     return f
 
-def plot_gsea():
+def plot_gsea(signature, geneset, library, prediction, pred_gene_number=100, max_highlight=20):
+    gs = set(library[geneset])
+    hits = [i for i,x in enumerate(signature[0]) if x in gs]
+    pred_genes = set(prediction[geneset.upper()].sort_values(ascending=False).iloc[0:pred_gene_number].index)
+    pred_genes = pred_genes.intersection(signature[0]).difference(gs)
+    pred_hits = [i for i,x in enumerate(signature[0]) if x in pred_genes]
+    combined_hits = set(list(list(gs)+list(pred_genes)))
+    running_sum_orig, es_orig = nes(signature, gs)
+    running_sum, es = nes(signature, combined_hits)
+    running_sum = list(running_sum)
     fig = plt.figure(figsize=(11,5))
     ax = fig.add_gridspec(12, 12, wspace=0, hspace=0)
     ax1 = fig.add_subplot(ax[0:7, 0:8])
     ax1.plot(list(running_sum_orig), color=(0.5,0.5,0.5), lw=2)
     ax1.plot(running_sum, color=(0,1,0), lw=3)
     plt.xlim([0, len(running_sum)])
+    # --------------------
+    nn = np.where(np.abs(running_sum)==np.max(np.abs(running_sum)))[0][0]
+    ax1.vlines(x=nn, ymin=np.min(running_sum), ymax=np.max(running_sum),linestyle = ':', color="red")
+    if es > 0:
+        ax1.text(len(running_sum)/30, 0, "ES="+"{:.3f}".format(running_sum[nn]), size=20, bbox={'facecolor':'white','alpha':0.8,'edgecolor':'none','pad':1}, ha='left', va='bottom', zorder=100)
+    else:
+        ax1.text(len(running_sum)/30, 0, "ES="+"{:.3f}".format(running_sum[nn]), size=20, bbox={'facecolor':'white','alpha':0.8,'edgecolor':'none','pad':1}, ha='left', va='top', zorder=100)
+    ax1.grid(True, which='both')
+    ax1.set(xticks=[])
+    #seaborn.despine(ax=ax1, offset=0)
+    plt.title(geneset)
+    plt.ylabel("Enrichment Score (ES)", fontsize=16)
+    #-----------------------
+    ax1 = fig.add_subplot(ax[7:9, 0:8])
+    ax1.vlines(x=pred_hits, ymin=-1, ymax=0, color=(1,0,1,1), lw=0.5)
+    ax1.vlines(x=hits, ymin=0, ymax=1, color=(0,0,0,1), lw=0.5)
+    plt.xlim([0, len(running_sum)])
+    plt.ylim([-1, 1])
+    ax1.set(yticks=[])
+    ax1.set(xticks=[])
+    ax1 = fig.add_subplot(ax[9:, 0:8])
+    rank_vec = signature[1]
+    x = np.arange(0.0, len(rank_vec), 20).astype("int")
+    x = np.append(x, signature.shape[0]-1)
+    ax1.fill_between(x, np.array(rank_vec)[x], color="lightgrey")
+    ax1.plot(x, np.array(rank_vec)[x], color=(0.2,0.2,0.2), lw=1)
+    ax1.hlines(y=0, xmin=0, xmax=len(rank_vec), color="black", zorder=100, lw=0.6)
+    plt.xlim([0, len(running_sum)])
+    plt.ylim([np.min(rank_vec), np.max(rank_vec)])
+    minabs = np.min(np.abs(rank_vec))
+    zero_cross = int(np.where(np.abs(rank_vec)==minabs)[0][0])
+    ax1.vlines(x=zero_cross, ymin=np.min(rank_vec), ymax=np.max(rank_vec),linestyle = ':',)
+    ax1.text(zero_cross, np.max(rank_vec)/3, "Zero crosses at "+str(zero_cross), bbox={'facecolor':'white','alpha':0.5,'edgecolor':'none','pad':1}, ha='center', va='center')
+    plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
+    plt.xlabel("Rank in Ordered Dataset", fontsize=16)
+    plt.ylabel("Ranked list metric", fontsize=16)
+    ax1 = fig.add_subplot(ax[:, 9:])
+    if es > 0:
+        pred_le = np.where(pred_hits < nn)[0][0:np.min([max_highlight, len(pred_hits)])]
+        bars = rank_vec.index[pred_hits][pred_le][::-1]
+    else:
+        pred_le = np.where(pred_hits > nn)[0][0:np.min([max_highlight, len(pred_hits)])]
+        bars = rank_vec.index[pred_hits][pred_le]
+    y_pos = np.arange(len(bars))
+    #ax1.barh(y_pos, height, color="black")
+    plt.yticks(y_pos, bars)
+    bar_width = 0.4
+    pp = prediction[geneset.upper()].sort_values(ascending=False)
+    pp = (pp - pp.mean())/pp.std(ddof=0)
+    # Fix the x-axes.
+    ax1.set_yticks(y_pos + bar_width / 2)
+    ax1.set_yticklabels(bars)
+    plt.xlabel("Predicted leading edge rank metric", fontsize=16)
+    sm = np.max(np.abs(list(rank_vec.loc[bars])))
+    #plt.xlim([np.min(list(rank_vec.loc[bars])), np.max(list(rank_vec.loc[bars]))])
+    plt.xlim([-sm, sm])
+    plt.box(False)
+    ax2 = ax1.twiny()
+    #ax2.set_xticks(np.linspace(0,sm,6))
+    ax2.set_xticks(np.linspace(sm,2*sm,4))
+    ax2.set_xticklabels(np.around(np.linspace(0,np.max(pp),4),1))
+    plt.xlabel("PrismExp Association z-Score", c="dodgerblue", fontsize=16)
+    plt.box(False)
+    return fig
