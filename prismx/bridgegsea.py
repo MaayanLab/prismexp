@@ -42,11 +42,14 @@ def filter_ledge(combined_scores):
         filtered_ledge.append(sorted(list(set(combined_scores.iloc[i,10].split(";")).difference(set(combined_scores.iloc[i,7].split(";"))))))
     return filtered_ledge
 
-def bridge_gsea(signature, library, predictions):
-    pre_res = gseapy.prerank(rnk=signature, gene_sets=library, processes=8, permutation_num=1000, outdir='test/prerank_report_kegg', format='png', seed=1)
+def bridge_gsea(signature, library, predictions, permutations=100, genes_added=50):
+    signature.index = signature[0]
+    signature = signature.sort_values(1, ascending=False)
+    signature = signature[~signature.index.duplicated(keep='first')]
+    pre_res = gseapy.prerank(rnk=signature, gene_sets=library, processes=8, permutation_num=permutations, outdir='test/prerank_report_kegg', format='png', seed=1)
     gsea_res = pre_res.res2d
-    bridge_library = bridge_genesets(predictions, gsea_res.index, library, pred_gene_number=50)
-    pre_res = gseapy.prerank(rnk=signature, gene_sets=bridge_library, processes=8, permutation_num=100, outdir='test/prerank_report_kegg', format='png', seed=1)
+    bridge_library = bridge_genesets(predictions, gsea_res.index, library, pred_gene_number=genes_added)
+    pre_res = gseapy.prerank(rnk=signature, gene_sets=bridge_library, processes=8, permutation_num=permutations, outdir='test/prerank_report_kegg', format='png', seed=1)
     bridge_gsea_res = pre_res.res2d
     combined_enrichment = pd.concat([gsea_res, bridge_gsea_res], join="inner", axis=1)
     coln = np.array(combined_enrichment.columns)
@@ -70,3 +73,11 @@ def plot_enrichment(enrichment):
     ax.set_xlabel('NES', fontsize=20)
     ax.set_ylabel('bridged NES', fontsize=20)
     return f
+
+def plot_gsea():
+    fig = plt.figure(figsize=(11,5))
+    ax = fig.add_gridspec(12, 12, wspace=0, hspace=0)
+    ax1 = fig.add_subplot(ax[0:7, 0:8])
+    ax1.plot(list(running_sum_orig), color=(0.5,0.5,0.5), lw=2)
+    ax1.plot(running_sum, color=(0,1,0), lw=3)
+    plt.xlim([0, len(running_sum)])
