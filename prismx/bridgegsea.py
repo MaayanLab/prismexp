@@ -42,12 +42,13 @@ def nes(signature, gene_set):
     es = running_sum[nn]
     return running_sum, es
 
-def bridge_genesets(pred, top_sets, library, pred_gene_number=50):
+def bridge_genesets(signature, pred, top_sets, library, pred_gene_number=50):
     bridge_library = {}
     for i in list(top_sets):
         gs = list(set(library[i.upper()]))
         bridge_library[i] = gs
-        pred_genes = set(pred[i.upper()].sort_values(ascending=False).iloc[0:pred_gene_number].index)
+        diff_genes = list(set(signature[0]).difference(gs).intersection(set(pred.index)))
+        pred_genes = set(pred[i.upper()].loc[diff_genes].sort_values(ascending=False).iloc[0:pred_gene_number].index)
         bridge_library[i].extend(pred_genes)
         bridge_library[i] = sorted(list(set(bridge_library[i])))
     return bridge_library
@@ -58,13 +59,13 @@ def filter_ledge(combined_scores):
         filtered_ledge.append(sorted(list(set(combined_scores.iloc[i,10].split(";")).difference(set(combined_scores.iloc[i,7].split(";"))))))
     return filtered_ledge
 
-def bridge_gsea(signature, library, predictions, permutations=100, genes_added=50):
+def bridge_gsea(signature, library, predictions, permutations=100, pred_gene_number=50):
     signature.index = signature[0]
     signature = signature.sort_values(1, ascending=False)
     signature = signature[~signature.index.duplicated(keep='first')]
     pre_res = gseapy.prerank(rnk=signature, gene_sets=library, processes=8, permutation_num=permutations, outdir='test/prerank_report_kegg', format='png', seed=1)
     gsea_res = pre_res.res2d
-    bridge_library = bridge_genesets(predictions, gsea_res.index, library, pred_gene_number=genes_added)
+    bridge_library = bridge_genesets(signature, predictions, gsea_res.index, library, pred_gene_number=pred_gene_number)
     pre_res = gseapy.prerank(rnk=signature, gene_sets=bridge_library, processes=8, permutation_num=permutations, outdir='test/prerank_report_kegg', format='png', seed=1)
     bridge_gsea_res = pre_res.res2d
     combined_enrichment = pd.concat([gsea_res, bridge_gsea_res], join="inner", axis=1)
@@ -90,14 +91,14 @@ def plot_enrichment(enrichment):
     ax.set_ylabel('bridged NES', fontsize=20)
     return f
 
-def plot_gsea(signature, geneset, library, prediction, pred_gene_number=100, max_highlight=20):
+def plot_gsea(signature, geneset, library, prediction, pred_gene_number=50, max_highlight=20):
     signature.index = signature[0]
     signature = signature.sort_values(1, ascending=False)
     signature = signature[~signature.index.duplicated(keep='first')]
     gs = set(library[geneset])
     hits = [i for i,x in enumerate(signature[0]) if x in gs]
-    pred_genes = set(prediction[geneset.upper()].sort_values(ascending=False).iloc[0:pred_gene_number].index)
-    pred_genes = pred_genes.intersection(signature[0]).difference(gs)
+    diff_genes = list(set(signature[0]).difference(gs).intersection(set(prediction.index)))
+    pred_genes = set(prediction[geneset.upper()].loc[diff_genes].sort_values(ascending=False).iloc[0:pred_gene_number].index)
     pred_hits = [i for i,x in enumerate(signature[0]) if x in pred_genes]
     combined_hits = set(list(list(gs)+list(pred_genes)))
     running_sum_orig, es_orig = nes(signature, gs)
