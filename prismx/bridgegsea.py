@@ -9,8 +9,7 @@ from matplotlib import pyplot as plt
 import gseapy
 import scipy.stats as stats
 
-def nes(rank_vector, gene_set):
-    rank_vector = rank_vector.sort_values(0, ascending=False)
+def nesold(rank_vector, gene_set):
     gs = set(gene_set)
     hits = [i for i,x in enumerate(rank_vector.index) if x in gs]
     hit_indicator = np.zeros(rank_vector.shape[0])
@@ -22,6 +21,23 @@ def nes(rank_vector, gene_set):
     norm_hit =  1.0/sum_hit_scores
     norm_no_hit = 1.0/number_miss
     running_sum = np.cumsum(hit_indicator * np.abs(rank_vector) * norm_hit - no_hit_indicator * norm_no_hit)
+    nn = np.where(np.abs(running_sum)==np.max(np.abs(running_sum)))[0][0]
+    es = running_sum[nn]
+    return running_sum, es
+
+def nes(signature, gene_set):
+    rank_vector = signature.sort_values(1, ascending=False).set_index(0)
+    gs = set(gene_set)
+    hits = [i for i,x in enumerate(rank_vector.index) if x in gs]
+    hit_indicator = np.zeros(rank_vector.shape[0])
+    hit_indicator[hits] = 1
+    no_hit_indicator = 1 - hit_indicator
+    number_hits = len(hits)
+    number_miss = rank_vector.shape[0] - number_hits
+    sum_hit_scores = np.sum(np.abs(rank_vector.iloc[hits]))
+    norm_hit =  1.0/sum_hit_scores
+    norm_no_hit = 1.0/number_miss
+    running_sum = np.cumsum(hit_indicator * np.abs(rank_vector[1]) * float(norm_hit) - no_hit_indicator * float(norm_no_hit))
     nn = np.where(np.abs(running_sum)==np.max(np.abs(running_sum)))[0][0]
     es = running_sum[nn]
     return running_sum, es
