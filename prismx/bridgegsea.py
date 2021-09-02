@@ -91,6 +91,9 @@ def plot_enrichment(enrichment):
     return f
 
 def plot_gsea(signature, geneset, library, prediction, pred_gene_number=100, max_highlight=20):
+    signature.index = signature[0]
+    signature = signature.sort_values(1, ascending=False)
+    signature = signature[~signature.index.duplicated(keep='first')]
     gs = set(library[geneset])
     hits = [i for i,x in enumerate(signature[0]) if x in gs]
     pred_genes = set(prediction[geneset.upper()].sort_values(ascending=False).iloc[0:pred_gene_number].index)
