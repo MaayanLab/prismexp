@@ -20,7 +20,7 @@ def predict(workdir: str, gmt_file: str, model=0, step_size: int=1000, intersect
     features(gmt_file, workdir, intersect=intersect, verbose=verbose)
     prismx_predictions(model, workdir, os.path.basename(gmt_file), step_size, verbose=verbose)
 
-def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int=1000, verbose: bool=False, normalize=True):
+def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int=1000, verbose: bool=False, normalize=False):
     os.makedirs(workdir+"/predictions", exist_ok=True)
     prediction_size = load_feature(workdir, 0).shape[1]
     prism = pd.DataFrame()
@@ -29,31 +29,31 @@ def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int
     for i in range(0, step_number):
         rfrom = i*step_size
         rto = min((i+1)*step_size, prediction_size)
-        predictions = load_features_range(workdir, rfrom, rto)
-        prism = make_predictions_range(model, prism, predictions)
-        predictions = 0
+        features = load_features_range(workdir, rfrom, rto)
+        prism = make_predictions_range(model, prism, features)
+        features = 0
         if verbose: bar.next()
     if verbose: bar.finish()
     if normalize:
         prism = prism.apply(zscore)
     prism.reset_index().to_feather(workdir+"/predictions/"+prediction_name+".f")
 
-def make_predictions_range(model: str, prism: pd.DataFrame, predictions: List[pd.DataFrame], verbose: bool=False) -> pd.DataFrame:
+def make_predictions_range(model: str, prism: pd.DataFrame, features: List[pd.DataFrame], verbose: bool=False) -> pd.DataFrame:
     pred_list = []
-    for i in range(0, predictions[0].shape[1]):
+    for i in range(0, features[0].shape[1]):
         start = time.time()
         df = pd.DataFrame()
         k = 0
-        for pp in predictions:
-            df[k] = pp.iloc[:,i]
+        for ff in features:
+            df[k] = ff.iloc[:,i]
             k = k + 1
         if verbose:
             print(str(i) + " - " + str(round(time.time()-start)))
         df.fillna(0, inplace=True)
         pred_list.append(model.predict(df))
     prism_temp = pd.DataFrame(pred_list).transpose()
-    prism_temp.columns = predictions[0].columns
-    prism_temp.index = predictions[0].index
+    prism_temp.columns = features[0].columns
+    prism_temp.index = features[0].index
     if prism.shape[1] == 0:
         prism = prism_temp
     else:
