@@ -90,6 +90,7 @@ def benchmark_gmt_fast(gmt_file: str, workdir: str, prediction_file: str, inters
     lk.append("global")
     geneAUC = pd.DataFrame()
     setAUC = pd.DataFrame()
+    genes = [x.encode("UTF-8") for x in genes]
     prediction = pd.read_feather(prediction_file).set_index("index").loc[genes,:]
     geneAUC["prismx"] = calculate_gene_auc(prediction, rev_library)
     geneAUC.index = unique_genes
