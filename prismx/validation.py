@@ -24,11 +24,11 @@ def calculate_set_auc(prediction: pd.DataFrame, library: Dict, min_lib_size: int
 
 def calculate_gene_auc(prediction: pd.DataFrame, rev_library: Dict, min_lib_size: int=1) -> List[float]:
     aucs = []
-    idx = prediction.index
+    gidx = [x.decode("UTF-8") for x in prediction.index]
     for se in rev_library:
         gold = [i in rev_library[se] for i in prediction.columns]
         sen = se.encode('utf-8')
-        if len(rev_library[se]) >= min_lib_size and sen in idx:
+        if len(rev_library[se]) >= min_lib_size and sen in gidx:
             fpr, tpr, _ = roc_curve(list(gold), list(prediction.loc[sen,:]))
             roc_auc = auc(fpr, tpr)
             aucs.append(roc_auc)
