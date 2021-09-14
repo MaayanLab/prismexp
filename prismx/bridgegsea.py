@@ -45,12 +45,13 @@ def nes(signature, gene_set):
 def bridge_genesets(signature, pred, top_sets, library, pred_gene_number=50):
     bridge_library = {}
     for i in list(top_sets):
-        gs = list(set(library[i.upper()]))
-        bridge_library[i] = gs
-        diff_genes = list(set(signature[0]).difference(gs).intersection(set(pred.index)))
-        pred_genes = set(pred[i.upper()].loc[diff_genes].sort_values(ascending=False).iloc[0:pred_gene_number].index)
-        bridge_library[i].extend(pred_genes)
-        bridge_library[i] = sorted(list(set(bridge_library[i])))
+        if i.upper() in pred.columns:
+            gs = list(set(library[i.upper()]))
+            bridge_library[i] = gs
+            diff_genes = list(set(signature[0]).difference(gs).intersection(set(pred.index)))
+            pred_genes = set(pred[i.upper()].loc[diff_genes].sort_values(ascending=False).iloc[0:pred_gene_number].index)
+            bridge_library[i].extend(pred_genes)
+            bridge_library[i] = sorted(list(set(bridge_library[i])))
     return bridge_library
 
 def filter_ledge(combined_scores):
