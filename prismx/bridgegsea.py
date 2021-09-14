@@ -59,15 +59,25 @@ def filter_ledge(combined_scores):
         filtered_ledge.append(sorted(list(set(combined_scores.iloc[i,10].split(";")).difference(set(combined_scores.iloc[i,7].split(";"))))))
     return filtered_ledge
 
-def bridge_gsea(signature, library, predictions, permutations=100, pred_gene_number=50, processes=1):
+def chopped_gsea(rnk, gene_sets, processes, permutation_num=100, max_lib_size=200, outdir='test/prerank_report_kegg', format='png', seed=1):
+    library_keys = list(gene_sets.keys())
+    chunks = [library_keys[i:i+max_lib_size] for i in range(0, len(library_keys), max_lib_size)]
+    results = []
+    for chunk in chunks:
+        tlib = {}
+        for k in chunk:
+            tlib[k] = gene_sets[k]
+        pre_res = gseapy.prerank(rnk=rnk, gene_sets=tlib, processes=processes, permutation_num=permutation_num, outdir=outdir, format=format, seed=seed)
+        results.append(pre_res.res2d)
+    return pd.concat(results)
+
+def bridge_gsea(signature, library, predictions, permutations=1000, pred_gene_number=50, max_lib_size=50, processes=1):
     signature.index = signature[0]
     signature = signature.sort_values(1, ascending=False)
     signature = signature[~signature.index.duplicated(keep='first')]
-    pre_res = gseapy.prerank(rnk=signature, gene_sets=library, processes=processes, permutation_num=permutations, outdir='test/prerank_report_kegg', format='png', seed=1)
-    gsea_res = pre_res.res2d
+    gsea_res = chopped_gsea(rnk=signature, gene_sets=library, processes=processes, permutation_num=permutations, max_lib_size=max_lib_size, outdir='test/prerank_report_kegg', format='png', seed=1)
     bridge_library = bridge_genesets(signature, predictions, gsea_res.index, library, pred_gene_number=pred_gene_number)
-    pre_res = gseapy.prerank(rnk=signature, gene_sets=bridge_library, processes=processes, permutation_num=permutations, outdir='test/prerank_report_kegg', format='png', seed=1)
-    bridge_gsea_res = pre_res.res2d
+    bridge_gsea_res = chopped_gsea(rnk=signature, gene_sets=bridge_library, processes=processes, permutation_num=permutations, max_lib_size=max_lib_size, outdir='test/prerank_report_kegg', format='png', seed=1)
     combined_enrichment = pd.concat([gsea_res, bridge_gsea_res], join="inner", axis=1)
     coln = np.array(combined_enrichment.columns)
     coln[8:] = ["bridged_"+x for x in coln[8:]]                           
