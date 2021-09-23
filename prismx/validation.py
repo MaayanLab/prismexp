@@ -10,11 +10,11 @@ from prismx.loaddata import get_genes
 def calculate_set_auc(prediction: pd.DataFrame, library: Dict, min_lib_size: int=1) -> pd.DataFrame:
     aucs = []
     setnames = []
-    idx = prediction.index
+    gidx = prediction.index
     for se in library:
         if len(library[se]) >= min_lib_size:
             lenc = [x.encode('utf-8') for x in library[se]]
-            gold = [i in lenc for i in idx]
+            gold = [i in lenc for i in gidx]
             fpr, tpr, _ = roc_curve(list(gold), list(prediction.loc[:,se]))
             roc_auc = auc(fpr, tpr)
             aucs.append(roc_auc)
@@ -24,12 +24,11 @@ def calculate_set_auc(prediction: pd.DataFrame, library: Dict, min_lib_size: int
 
 def calculate_gene_auc(prediction: pd.DataFrame, rev_library: Dict, min_lib_size: int=1) -> List[float]:
     aucs = []
-    gidx = [x.decode("UTF-8") for x in prediction.index]
+    gidx = prediction.index
     for se in rev_library:
         gold = [i in rev_library[se] for i in prediction.columns]
-        sen = se.encode('utf-8')
-        if len(rev_library[se]) >= min_lib_size and sen in gidx:
-            fpr, tpr, _ = roc_curve(list(gold), list(prediction.loc[sen,:]))
+        if len(rev_library[se]) >= min_lib_size and se.encode("UTF-8") in gidx:
+            fpr, tpr, _ = roc_curve(list(gold), list(prediction.loc[se.encode("UTF-8"),:]))
             roc_auc = auc(fpr, tpr)
             aucs.append(roc_auc)
     return(aucs)

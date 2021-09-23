@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 from progress.bar import Bar
+from tqdm import tqdm
 import multiprocessing
 
 from prismx.utils import read_gmt, load_correlation, load_feature
@@ -26,13 +27,15 @@ def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=4,
             print("overlapping genes: "+str(len(ugenes)))
     lk = list(range(0, len(correlation_files)-1))
     lk.append("global")
-    if verbose: bar = Bar('Processing average correlation', max=len(lk))
+    #if verbose: bar = Bar('Processing average correlation', max=len(lk))
+    if verbose: pbar = tqdm(total=len(lk))
     params = list()
     for ll in lk:
         params.append((workdir, ll, library, intersect, ugenes))
     process_pool = multiprocessing.Pool(threads)
     process_pool.starmap(get_average_correlation, params)
-    if verbose: bar.finish()
+    #if verbose: bar.finish()
+    if verbose: pbar.close()
 
 def get_average_correlation(workdir: str, i: int, library: Dict, intersect: bool=False, ugenes: List=[]):
     correlation = load_correlation(workdir, i)
