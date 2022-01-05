@@ -6,24 +6,9 @@ import requests
 import json
 
 from matplotlib import pyplot as plt
-import gseapy
+import blitzgsea as blitz
 import scipy.stats as stats
 
-def nesold(rank_vector, gene_set):
-    gs = set(gene_set)
-    hits = [i for i,x in enumerate(rank_vector.index) if x in gs]
-    hit_indicator = np.zeros(rank_vector.shape[0])
-    hit_indicator[hits] = 1
-    no_hit_indicator = 1 - hit_indicator
-    number_hits = len(hits)
-    number_miss = rank_vector.shape[0] - number_hits
-    sum_hit_scores = np.sum(np.abs(rank_vector.iloc[hits]))
-    norm_hit =  1.0/sum_hit_scores
-    norm_no_hit = 1.0/number_miss
-    running_sum = np.cumsum(hit_indicator * np.abs(rank_vector) * norm_hit - no_hit_indicator * norm_no_hit)
-    nn = np.where(np.abs(running_sum)==np.max(np.abs(running_sum)))[0][0]
-    es = running_sum[nn]
-    return running_sum, es
 
 def nes(signature, gene_set):
     rank_vector = signature.sort_values(1, ascending=False).set_index(0)
@@ -60,25 +45,16 @@ def filter_ledge(combined_scores):
         filtered_ledge.append(sorted(list(set(combined_scores.iloc[i,10].split(";")).difference(set(combined_scores.iloc[i,7].split(";"))))))
     return filtered_ledge
 
-def chopped_gsea(rnk, gene_sets, processes, permutation_num=100, max_lib_size=200, outdir='test/prerank_report_kegg', format='png', seed=1):
-    library_keys = list(gene_sets.keys())
-    chunks = [library_keys[i:i+max_lib_size] for i in range(0, len(library_keys), max_lib_size)]
-    results = []
-    for chunk in chunks:
-        tlib = {}
-        for k in chunk:
-            tlib[k] = gene_sets[k]
-        pre_res = gseapy.prerank(rnk=rnk, gene_sets=tlib, processes=processes, permutation_num=permutation_num, outdir=outdir, format=format, seed=seed)
-        results.append(pre_res.res2d)
-    return pd.concat(results)
-
 def bridge_gsea(signature, library, predictions, permutations=1000, pred_gene_number=50, max_lib_size=50, processes=1, seed=1):
     signature.index = signature[0]
     signature = signature.sort_values(1, ascending=False)
     signature = signature[~signature.index.duplicated(keep='first')]
-    gsea_res = chopped_gsea(rnk=signature, gene_sets=library, processes=processes, permutation_num=permutations, max_lib_size=max_lib_size, outdir='test/prerank_report_kegg', format='png', seed=seed)
+    
+    gsea_res = blitz.gsea(signature, library, max_size=max_lib_size, permutations=permutations)
+    
     bridge_library = bridge_genesets(signature, predictions, gsea_res.index, library, pred_gene_number=pred_gene_number)
-    bridge_gsea_res = chopped_gsea(rnk=signature, gene_sets=bridge_library, processes=processes, permutation_num=permutations, max_lib_size=max_lib_size, outdir='test/prerank_report_kegg', format='png', seed=seed)
+    bridge_gsea_res = blitz.gsea(signature, bridge_library, max_size=max_lib_size, permutations=permutations)
+
     combined_enrichment = pd.concat([gsea_res, bridge_gsea_res], join="inner", axis=1)
     coln = np.array(combined_enrichment.columns)
     coln[8:] = ["bridged_"+x for x in coln[8:]]
