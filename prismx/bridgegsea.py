@@ -9,7 +9,6 @@ from matplotlib import pyplot as plt
 import blitzgsea as blitz
 import scipy.stats as stats
 
-
 def nes(signature, gene_set):
     rank_vector = signature.sort_values(1, ascending=False).set_index(0)
     gs = set(gene_set)
@@ -54,7 +53,7 @@ def bridge_gsea(signature, library, predictions, permutations=1000, pred_gene_nu
     
     bridge_library = bridge_genesets(signature, predictions, gsea_res.index, library, pred_gene_number=pred_gene_number)
     bridge_gsea_res = blitz.gsea(signature, bridge_library, max_size=max_lib_size, permutations=permutations)
-
+    
     combined_enrichment = pd.concat([gsea_res, bridge_gsea_res], join="inner", axis=1)
     coln = np.array(combined_enrichment.columns)
     coln[8:] = ["bridged_"+x for x in coln[8:]]
