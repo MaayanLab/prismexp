@@ -19,9 +19,6 @@ from prismx.prediction import predict, prismx_predictions
 from prismx.validation import benchmark_gmt, benchmarkGMTfast, benchmark_gmt_fast
 from prismx.bridgegsea import bridge_gsea, plot_enrichment, plot_gsea, nes
 
-from importlib import reload
-reload(bridge_gsea)
-
 def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, verbose: bool=True):
     '''
     Write a set of correlation matrices, by partitioning gene expression into clusters and applying Pearson
