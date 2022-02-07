@@ -52,7 +52,11 @@ def bridge_gsea(signature, library, predictions, permutations=1000, pred_gene_nu
     gsea_res = blitz.gsea(signature, library, max_size=max_lib_size, permutations=permutations)
     
     bridge_library = bridge_genesets(signature, predictions, gsea_res.index, library, pred_gene_number=pred_gene_number)
-    print(bridge_library)
+    kk = list(bridge_library.keys())
+    for k in kk[0:10]:
+        print(k)
+        print(bridge_library[k])
+    
     bridge_gsea_res = blitz.gsea(signature, bridge_library, max_size=max_lib_size, permutations=permutations)
     
     combined_enrichment = pd.concat([gsea_res, bridge_gsea_res], join="inner", axis=1)

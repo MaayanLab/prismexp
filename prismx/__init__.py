@@ -9,6 +9,9 @@ import os
 from progress.bar import Bar
 from typing import List
 
+from importlib import reload
+reload(prismx.bridgegsea)
+
 from prismx.filter import filterGenes
 from prismx.correlation import createClustering, calculateCorrelation
 from prismx.feature import features
