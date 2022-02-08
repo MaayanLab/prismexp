@@ -44,8 +44,9 @@ def filter_ledge(combined_scores):
     return filtered_ledge
 
 def bridge_gsea(signature, library, predictions, permutations=1000, pred_gene_number=50, min_lib_size=5, max_lib_size=500, processes=1, seed=1):
+    signature.columns = ["gene", "value"]
     signature.index = signature.iloc[:, 0]
-    signature = signature.sort_values(1, ascending=False)
+    signature = signature.sort_values("value", ascending=False)
     signature = signature[~signature.index.duplicated(keep='first')]
     
     gsea_res = blitz.gsea(signature, library, min_size=min_lib_size, max_size=max_lib_size, permutations=permutations)
