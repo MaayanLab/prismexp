@@ -81,8 +81,9 @@ def plot_enrichment(enrichment):
 import seaborn
 
 def plot_gsea(signature, library, predictions, geneset_name, pred_gene_number=100, max_highlight = 30):
+    signature.columns = ["genes", "values"]
     signature.index = signature.iloc[:,0]
-    signature = signature.sort_values(1, ascending=False)
+    signature = signature.sort_values("values", ascending=False)
     signature = signature[~signature.index.duplicated(keep='first')]
     print(signature)
     prediction = predictions.loc[:,geneset_name].sort_values(0, ascending=False)
