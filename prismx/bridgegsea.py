@@ -19,10 +19,10 @@ def nes(signature, gene_set):
     number_hits = len(hits)
     number_miss = rank_vector.shape[0] - number_hits
     sum_hit_scores = np.sum(np.abs(rank_vector.iloc[hits]))
-    norm_hit =  1.0/sum_hit_scores
-    norm_no_hit = 1.0/number_miss
-    running_sum = np.cumsum(hit_indicator * np.abs(rank_vector[1]) * float(norm_hit) - no_hit_indicator * float(norm_no_hit))
-    nn = np.where(np.abs(running_sum)==np.max(np.abs(running_sum)))[0][0]
+    norm_hit =  float(1.0/sum_hit_scores)
+    norm_no_hit = float(1.0/number_miss)
+    running_sum = np.cumsum(hit_indicator * np.abs(signature) * norm_hit - no_hit_indicator * norm_no_hit)
+    nn = np.argmax(np.abs(running_sum))
     es = running_sum[nn]
     return running_sum, es
 
@@ -170,7 +170,7 @@ def plot_gsea(signature, library, predictions, geneset_name, pred_gene_number=10
     bar_width = 0.4
     
     v = ((prediction.loc[bars]/np.max(prediction))*np.max(np.abs(signature.iloc[:,1].loc[bars])))
-    print(np.max(prediction.loc[bars]))
+    
     b1 = ax1.barh(y_pos, v, height=bar_height, color="dodgerblue")
     b2 = ax1.barh(y_pos + bar_width, list(signature.iloc[:,1].loc[bars]), height=bar_height, color="black")
 
