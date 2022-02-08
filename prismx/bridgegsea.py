@@ -44,7 +44,7 @@ def filter_ledge(combined_scores):
     return filtered_ledge
 
 def bridge_gsea(signature, library, predictions, permutations=1000, pred_gene_number=50, min_lib_size=5, max_lib_size=500, processes=1, seed=1):
-    signature.index = signature[0]
+    signature.index = signature.iloc[:, 0]
     signature = signature.sort_values(1, ascending=False)
     signature = signature[~signature.index.duplicated(keep='first')]
     
@@ -80,7 +80,7 @@ def plot_enrichment(enrichment):
 import seaborn
 
 def plot_gsea(signature, library, predictions, geneset_name, pred_gene_number=100, max_highlight = 30):
-    signature.index = signature[0]
+    signature.index = signature.iloc[:,0]
     signature = signature.sort_values(1, ascending=False)
     signature = signature[~signature.index.duplicated(keep='first')]
     print(signature)
