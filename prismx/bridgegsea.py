@@ -10,10 +10,6 @@ import blitzgsea as blitz
 import scipy.stats as stats
 
 def nes(signature, gene_set):
-    signature.index = signature[0]
-    signature = signature.sort_values(1, ascending=False)
-    signature = signature[~signature.index.duplicated(keep='first')]
-    signature = signature.sort_values(1, ascending=False).set_index(0)
     gs = set(gene_set)
     hits = [i for i,x in enumerate(signature.index) if x in gs]
     hit_indicator = np.zeros(signature.shape[0])
@@ -87,7 +83,7 @@ def plot_gsea(signature, library, predictions, geneset_name, pred_gene_number=10
     signature.index = signature[0]
     signature = signature.sort_values(1, ascending=False)
     signature = signature[~signature.index.duplicated(keep='first')]
-    
+    print(signature)
     prediction = predictions.loc[:,geneset_name].sort_values(0, ascending=False)
     geneset = library[geneset_name]
     
