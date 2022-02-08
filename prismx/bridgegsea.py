@@ -10,18 +10,21 @@ import blitzgsea as blitz
 import scipy.stats as stats
 
 def nes(signature, gene_set):
-    rank_vector = signature.sort_values(1, ascending=False).set_index(0)
+    signature.index = signature[0]
+    signature = signature.sort_values(1, ascending=False)
+    signature = signature[~signature.index.duplicated(keep='first')]
+    signature = signature.sort_values(1, ascending=False).set_index(0)
     gs = set(gene_set)
-    hits = [i for i,x in enumerate(rank_vector.index) if x in gs]
-    hit_indicator = np.zeros(rank_vector.shape[0])
+    hits = [i for i,x in enumerate(signature.index) if x in gs]
+    hit_indicator = np.zeros(signature.shape[0])
     hit_indicator[hits] = 1
     no_hit_indicator = 1 - hit_indicator
     number_hits = len(hits)
-    number_miss = rank_vector.shape[0] - number_hits
-    sum_hit_scores = np.sum(np.abs(rank_vector.iloc[hits]))
+    number_miss = signature.shape[0] - number_hits
+    sum_hit_scores = np.sum(np.abs(signature.iloc[hits,1]))
     norm_hit =  float(1.0/sum_hit_scores)
     norm_no_hit = float(1.0/number_miss)
-    running_sum = np.cumsum(hit_indicator * np.abs(signature) * norm_hit - no_hit_indicator * norm_no_hit)
+    running_sum = np.cumsum(hit_indicator * np.abs(signature.iloc[:,1]) * norm_hit - no_hit_indicator * norm_no_hit)
     nn = np.argmax(np.abs(running_sum))
     es = running_sum[nn]
     return running_sum, es

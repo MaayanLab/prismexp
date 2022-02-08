@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="prismx",
-    version="0.1.6",
+    version="0.1.7",
     author="Alexander Lachmann",
     author_email="alexander.lachmann@mssm.edu",
     description="Package to for gene function predictions by unsupervised gene expression partitioning.",
