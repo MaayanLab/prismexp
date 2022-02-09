@@ -61,6 +61,9 @@ for lib in genesetlibs[0:6]:
 
 modelq_set.index = genesetlibs
 
+modelq_set["global"] = modelq_set_g.mean(axis=1)
+
+
 modelq_gene_g = pd.DataFrame()
 for lib in genesetlibs[0:6]:
     lq = list()
@@ -82,9 +85,12 @@ for lib in genesetlibs[0:6]:
 
 modelq_gene.index = genesetlibs
 
-np.fill_diagonal(modelq_gene.values, np.NaN)
+modelq_gene["global"] = modelq_gene_g.mean(axis=1)
 
-labels = ["ChEA", "GO: Biological Process", "GWAS Catalog", "KEA", "MGI Mammalian Phenotype", "huMAP"]
+#np.fill_diagonal(modelq_gene.values, np.NaN)
+
+labels = ["ChEA", "GO: Biological Process", "GWAS Catalog", "KEA", "Mammalian Phenotype", "huMAP"]
+labels2 = ["ChEA", "GO: Biological Process", "GWAS Catalog", "KEA", "Mammalian Phenotype", "huMAP", "global"]
 
 def heatmap(data, row_labels, col_labels, ax=None,
             cbar_kw={}, cbarlabel="", **kwargs):
@@ -170,8 +176,18 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
 plt.close()
 plt.rcParams["axes.grid"] = False
 fig, ax = plt.subplots()
-im, cbar = heatmap(modelq_gene, labels, labels, ax=ax,
+im, cbar = heatmap(modelq_gene, labels, labels2, ax=ax,
                    cmap="magma_r", cbarlabel="AUC")
 texts = annotate_heatmap(im, valfmt="{x:.2f}")
 fig.tight_layout()
-plt.show()
+plt.savefig("figures/modelq_gene.pdf")
+
+plt.close()
+plt.rcParams["axes.grid"] = False
+fig, ax = plt.subplots()
+im, cbar = heatmap(modelq_set, labels, labels2, ax=ax,
+                   cmap="magma_r", cbarlabel="AUC")
+texts = annotate_heatmap(im, valfmt="{x:.2f}")
+fig.tight_layout()
+plt.savefig("figures/modelq_set.pdf")
+

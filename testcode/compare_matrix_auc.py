@@ -17,7 +17,7 @@ import pandas as pd
 
 import prismx as px
 from prismx.validation import calculateGeneAUC, calculateSetAUC
-from prism.utils import readGMT
+from prismx.utils import readGMT
 
 def intersection(lst1, lst2): 
     lst3 = [value for value in lst1 if value in lst2]
@@ -35,19 +35,20 @@ aucs = aucs.set_index("index")
 libs = px.listLibraries()
 gmtFile = px.loadLibrary(libs[111], overwrite=True)
 outname = libs[111]
-geneAUC, setAUC = px.benchmarkGMTfast(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
+from prismx.validation import calculateSetAUC,calculateGeneAUC, benchmarkGMT, getGenes
+geneAUC2, setAUC2 = benchmarkGMT(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
 
-
+pd.write_feather()
 
 gop = pd.read_feather(outfolder+"/GO_Biological_Process_2018.f")
 gop = gop.set_index("index")
 gop.index = [x.decode("UTF-8") for x in gop.index]
 
-
+[libr, rev_libr, ugenes] = readGMT(gmtFile, backgroundGenes=gop.index)
 
 pred = pd.read_feather(predictionFolder+"/prediction_0.f")
 pred = pred.set_index("index")
-
+pred.index = [x.decode("UTF-8") for x in pred.index]
 
 
 
