@@ -48,7 +48,7 @@ plt.savefig("figures/feature_importance.pdf")
 
 
 # calculate AUC scores for individual correlation matrices. 
-aucs = pd.read_feather("testdata/full_auc_set.f")
+aucs = pd.read_feather("test_data/full_auc_set.f")
 aucs = aucs.set_index("index")
 ma = aucs.mean()
 
@@ -68,7 +68,7 @@ plt.close()
 
 
 # calculate AUC scores for individual correlation matrices. 
-aucs = pd.read_feather("testdata/full_auc_gene.f")
+aucs = pd.read_feather("test_data/full_auc_gene.f")
 aucs = aucs.set_index("index")
 ma = aucs.mean()
 

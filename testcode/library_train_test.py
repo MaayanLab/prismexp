@@ -16,26 +16,26 @@ genesetlibs = ["ChEA_2016", "KEA_2013", "GWAS_Catalog_2019", "huMAP", "GO_Biolog
 genesetlibs.sort()
 
 for lib in genesetlibs[0:2]:
-    gmtFile = px.loadLibrary(lib)
-    px.correlationScores(gmtFile, correlationFolder, predictionFolder, verbose=True)
-    model = px.trainModel(predictionFolder, correlationFolder, gmtFile, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
+    gmt_file = px.load_library(lib)
+    px.correlation_scores(gmt_file, correlationFolder, predictionFolder, verbose=True)
+    model = px.trainModel(predictionFolder, correlationFolder, gmt_file, training_size=300000, test_train_split=0.1, sample_positive=40000, sample_negative=200000, random_state=42, verbose=True)
     pickle.dump(model, open(lib+"_model_"+str(clusterCount)+".pkl", 'wb'))
 
 
 outfolder = "prismxresult_"+str(clusterCount)
 
-os.makedirs("testdata", exist_ok=True)
+os.makedirs("test_data", exist_ok=True)
 for lib in genesetlibs[0:2]:
     for lib2 in genesetlibs[0:6]:
         outname = lib2
-        gmtFile = px.loadLibrary(lib2)
-        px.predictGMT(lib+"_model_"+str(clusterCount)+".pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=200, intersect=True, verbose=True)
+        gmt_file = px.load_library(lib2)
+        px.predict_gmt(lib+"_model_"+str(clusterCount)+".pkl", gmt_file, correlationFolder, predictionFolder, outfolder, outname, step_size=200, intersect=True, verbose=True)
         # benchmark the prediction quality
-        geneAUC, setAUC = px.benchmarkGMTfast(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
+        geneAUC, setAUC = px.benchmarkGMTfast(gmt_file, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
         geneAUC = geneAUC.reset_index()
         setAUC = setAUC.reset_index()
-        geneAUC.to_feather("testdata/auc_gene_"+lib+"_"+lib2+".f")
-        setAUC.to_feather("testdata/auc_set_"+lib+"_"+lib2+".f")
+        geneAUC.to_feather("test_data/auc_gene_"+lib+"_"+lib2+".f")
+        setAUC.to_feather("test_data/auc_set_"+lib+"_"+lib2+".f")
 
 
 
@@ -44,7 +44,7 @@ modelq_set_g = pd.DataFrame()
 for lib in genesetlibs[0:6]:
     lq = list()
     for lib2 in genesetlibs[0:6]:
-        aauc = pd.read_feather("testdata/modelq/auc_set_"+lib+"_"+lib2+".f").mean()[0]
+        aauc = pd.read_feather("test_data/modelq/auc_set_"+lib+"_"+lib2+".f").mean()[0]
         lq.append(aauc)
     modelq_set_g[lib] = lq
 
@@ -55,7 +55,7 @@ modelq_set = pd.DataFrame()
 for lib in genesetlibs[0:6]:
     lq = list()
     for lib2 in genesetlibs[0:6]:
-        aauc = pd.read_feather("testdata/modelq/auc_set_"+lib+"_"+lib2+".f").mean()[1]
+        aauc = pd.read_feather("test_data/modelq/auc_set_"+lib+"_"+lib2+".f").mean()[1]
         lq.append(aauc)
     modelq_set[lib] = lq
 
@@ -68,7 +68,7 @@ modelq_gene_g = pd.DataFrame()
 for lib in genesetlibs[0:6]:
     lq = list()
     for lib2 in genesetlibs[0:6]:
-        aauc = pd.read_feather("testdata/modelq/auc_gene_"+lib+"_"+lib2+".f").mean()[0]
+        aauc = pd.read_feather("test_data/modelq/auc_gene_"+lib+"_"+lib2+".f").mean()[0]
         lq.append(aauc)
     modelq_gene_g[lib] = lq
 
@@ -79,7 +79,7 @@ modelq_gene = pd.DataFrame()
 for lib in genesetlibs[0:6]:
     lq = list()
     for lib2 in genesetlibs[0:6]:
-        aauc = pd.read_feather("testdata/modelq/auc_gene_"+lib+"_"+lib2+".f").mean()[1]
+        aauc = pd.read_feather("test_data/modelq/auc_gene_"+lib+"_"+lib2+".f").mean()[1]
         lq.append(aauc)
     modelq_gene[lib] = lq
 

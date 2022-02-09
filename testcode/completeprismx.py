@@ -15,15 +15,15 @@ def runPrismX():
     start = time.time()
     correlationFolder = "correlation_100_folder"
     predictionFolder = "prediction_100_folder"
-    libs = px.listLibraries()
-    gmtFile = px.loadLibrary(libs[110])
+    libs = px.list_libraries()
+    gmt_file = px.load_library(libs[110])
     px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=100, sampleCount=5000, correlationSampleCount=5000, verbose=True)
     t1 = time.time()-start
     print("T1: "+str(t1))
-    px.correlationScores(gmtFile, correlationFolder, predictionFolder, verbose=True)
+    px.correlation_scores(gmt_file, correlationFolder, predictionFolder, verbose=True)
     t2 = time.time()-start
     print("T2: "+str(t2))
-    model = px.trainModel(predictionFolder, correlationFolder, gmtFile, trainingSize=300000, testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
+    model = px.trainModel(predictionFolder, correlationFolder, gmt_file, training_size=300000, test_train_split=0.1, sample_positive=40000, sample_negative=200000, random_state=42, verbose=True)
     pickle.dump(model, open("gobp_model_300.pkl", 'wb'))
     t3 = time.time() - start
     print("T3: "+str(t3))
@@ -75,14 +75,14 @@ import time
 import matplotlib.pyplot as plt
 import pandas as pd
 import feather
-from prismx.utils import loadJSON, getConfig, getDataPath, readGMT
-from prismx.loaddata import getGenes
+from prismx.utils import load_json, get_config, get_data_path, read_gmt
+from prismx.loaddata import get_genes
 from progress.bar import Bar
 import numpy as np
 
-px.printLibraries()
-libs = px.listLibraries()
-gmtFile = px.loadLibrary(libs[28])
+px.print_libraries()
+libs = px.list_libraries()
+gmt_file = px.load_library(libs[28])
 
 outname = libs[28]
 correlationFolder = "correlation_100_folder"
@@ -90,9 +90,9 @@ predictionFolder = "prediction_100_folder"
 outfolder = "prismxresult_100"
 
 
-px.predictGMT("gobp_model_100.pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=1000, verbose=True)
+px.predict_gmt("gobp_model_100.pkl", gmt_file, correlationFolder, predictionFolder, outfolder, outname, step_size=1000, verbose=True)
 
-geneAUC, setAUC = px.benchmarkGMT(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", verbose=True)
+geneAUC, setAUC = px.benchmarkGMT(gmt_file, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", verbose=True)
 
 
 fig, ax = plt.subplots(figsize=[4,16])
@@ -126,28 +126,28 @@ correlationFolder = "correlation_folder"
 predictionFolder = "prediction_folder"
 
 # download/initialize gmt file
-px.printLibraries()
-libs = px.listLibraries()
-gmtFile = px.loadLibrary(libs[110])
+px.print_libraries()
+libs = px.list_libraries()
+gmt_file = px.load_library(libs[110])
 
 # apply gene filtering, expression clustering and correlation calculations
 px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=50, sampleCount=5000, 
             correlationSampleCount=5000, verbose=True)
 
 # average correlation scores for a given gmt file
-px.correlationScores(gmtFile, correlationFolder, predictionFolder, verbose=True)
+px.correlation_scores(gmt_file, correlationFolder, predictionFolder, verbose=True)
 
 # build a training data set and train model
-model = px.trainModel(predictionFolder, correlationFolder, gmtFile, trainingSize=300000, 
-            testTrainSplit=0.1, samplePositive=40000, sampleNegative=200000, randomState=42, verbose=True)
+model = px.trainModel(predictionFolder, correlationFolder, gmt_file, training_size=300000, 
+            test_train_split=0.1, sample_positive=40000, sample_negative=200000, random_state=42, verbose=True)
 
 
 
 import prismx as px
 
 # select gmt file
-px.printLibraries()
-libs = px.listLibraries()
+px.print_libraries()
+libs = px.list_libraries()
 
 gauc= []
 sauc=[]
@@ -156,16 +156,16 @@ siglibs = [159, 155, 149, 143, 120, 110, 95, 91, 76, 63, 46, 42, 39, 33, 27]
 siglibs.sort()
 
 for i in siglibs:
-    gmtFile = px.loadLibrary(libs[i])
+    gmt_file = px.load_library(libs[i])
     # set output configuration
     outname = libs[i]
     correlationFolder = "correlation_100_folder"
     predictionFolder = "prediction_100"
     outfolder = "prismxresult_100"
     # calculate PrismX predictions with pretrained model
-    px.predictGMT("gobp_model_100.pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=1000, verbose=True)
+    px.predict_gmt("gobp_model_100.pkl", gmt_file, correlationFolder, predictionFolder, outfolder, outname, step_size=1000, verbose=True)
     # benchmark the prediction quality
-    geneAUC, setAUC = px.benchmarkGMT(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", verbose=True)
+    geneAUC, setAUC = px.benchmarkGMT(gmt_file, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", verbose=True)
     gauc.append(geneAUC.iloc[:,-1].mean())
     sauc.append(setAUC.iloc[:,-1].mean())
 
@@ -173,8 +173,8 @@ for i in siglibs:
 import prismx as px
 
 # select gmt file
-px.printLibraries()
-libs = px.listLibraries()
+px.print_libraries()
+libs = px.list_libraries()
 
 gauc= []
 sauc=[]
@@ -184,16 +184,16 @@ siglibs = [95, 76, 63, 46, 42, 39, 33, 27]
 siglibs.sort()
 
 for i in siglibs:
-    gmtFile = px.loadLibrary(libs[i])
+    gmt_file = px.load_library(libs[i])
     # set output configuration
     outname = libs[i]
     correlationFolder = "correlation_folder"
     predictionFolder = "prediction_folder"
     outfolder = "prismxresult"
     # calculate PrismX predictions with pretrained model
-    px.predictGMT("gobp_model.pkl", gmtFile, correlationFolder, predictionFolder, outfolder, outname, stepSize=1000, verbose=True)
+    px.predict_gmt("gobp_model.pkl", gmt_file, correlationFolder, predictionFolder, outfolder, outname, step_size=1000, verbose=True)
     # benchmark the prediction quality
-    geneAUC, setAUC = px.benchmarkGMT(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", verbose=True)
+    geneAUC, setAUC = px.benchmarkGMT(gmt_file, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", verbose=True)
     gauc.append(geneAUC.iloc[:,-1].mean())
     sauc.append(setAUC.iloc[:,-1].mean())
 

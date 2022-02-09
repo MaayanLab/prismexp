@@ -72,8 +72,8 @@ pgene["100"] = score100.loc["prismx_gene",:]
 pgene["300"] = score300.loc["prismx_gene",:]
 
 
-pgene.to_csv("testdata/gene_auc5.tsv", sep="\t")
-pset.to_csv("testdata/set_auc5.tsv", sep="\t")
+pgene.to_csv("test_data/gene_auc5.tsv", sep="\t")
+pset.to_csv("test_data/set_auc5.tsv", sep="\t")
 
 def func(x, a, b, c):
     return a * np.log(b * x) + c

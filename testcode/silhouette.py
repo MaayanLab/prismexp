@@ -91,14 +91,14 @@ for n_clusters in range_n_clusters:
 plt.show()
 
 
-stepSize=2000
+step_size=2000
 transpose=True
 
 if transpose: exp = exp.transpose()
 
 expl = pd.DataFrame(np.log2(exp+1))
 
-stepNumber = math.ceil(expl.shape[0]/stepSize)
+step_number = math.ceil(expl.shape[0]/step_size)
 sampleNumber = expl.shape[1]
 geneNumber = expl.shape[0]
 
@@ -113,9 +113,9 @@ qn = pd.DataFrame(np.zeros(shape=(geneNumber,sampleNumber)))
 
 qn = qnorm.quantile_normalize(expl)
 
-for i in range(0, stepNumber):
-    rfrom=i*stepSize
-    rto = min(geneNumber, (i+1)*stepSize)
+for i in range(0, step_number):
+    rfrom=i*step_size
+    rto = min(geneNumber, (i+1)*step_size)
     exp_stack = expl.iloc[rfrom:rto,:].stack()
     exp_stack2 = exp_stack.map(exp_mean)
     qn.iloc[rfrom:rto,:] = exp_stack.unstack().fillna(0)

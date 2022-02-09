@@ -17,7 +17,7 @@ import pandas as pd
 
 import prismx as px
 from prismx.validation import calculateGeneAUC, calculateSetAUC
-from prismx.utils import readGMT
+from prism.utils import read_gmt
 
 def intersection(lst1, lst2): 
     lst3 = [value for value in lst1 if value in lst2]
@@ -30,13 +30,13 @@ outfolder = "prismxresult_q"
 
 
 
-aucs = pd.read_feather("testdata/gobp_all_avg.f")
+aucs = pd.read_feather("test_data/gobp_all_avg.f")
 aucs = aucs.set_index("index")
-libs = px.listLibraries()
-gmtFile = px.loadLibrary(libs[111], overwrite=True)
+libs = px.list_libraries()
+gmt_file = px.load_library(libs[111], overwrite=True)
 outname = libs[111]
-from prismx.validation import calculateSetAUC,calculateGeneAUC, benchmarkGMT, getGenes
-geneAUC2, setAUC2 = benchmarkGMT(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
+geneAUC, setAUC = px.benchmarkGMTfast(gmt_file, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
+
 
 pd.write_feather()
 
@@ -52,17 +52,17 @@ pred.index = [x.decode("UTF-8") for x in pred.index]
 
 
 
-aucs = pd.read_feather("testdata/gobp_all_avg.f")
+aucs = pd.read_feather("test_data/gobp_all_avg.f")
 aucs = aucs.set_index("index")
 
 clustn = 300
 
-libs = px.listLibraries()
-gmtFile = px.loadLibrary(libs[111], overwrite=True)
+libs = px.list_libraries()
+gmt_file = px.load_library(libs[111], overwrite=True)
 
 outname = libs[111]
 
-geneAUC, setAUC = px.benchmarkGMTfast(gmtFile, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
+geneAUC, setAUC = px.benchmarkGMTfast(gmt_file, correlationFolder, predictionFolder, outfolder+"/"+outname+".f", intersect=True, verbose=True)
 
 inter = intersection(setAUC.index, aucs.index)
 inter.sort()
@@ -72,4 +72,4 @@ setAUC = setAUC.loc[inter,:]
 
 aucs["prismx"] = setAUC.loc[:,"prismx"]
 auci = aucs.reset_index()
-auci.to_feather("testdata/matrix_auc.f")
+auci.to_feather("test_data/matrix_auc.f")

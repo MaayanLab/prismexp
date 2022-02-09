@@ -25,19 +25,20 @@ def quantile_normalize(df: pd.DataFrame) -> pd.DataFrame:
     df_qn = df.rank(method="min").stack().astype(int).map(df_mean).unstack()
     return(df_qn)
 
-def readGMT(gmtFile: str, backgroundGenes: List[str]=[], verbose=False) -> List:
-    file = open(gmtFile, 'r')
+def read_gmt(gmt_file: str, background_genes: List[str]=[], verbose=False) -> List:
+    file = open(gmt_file, 'r')
     lines = file.readlines()
     library = {}
-    backgroundSet = {}
-    if len(backgroundGenes) > 1:
-        backgroundGenes = [x.upper() for x in backgroundGenes]
-        backgroundSet = set(backgroundGenes)
+    background_set = {}
+    if len(background_genes) > 1:
+        background_genes = [x.upper() for x in background_genes]
+        background_set = set(background_genes)
     for line in lines:
         sp = line.strip().upper().split("\t")
         sp2 = [re.sub(",.*", "",value) for value in sp[2:]]
-        if len(backgroundGenes) > 0:
-            geneset = list(set(sp2).intersection(backgroundSet))
+        sp2 = [x for x in sp2 if x] 
+        if len(background_genes) > 2:
+            geneset = list(set(sp2).intersection(background_set))
             if len(geneset) > 0:
                 library[sp[0]] = geneset
         else:
@@ -55,12 +56,12 @@ def readGMT(gmtFile: str, backgroundGenes: List[str]=[], verbose=False) -> List:
         print("Library loaded. Library contains "+str(len(library))+" gene sets. "+str(len(ugenes))+" unique genes found.")
     return [library, rev_library, ugenes]
 
-def loadJSON(url):
+def load_json(url):
     req = urllib.request.Request(url)
     r = urllib.request.urlopen(req).read()
     return(json.loads(r.decode('utf-8')))
 
-def getConfig():
+def get_config():
     config_url = os.path.join(
         os.path.dirname(__file__),
         'data/config.json')
@@ -68,7 +69,7 @@ def getConfig():
         data = json.load(json_file)
     return(data)
 
-def getDataPath() -> str:
+def get_data_path() -> str:
     path = os.path.join(
         os.path.dirname(__file__),
         'data/'
@@ -84,15 +85,15 @@ def help():
         data = f.read()
         print(data)
 
-def normalize(exp: pd.DataFrame, stepSize: int=2000, transpose: bool=False) -> pd.DataFrame:
+def normalize(exp: pd.DataFrame, transpose: bool=False) -> pd.DataFrame:
     if transpose: exp = exp.transpose()
     exp = pd.DataFrame(np.log2(exp+1))
     exp = qnorm.quantile_normalize(exp)
     return(exp)
 
-def loadCorrelation(correlationFolder: str, suffix: int):
-    cc = pd.DataFrame(pd.read_feather(correlationFolder+"/correlation_"+str(suffix)+".f").set_index("index"), dtype=np.float32)
+def load_correlation(workdir: str, suffix: int) -> pd.DataFrame:
+    cc = pd.DataFrame(pd.read_feather(workdir+"/correlation/correlation_"+str(suffix)+".f").set_index("index"), dtype=np.float32)
     return(cc)
 
-def loadPrediction(predictionFolder: str, i: int):
-    return pd.DataFrame(pd.read_feather(predictionFolder+"/prediction_"+str(i)+".f").set_index("index"), dtype=np.float32)
+def load_feature(workdir: str, i: int) -> pd.DataFrame:
+    return pd.DataFrame(pd.read_feather(workdir+"/features/features_"+str(i)+".f").set_index("index"), dtype=np.float32)

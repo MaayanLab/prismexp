@@ -19,12 +19,12 @@ f = h5.File("mouse_matrix_3.h5", "w")
 dset = f.create_dataset("data/expression", exp.shape, chunks=(2, 3000), dtype=np.int32, compression='gzip',  compression_opts=9)
 
 steps = 500
-stepSize = math.floor(exp.shape[0]/steps)
+step_size = math.floor(exp.shape[0]/steps)
 
 for i in range(0, steps+1):
     print(i)
-    fromStep = i*stepSize
-    toStep = min((i+1)*stepSize, exp.shape[0])
+    fromStep = i*step_size
+    toStep = min((i+1)*step_size, exp.shape[0])
     ee = exp[fromStep:toStep, :]
     dset[fromStep:toStep, :] = exp[fromStep:toStep, :]
 
