@@ -9,3 +9,4 @@ figures/*
 test_data/*
 *.pdf
 prismx/data/GO_B*
+testdata/*
