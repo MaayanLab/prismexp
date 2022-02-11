@@ -85,7 +85,7 @@ def plot_gsea(signature, library, predictions, geneset_name, pred_gene_number=10
     signature.index = signature.iloc[:,0]
     signature = signature.sort_values("values", ascending=False)
     signature = signature[~signature.index.duplicated(keep='first')]
-    print(signature)
+    
     prediction = predictions.loc[:,geneset_name].sort_values(0, ascending=False)
     geneset = library[geneset_name]
     
