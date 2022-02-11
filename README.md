@@ -19,6 +19,15 @@ Human Data (238522 samples): https://mssm-seq-matrix.s3.amazonaws.com/human_matr
 
 ---
 
+
+## Installation
+
+Install the python package directly from Github using PIP.
+
+```
+$ pip install git+https://github.com/MaayanLab/prismexp.git
+```
+
 ## Usage
 
 ### Create gene correlation matrices
