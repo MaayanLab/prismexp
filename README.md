@@ -115,3 +115,25 @@ outfolder = "prismxresult"
 
 px.predict_gmt("gobp_model.pkl", gmt_file, correlationFolder, predictionFolder, outfolder, outname, step_size=200, intersect=False, verbose=True)
 ```
+
+## Bridge Gene Set Enrichment Analysis (bridgeGSEA)
+
+Use PrismEXP gene set predictions in enrichment analysis to identify novel genes in enriched pathways and biological processes.
+
+```
+import prismx as px
+import prismx.gsea as pxgsea
+import blitzgsea as blitz
+import urllib.request
+
+url = "https://github.com/MaayanLab/blitzgsea/raw/main/testing/ageing_muscle_gtex.tsv"
+urllib.request.urlretrieve(url, "ageing_muscle_gtex.tsv")
+
+# read signature as pandas dataframe
+signature = pd.read_csv("ageing_muscle_gtex.tsv")
+
+# use enrichr submodule to retrieve gene set library
+library = blitz.enrichr.get_library("GO_Biological_Process_2021")
+
+result = px.bridgegsea.bridge_gsea(signature, library, predictions)
+```
