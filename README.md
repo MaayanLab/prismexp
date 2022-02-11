@@ -120,7 +120,7 @@ px.predict_gmt("gobp_model.pkl", gmt_file, correlationFolder, predictionFolder, 
 
 Use PrismEXP gene set predictions in enrichment analysis to identify novel genes in enriched pathways and biological processes.
 
-```
+```python
 import prismx as px
 import prismx.gsea as pxgsea
 import blitzgsea as blitz
