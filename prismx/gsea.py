@@ -3,14 +3,12 @@ import feather
 import numpy as np
 import os
 import h5py as h5
-import mygene
 import requests
 import json
 
 from matplotlib import pyplot as plt
 import seaborn
 seaborn.set(style='ticks')
-import gseapy
 import scipy.stats as stats
 
 burl = "https://maayanlab.cloud/prismexpapi/"
