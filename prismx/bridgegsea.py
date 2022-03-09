@@ -5,6 +5,9 @@ import os
 import requests
 import json
 
+import seaborn
+
+
 from matplotlib import pyplot as plt
 import blitzgsea as blitz
 import scipy.stats as stats
@@ -77,8 +80,6 @@ def plot_enrichment(enrichment):
     ax.set_xlabel('NES', fontsize=20)
     ax.set_ylabel('bridged NES', fontsize=20)
     return f
-
-import seaborn
 
 def plot_gsea(signature, library, predictions, geneset_name, pred_gene_number=100, max_highlight = 30):
     signature.columns = ["genes", "values"]
