@@ -33,6 +33,7 @@ def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: in
             Returns:
                     gene cluster mapping (pandas.DataFrame)
     '''
+    os.makedirs(outputFolder, exist_ok=True)
     if verbose: print("1. Filter genes")
     tstart = time.time()
     filtered_genes = filterGenes(h5file, readThreshold, sampleThreshold, filterSamples)

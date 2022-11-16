@@ -11,7 +11,7 @@ from prismx.utils import quantile_normalize, normalize
 
 np.seterr(divide='ignore', invalid='ignore')
 
-def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[int], clusterID: str="global", maxSampleCount: int=2000) -> List:
+def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[int], clusterID: str="global", maxSampleCount: int=2000) -> pd.DataFrame:
     '''
     Returns correlation matrix for specified samples
 
