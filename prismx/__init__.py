@@ -43,7 +43,6 @@ def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: in
     tstart = time.time()
     clustering = create_clustering(h5file, filtered_genes, clusterGeneCount, clusterCount)
     tclust = clustering.iloc[:,1]
-    tclust.index = [x.decode("UTF-8") for x in tclust.index]
     tclust.to_csv(outputFolder+"/clustering.tsv", sep="\t")
     elapsed = round((time.time()-tstart)/60,2)
     if verbose: print("   -> completed in "+str(elapsed)+"min")
