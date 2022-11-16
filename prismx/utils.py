@@ -88,7 +88,8 @@ def help():
 def normalize(exp: pd.DataFrame, transpose: bool=False) -> pd.DataFrame:
     if transpose: exp = exp.transpose()
     exp = pd.DataFrame(np.log2(exp+1))
-    exp = qnorm.quantile_normalize(exp)
+    exp_qnorm = qnorm.quantile_normalize(np.array(exp, dtype=np.float32))
+    exp = pd.DataFrame(exp_qnorm, index=exp.index, columns=exp.columns)
     return(exp)
 
 def load_correlation(workdir: str, suffix: int) -> pd.DataFrame:

@@ -26,7 +26,7 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
     '''
     f = h5.File(h5file, 'r')
     samples = f['meta/samples/geo_accession']
-    genes = f['meta/genes/genes']
+    genes = f['meta/genes/gene_symbol']
     if clusterID == "global":
         samplesidx = sorted(random.sample(range(len(samples)), min(maxSampleCount, len(samples))))
     else:
