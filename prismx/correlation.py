@@ -6,12 +6,13 @@ import pandas as pd
 import random
 from typing import List
 import sys
+import archs4py as a4
 
 from prismx.utils import quantile_normalize, normalize
 
 np.seterr(divide='ignore', invalid='ignore')
 
-def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[int], clusterID: str="global", maxSampleCount: int=2000) -> pd.DataFrame:
+def calculate_correlation(h5file: str, clustering: pd.DataFrame, geneidx: List[int], clusterID: str="global", maxSampleCount: int=2000) -> pd.DataFrame:
     '''
     Returns correlation matrix for specified samples
 
@@ -46,7 +47,7 @@ def calculateCorrelation(h5file: str, clustering: pd.DataFrame, geneidx: List[in
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
     return(correlation)
 
-def createClustering(h5file: str, geneidx: List[int], geneCount: int=500, clusterCount: int=50, deterministic: bool=True) -> pd.DataFrame:
+def create_clustering(h5file: str, geneidx: List[int], geneCount: int=500, clusterCount: int=50, deterministic: bool=True) -> pd.DataFrame:
     '''
     Returns cluster association for all samples in input expression h5 file
 
@@ -60,12 +61,12 @@ def createClustering(h5file: str, geneidx: List[int], geneCount: int=500, cluste
     '''
     if deterministic:
         random.seed(42)
-    f = h5.File(h5file, 'r')
-    expression = f['data/expression']
-    samples = list(f['meta/samples/geo_accession'])
-    genes = sorted(random.sample(geneidx, geneCount))
-    exp = expression[genes, :]
-    f.close()
+    
+    samples = a4.meta.get_meta_sample_field(h5file,'geo_accession')
+    genes = a4.meta.get_meta_gene_field(h5file,'gene_symbol')
+
+    exp = a4.data.index(h5file, list(range(len(samples))), gene_idx=sorted(random.sample(range(len(genes)), geneCount)))
+
     qq = normalize(exp, transpose=False)
     qq = pd.DataFrame(zscore(qq, axis=1)).fillna(0)
     exp = 0

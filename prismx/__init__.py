@@ -10,7 +10,7 @@ from progress.bar import Bar
 from typing import List
 
 from prismx.filter import filterGenes
-from prismx.correlation import createClustering, calculateCorrelation
+from prismx.correlation import create_clustering, calculate_correlation
 from prismx.feature import features
 from prismx.training import train
 from prismx.utils import get_config, help, read_gmt, normalize
@@ -41,7 +41,7 @@ def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: in
     if verbose: print("   -> completed in "+str(elapsed)+"min / #genes="+str(len(filtered_genes)))
     if verbose: print("2. Cluster samples")
     tstart = time.time()
-    clustering = createClustering(h5file, filtered_genes, clusterGeneCount, clusterCount)
+    clustering = create_clustering(h5file, filtered_genes, clusterGeneCount, clusterCount)
     tclust = clustering.iloc[:,1]
     tclust.index = [x.decode("UTF-8") for x in tclust.index]
     tclust.to_csv(outputFolder+"/clustering.tsv", sep="\t")
@@ -55,7 +55,7 @@ def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: in
     os.makedirs(outputFolder+"/correlation", exist_ok=True)
     if verbose: bar = Bar('Processing correlation', max=len(mats))
     for i in range(0, len(mats)):
-        cor_mat = calculateCorrelation(h5file, clustering, filtered_genes, clusterID=mats[i], maxSampleCount=sampleCount)
+        cor_mat = calculate_correlation(h5file, clustering, filtered_genes, clusterID=mats[i], maxSampleCount=sampleCount)
         cor_mat.columns = cor_mat.columns.astype(str)
         cor_mat.reset_index().to_feather(outputFolder+"/correlation/correlation_"+str(mats[i])+".f")
         j = j+1
