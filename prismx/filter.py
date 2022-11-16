@@ -24,14 +24,13 @@ def filterGenes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.02,
     if deterministic:
         random.seed(42)
 
-    exp = a4.data.rand(h5file, 100, filterSingle=True)
+    exp = a4.data.rand(h5file, filterSamples, filterSingle=True)
     #f = h5.File(h5file, 'r')
     #expression = f['data/expression']
     #filterSamples = min(expression.shape[1], filterSamples)
     #random_samples = sorted(random.sample(range(expression.shape[1]), filterSamples))
     #exp = pd.DataFrame(expression[:, random_samples], dtype=np.int32)
     kk = exp[exp > readThreshold].count(axis=1)
-    del exp
     #f.close()
     return([idx for idx, val in enumerate(kk) if val >= exp.shape[1]*sampleThreshold])
 
