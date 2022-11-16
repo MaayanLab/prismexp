@@ -25,20 +25,16 @@ def calculate_correlation(h5file: str, clustering: pd.DataFrame, geneidx: List[i
                     correlation coefficients (pandas DataFrame)
                     average sample correlation
     '''
-    samples = a4.meta.get_meta_sample_field(h5file,'geo_accession')
-    genes = a4.meta.get_meta_gene_field(h5file,'gene_symbol')
+    samples = np.array(a4.meta.get_meta_sample_field(h5file,'geo_accession'))
+    genes = np.array(a4.meta.get_meta_gene_field(h5file,'gene_symbol'))
 
-    #f = h5.File(h5file, 'r')
-    #samples = f['meta/samples/geo_accession']
-    #genes = f['meta/genes/gene_symbol']
     if clusterID == "global":
         samplesidx = sorted(random.sample(range(len(samples)), min(maxSampleCount, len(samples))))
     else:
         samplesidx = np.where(clustering.loc[:,"clusterID"] == int(clusterID))[0]
         if maxSampleCount > 2: samplesidx = sorted(random.sample(set(samplesidx), min(len(samplesidx), maxSampleCount)))
     
-    exp = a4.data.index(h5file, samplesidx, gene_idx=geneidx)
-    #exp = f['data/expression'][:,samplesidx][geneidx,:]
+    exp = a4.data.index(h5file, samplesidx, gene_idx=geneidx, silent=True)
     qq = normalize(exp, transpose=False)
     exp = 0
     cc = np.corrcoef(qq)

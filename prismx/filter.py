@@ -25,13 +25,7 @@ def filterGenes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.02,
         random.seed(42)
 
     exp = a4.data.rand(h5file, filterSamples, filterSingle=True)
-    #f = h5.File(h5file, 'r')
-    #expression = f['data/expression']
-    #filterSamples = min(expression.shape[1], filterSamples)
-    #random_samples = sorted(random.sample(range(expression.shape[1]), filterSamples))
-    #exp = pd.DataFrame(expression[:, random_samples], dtype=np.int32)
     kk = exp[exp > readThreshold].count(axis=1)
-    #f.close()
     return([idx for idx, val in enumerate(kk) if val >= exp.shape[1]*sampleThreshold])
 
 def geneClustering(h5file: str, geneidx: List[int], clusterCount: int=100, sampleCount: int=3000) -> pd.DataFrame:
@@ -45,17 +39,17 @@ def geneClustering(h5file: str, geneidx: List[int], clusterCount: int=100, sampl
         Returns:
                 (pandas.DataFrame): gene cluster mapping
     '''
-    f = h5.File(h5file, 'r')
-    expression = f['data/expression']
-    samples = f['meta/samples/geo_accession']
-    genes = f['meta/genes/gene_symbol']
+    
+    samples = np.array(a4.meta.get_meta_sample_field(h5file,'geo_accession'))
+    genes = np.array(a4.meta.get_meta_gene_field(h5file,'gene_symbol'))
+
     sampleCount = min(len(samples), sampleCount)
     clusterCount = min(len(genes), clusterCount)
     sampleidx = random.sample(range(0, len(samples)), sampleCount)
     sampleidx.sort()
     geneidx.sort()
     exp = 0     # keep memory footprint low
-    exp = expression[geneidx,:][:, sampleidx]
+    exp = a4.data.index(h5file, sampleidx, gene_idx=geneidx)
     qq = normalize(exp, transpose=False)
     kmeans = KMeans(n_clusters=clusterCount, random_state=42).fit(qq)
     qq = 0      # keep memory footprint low
