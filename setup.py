@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="prismx",
-    version="0.1.15",
+    version="0.1.16",
     author="Alexander Lachmann",
     author_email="alexander.lachmann@mssm.edu",
     description="Package to for gene function predictions by unsupervised gene expression partitioning.",
@@ -32,7 +32,8 @@ setuptools.setup(
         'qnorm',
         'lightgbm',
         'gseapy',
-        'blitzgsea @ git+https://github.com/maayanlab/blitzgsea.git'
+        'blitzgsea @ git+https://github.com/maayanlab/blitzgsea.git',
+        'archs4py @ git+https://github.com/MaayanLab/archs4py.git'
     ],
     python_requires='>=3.6',
 )
