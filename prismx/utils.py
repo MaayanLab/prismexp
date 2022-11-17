@@ -94,8 +94,8 @@ def normalize(exp: pd.DataFrame, transpose: bool=False) -> pd.DataFrame:
 
 def load_correlation(workdir: str, suffix: int) -> pd.DataFrame:
     cc = pd.DataFrame(pd.read_feather(workdir+"/correlation/correlation_"+str(suffix)+".f").set_index("index"), dtype=np.float16)
-    cc.index = np.char.upper(cc.index)
-    cc.columns = np.char.upper(cc.columns)
+    cc.index = [g.upper() for g in cc.index]
+    cc.columns = [g.upper() for g in cc.columns]
     return(cc)
 
 def load_feature(workdir: str, i: int) -> pd.DataFrame:
