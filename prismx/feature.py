@@ -28,7 +28,7 @@ def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=4,
     lk = list(range(0, len(correlation_files)-1))
     lk.append("global")
     #if verbose: bar = Bar('Processing average correlation', max=len(lk))
-    if verbose: pbar = tqdm(total=len(lk))
+    #if verbose: pbar = tqdm(total=len(lk))
     params = list()
     for ll in lk:
         params.append((workdir, ll, library, intersect, ugenes))
@@ -42,7 +42,7 @@ def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=4,
             res = r.get()
 
     #if verbose: bar.finish()
-    if verbose: pbar.close()
+    #if verbose: pbar.close()
 
 def get_average_correlation(workdir: str, i: int, library: Dict, intersect: bool=False, ugenes: List=[]):
     correlation = load_correlation(workdir, i)
