@@ -23,7 +23,7 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
     lk = list(range(0, len(correlation_files)-1))
     lk.append("global")
     
-    for i in tqdm.tqdm(lk, desc="Build True Examples", silent=(not verbose)):
+    for i in tqdm.tqdm(lk, desc="Build True Examples", disable=(not verbose)):
         feature = load_feature(workdir, i)
         features = []
         keys = list(feature.columns)
@@ -53,7 +53,7 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
                 samp_gene.append(rgene)
     df_false = []
     
-    for i in tqdm.tqdm(lk, desc="Build False Examples", silent=(not verbose)):
+    for i in tqdm.tqdm(lk, desc="Build False Examples", disable=(not verbose)):
         feature = load_feature(workdir, i)
         features = []
         setname = []
