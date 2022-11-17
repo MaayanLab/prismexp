@@ -93,7 +93,7 @@ def normalize(exp: pd.DataFrame, transpose: bool=False) -> pd.DataFrame:
     return(exp)
 
 def load_correlation(workdir: str, suffix: int) -> pd.DataFrame:
-    cc = pd.DataFrame(pd.read_feather(workdir+"/correlation/correlation_"+str(suffix)+".f").set_index("index"), dtype=np.float32)
+    cc = pd.DataFrame(pd.read_feather(workdir+"/correlation/correlation_"+str(suffix)+".f").set_index("index"), dtype=np.float16)
     return(cc)
 
 def load_feature(workdir: str, i: int) -> pd.DataFrame:
