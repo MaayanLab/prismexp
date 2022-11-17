@@ -9,11 +9,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from lightgbm import LGBMRegressor
 from progress.bar import Bar
+import tqdm
 
 from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.feature import load_features
 
-def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50000) -> List:
+def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50000, verbose: bool=True) -> List:
     correlation_files = os.listdir(workdir+"/correlation")
     correlation = load_correlation(workdir, 0)
     background_genes = list(correlation.columns)
@@ -21,8 +22,8 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
     df_true = pd.DataFrame()
     lk = list(range(0, len(correlation_files)-1))
     lk.append("global")
-    bar = Bar('Retrieve training data', max=2*len(lk))
-    for i in lk:
+    
+    for i in tqdm.tqdm(lk, desc="Build True Examples", silent=(not verbose)):
         feature = load_feature(workdir, i)
         features = []
         keys = list(feature.columns)
@@ -35,7 +36,7 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
                 genename.append(se)
                 features.append(feature.loc[val, se])
         df_true.loc[:,i] = features
-        bar.next()
+        
     df_true2 = pd.concat([pd.DataFrame(genename), pd.DataFrame(setname),df_true, pd.DataFrame(np.ones(len(setname)))], axis=1)
     samp_set = []
     samp_gene = []
@@ -50,8 +51,8 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
                 samp_set.append(rkey)
                 samp_gene.append(rgene)
     df_false = pd.DataFrame()
-    Bar('Retrieve false samples ', max=len(lk))
-    for i in lk:
+    
+    for i in tqdm.tqdm(lk, desc="Build False Examples", silent=(not verbose)):
         feature = load_feature(workdir, i)
         features = []
         setname = []
@@ -63,9 +64,8 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
             genename.append(val)
             features.append(feature.loc[val, se])
         df_false.loc[:,i] = features
-        bar.next()
+        
     df_false2 = pd.concat([pd.DataFrame(setname), pd.DataFrame(genename),df_false,pd.DataFrame(np.zeros(len(setname)))], axis=1)
-    bar.finish()
     return([df_true2, df_false2.iloc[random.sample(range(0, df_false2.shape[0]), false_sample_count), :]])
 
 def balance_data(df_true: pd.DataFrame, df_false: pd.DataFrame, true_count: int, false_count: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -82,7 +82,7 @@ def balance_data(df_true: pd.DataFrame, df_false: pd.DataFrame, true_count: int,
     return(X, y)
 
 def train(workdir: str, gmt_file: str, training_size: int=200000, test_train_split: float=0.1, sample_positive: int=20000, sample_negative: int=80000, random_state: int=42, verbose: bool=False):
-    df_true, df_false = create_training_data(workdir, gmt_file, training_size)
+    df_true, df_false = create_training_data(workdir, gmt_file, training_size, verbose=verbose)
     X, y = balance_data(df_true, df_false, sample_positive, sample_negative)
     true_count = np.sum(y)
     false_count = len(y)-true_count
