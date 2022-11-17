@@ -19,7 +19,7 @@ from prismx.prediction import predict, prismx_predictions
 from prismx.validation import benchmark_gmt, benchmarkGMTfast, benchmark_gmt_fast
 from prismx.bridgegsea import bridge_gsea, plot_enrichment, plot_gsea, nes
 
-def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, verbose: bool=True):
+def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, reuseClustering: bool=False, verbose: bool=True):
     '''
     Write a set of correlation matrices, by partitioning gene expression into clusters and applying Pearson
     correlation for pairs of genes. It will also create an additional matrix for global correlation.
@@ -41,7 +41,7 @@ def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: in
     if verbose: print("   -> completed in "+str(elapsed)+"min / #genes="+str(len(filtered_genes)))
     if verbose: print("2. Cluster samples")
     tstart = time.time()
-    clustering = create_clustering(h5file, filtered_genes, clusterGeneCount, clusterCount)
+    clustering = create_clustering(h5file, outputFolder, filtered_genes, clusterGeneCount, clusterCount, reuseClustering=reuseClustering)
     tclust = clustering.iloc[:,1]
     tclust.to_csv(outputFolder+"/clustering.tsv", sep="\t")
     elapsed = round((time.time()-tstart)/60,2)

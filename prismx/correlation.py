@@ -45,9 +45,9 @@ def calculate_correlation(h5file: str, clustering: pd.DataFrame, geneidx: List[i
     correlation.columns = genes[geneidx]
     cc = 0
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
-    return(correlation)
+    return correlation
 
-def create_clustering(h5file: str, geneidx: List[int], geneCount: int=500, clusterCount: int=50, deterministic: bool=True) -> pd.DataFrame:
+def create_clustering(h5file: str, workdir, geneidx: List[int], geneCount: int=500, clusterCount: int=50, deterministic: bool=True, reuseClustering=False) -> pd.DataFrame:
     '''
     Returns cluster association for all samples in input expression h5 file
 
@@ -62,10 +62,19 @@ def create_clustering(h5file: str, geneidx: List[int], geneCount: int=500, clust
     if deterministic:
         random.seed(42)
     
-    samples = a4.meta.get_meta_sample_field(h5file,'geo_accession')
-    genes = a4.meta.get_meta_gene_field(h5file,'gene_symbol')
+    if reuseClustering:
+        try:
+            clusterMapping = pd.read_csv(workdir+"/clustering.tsv")
+            clusterMapping.index = clusterMapping.iloc[:,0]
+            clusterMapping.columns=["sampleID", "clusterID"]
+            if len(set(clusterMapping.iloc[:,1])) == clusterCount:
+                return clusterMapping
+        except Exception:
+            x = "file could not be read or clustering number does not match"
 
-    exp = a4.data.index(h5file, list(range(len(samples))), gene_idx=sorted(random.sample(range(len(genes)), geneCount)))
+    samples = a4.meta.get_meta_sample_field(h5file,'geo_accession')
+
+    exp = a4.data.index(h5file, list(range(len(samples))), gene_idx=sorted(random.sample(geneidx, geneCount)))
 
     qq = normalize(exp, transpose=False)
     qq = pd.DataFrame(zscore(qq, axis=1)).fillna(0)
@@ -75,4 +84,4 @@ def create_clustering(h5file: str, geneidx: List[int], geneCount: int=500, clust
     clustering = kmeans.labels_
     kmeans = 0  # keep memory footprint low
     clusterMapping = pd.DataFrame({'sampleID': samples, 'clusterID': clustering}, index = samples, columns=["sampleID", "clusterID"])
-    return(clusterMapping)
+    return clusterMapping
