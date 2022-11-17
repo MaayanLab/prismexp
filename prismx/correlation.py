@@ -64,7 +64,7 @@ def create_clustering(h5file: str, workdir, geneidx: List[int], geneCount: int=5
     
     if reuseClustering:
         try:
-            clusterMapping = pd.read_csv(workdir+"/clustering.tsv")
+            clusterMapping = pd.read_csv(workdir+"/clustering.tsv", sep="\t")
             clusterMapping.index = clusterMapping.iloc[:,0]
             clusterMapping.columns=["sampleID", "clusterID"]
             if len(set(clusterMapping.iloc[:,1])) == clusterCount:
