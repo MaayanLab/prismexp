@@ -33,7 +33,7 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
             for val in vals:
                 setname.append(val)
                 genename.append(se)
-                features.append(feature.loc[val.encode('UTF-8'), se])
+                features.append(feature.loc[val, se])
         df_true.loc[:,i] = features
         bar.next()
     df_true2 = pd.concat([pd.DataFrame(genename), pd.DataFrame(setname),df_true, pd.DataFrame(np.ones(len(setname)))], axis=1)
@@ -61,7 +61,7 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
             val = samp_gene[k]
             setname.append(se)
             genename.append(val)
-            features.append(feature.loc[val.encode('UTF-8'), se])
+            features.append(feature.loc[val, se])
         df_false.loc[:,i] = features
         bar.next()
     df_false2 = pd.concat([pd.DataFrame(setname), pd.DataFrame(genename),df_false,pd.DataFrame(np.zeros(len(setname)))], axis=1)

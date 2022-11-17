@@ -99,4 +99,4 @@ def load_correlation(workdir: str, suffix: int) -> pd.DataFrame:
     return(cc)
 
 def load_feature(workdir: str, i: int) -> pd.DataFrame:
-    return pd.DataFrame(pd.read_feather(workdir+"/features/features_"+str(i)+".f").set_index("index"), dtype=np.float32)
+    return pd.DataFrame(pd.read_feather(workdir+"/features/features_"+str(i)+".f").set_index("index"), dtype=np.float16)
