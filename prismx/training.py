@@ -19,7 +19,7 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
     correlation = load_correlation(workdir, 0)
     background_genes = list(correlation.columns)
     library, rev_library, ugenes = read_gmt(gmt_file, background_genes)
-    df_true = pd.DataFrame()
+    df_true = []
     lk = list(range(0, len(correlation_files)-1))
     lk.append("global")
     
@@ -35,7 +35,8 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
                 setname.append(val)
                 genename.append(se)
                 features.append(feature.loc[val, se])
-        df_true.loc[:,i] = features
+        df_true.append(features)
+    df_true = pd.concat(df_true, axis=1)
         
     df_true2 = pd.concat([pd.DataFrame(genename), pd.DataFrame(setname),df_true, pd.DataFrame(np.ones(len(setname)))], axis=1)
     samp_set = []
@@ -50,7 +51,7 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
             if rgene not in df_true2.iloc[ww, 1]:
                 samp_set.append(rkey)
                 samp_gene.append(rgene)
-    df_false = pd.DataFrame()
+    df_false = []
     
     for i in tqdm.tqdm(lk, desc="Build False Examples", silent=(not verbose)):
         feature = load_feature(workdir, i)
@@ -63,8 +64,8 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
             setname.append(se)
             genename.append(val)
             features.append(feature.loc[val, se])
-        df_false.loc[:,i] = features
-        
+        df_false.append(features)
+    df_true = pd.concat(df_false, axis=1)
     df_false2 = pd.concat([pd.DataFrame(setname), pd.DataFrame(genename),df_false,pd.DataFrame(np.zeros(len(setname)))], axis=1)
     return([df_true2, df_false2.iloc[random.sample(range(0, df_false2.shape[0]), false_sample_count), :]])
 
