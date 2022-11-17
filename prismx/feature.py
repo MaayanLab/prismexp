@@ -32,8 +32,15 @@ def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=4,
     params = list()
     for ll in lk:
         params.append((workdir, ll, library, intersect, ugenes))
-    process_pool = multiprocessing.Pool(threads)
-    process_pool.starmap(get_average_correlation, params)
+    #process_pool = multiprocessing.Pool(threads)
+    #process_pool.starmap(get_average_correlation, params)
+
+    PROCESSES = threads
+    with multiprocessing.Pool(PROCESSES) as pool:
+        results = [pool.apply_async(get_average_correlation, i) for i in params]
+        for r in tqdm(results, disable=(not verbose)):
+            res = r.get()
+
     #if verbose: bar.finish()
     if verbose: pbar.close()
 
@@ -51,6 +58,7 @@ def get_average_correlation(workdir: str, i: int, library: Dict, intersect: bool
     features = features.reset_index()
     features.columns = features.columns.astype(str)
     features.to_feather(workdir+"/features/features_"+str(i)+".f")
+    return 1
 
 def load_features(workdir: str, verbose: bool=False): 
     features = []
