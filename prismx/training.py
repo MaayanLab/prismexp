@@ -36,7 +36,8 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
                 genename.append(se)
                 features.append(feature.loc[val, se])
         df_true.append(features)
-    df_true = pd.concat(df_true, axis=1)
+    #df_true = pd.concat(df_true, axis=1)
+    df_true = pd.DataFrame(np.array(df_true).T)
         
     df_true2 = pd.concat([pd.DataFrame(genename), pd.DataFrame(setname),df_true, pd.DataFrame(np.ones(len(setname)))], axis=1)
     samp_set = []
@@ -65,7 +66,7 @@ def create_training_data(workdir: str, gmt_file: str, false_sample_count: int=50
             genename.append(val)
             features.append(feature.loc[val, se])
         df_false.append(features)
-    df_true = pd.concat(df_false, axis=1)
+    df_false = pd.DataFrame(np.array(df_false).T)
     df_false2 = pd.concat([pd.DataFrame(setname), pd.DataFrame(genename),df_false,pd.DataFrame(np.zeros(len(setname)))], axis=1)
     return([df_true2, df_false2.iloc[random.sample(range(0, df_false2.shape[0]), false_sample_count), :]])
 
