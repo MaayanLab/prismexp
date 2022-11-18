@@ -39,6 +39,6 @@ def print_libraries():
 
 def get_genes(workdir: str) -> List[str]:
     cc = pd.read_feather(workdir+"/correlation/correlation_0.f").set_index("index")
-    genes = list(cc.index)
+    genes = [x.upper() for x in list(cc.index)]
     cc = 0
     return(genes)
