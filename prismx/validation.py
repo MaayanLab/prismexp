@@ -1,7 +1,9 @@
 from sklearn.metrics import roc_auc_score, roc_curve, auc
 import pandas as pd
+import numpy as np
 from typing import Dict, List
 from progress.bar import Bar
+import tqdm
 import os
 import pickle
 from prismx.utils import read_gmt, load_correlation, load_feature
@@ -34,7 +36,7 @@ def calculate_gene_auc(prediction: pd.DataFrame, rev_library: Dict, min_lib_size
     return(aucs)
 
 def benchmark_gmt(gmt_file: str, workdir: str, prediction_file: str, intersect: bool=False, verbose=False):
-    genes = [x.decode("UTF-8") for x in get_genes(workdir)]
+    genes = get_genes(workdir)
     library, rev_library, unique_genes = read_gmt(gmt_file, genes, verbose=verbose)
     if intersect:
         ugenes = list(set(sum(library.values(), [])))
@@ -42,17 +44,16 @@ def benchmark_gmt(gmt_file: str, workdir: str, prediction_file: str, intersect: 
     prediction_files = os.listdir(workdir+"/features")
     lk = list(range(0, len(prediction_files)-1))
     lk.append("global")
-    geneAUC = pd.DataFrame()
-    setAUC = pd.DataFrame()
-    if verbose: bar = Bar('AUC calculation', max=len(lk))
-    for i in lk:
+    geneAUC = []
+    setAUC = []
+    for i in tqdm.tqdm(lk, desc="AUC calculation", disable=(not verbose)):
         prediction = load_feature(workdir, i).loc[genes,:]
-        prediction.index = [x.decode("UTF-8") for x in prediction.index]
+        prediction.index = prediction.index
         prediction = prediction.loc[genes,:]
-        geneAUC[i] = calculate_gene_auc(prediction, rev_library)
-        setAUC[i] = calculate_set_auc(prediction, library)[0]
-        if verbose: bar.next()
-    if verbose: bar.finish()
+        geneAUC.append(calculate_gene_auc(prediction, rev_library))
+        setAUC.append(calculate_set_auc(prediction, library)[0])
+    
+    geneAUC = pd.DataFrame(np.array(geneAUC).T, index=genes)
     prediction = pd.read_feather(prediction_file).set_index("index").loc[genes,:]
     geneAUC["prismx"] = calculate_gene_auc(prediction, rev_library)
     geneAUC.index = unique_genes
@@ -69,13 +70,13 @@ def benchmarkGMTfast(gmt_file: str, correlationFolder: str, predictionFolder: st
     prediction_files = os.listdir(predictionFolder)
     geneAUC = pd.DataFrame()
     setAUC = pd.DataFrame()
-    prediction = loadPrediction(predictionFolder, "global").loc[unique_genes,:]
-    geneAUC["global"] = calculateGeneAUC(prediction, rev_library)
-    setAUC["global"] = calculateSetAUC(prediction, library)[0]
+    prediction = load_feature(predictionFolder, "global").loc[unique_genes,:]
+    geneAUC["global"] = calculate_gene_auc(prediction, rev_library)
+    setAUC["global"] = calculate_set_auc(prediction, library)[0]
     prediction = pd.read_feather(prismxPrediction).set_index("index").loc[unique_genes,:]
-    geneAUC["prismx"] = calculateGeneAUC(prediction, rev_library)
+    geneAUC["prismx"] = calculate_gene_auc(prediction, rev_library)
     geneAUC.index = unique_genes
-    setAUC["prismx"] = calculateSetAUC(prediction, library)[0]
+    setAUC["prismx"] = calculate_set_auc(prediction, library)[0]
     return([geneAUC, setAUC])
 
 def benchmark_gmt_fast(gmt_file: str, workdir: str, prediction_file: str, intersect: bool=False, verbose=False):
