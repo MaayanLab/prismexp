@@ -27,17 +27,15 @@ def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int
     prism = pd.DataFrame()
     step_number = math.ceil(prediction_size/step_size)
     #if verbose: bar = Bar('Processing predictions', max=step_number)
-    if verbose: pbar = tqdm(total=100)
-    for i in range(0, step_number):
+    
+    for i in tqdm.tqdm(range(0, step_number), desc="Load Features", disable=(not verbose)):
         rfrom = i*step_size
         rto = min((i+1)*step_size, prediction_size)
         features = load_features_range(workdir, rfrom, rto)
         prism = make_predictions_range(model, prism, features)
         features = 0
         #if verbose: bar.next()
-        if verbose: pbar.update(i)
     #if verbose: bar.finish()
-    if verbose: pbar.close()
     if normalize:
         prism = prism.apply(zscore)
     prism.reset_index().to_feather(workdir+"/predictions/"+prediction_name+".f")
