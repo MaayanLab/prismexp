@@ -11,7 +11,7 @@ from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.loaddata import get_genes
 
 
-def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=4, verbose: bool=False):
+def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=5, verbose: bool=False):
     os.makedirs(workdir+"/features", exist_ok=True)
     correlation_files = os.listdir(workdir+"/correlation")
     cct = load_correlation(workdir, 0)
@@ -40,9 +40,6 @@ def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=4,
         results = [pool.apply_async(get_average_correlation, i) for i in params]
         for r in tqdm(results, disable=(not verbose)):
             res = r.get()
-
-    #if verbose: bar.finish()
-    #if verbose: pbar.close()
 
 def get_average_correlation(workdir: str, i: int, library: Dict, intersect: bool=False, ugenes: List=[]):
     correlation = load_correlation(workdir, i)

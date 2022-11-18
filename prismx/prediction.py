@@ -46,13 +46,14 @@ def make_predictions_range(model: str, prism: pd.DataFrame, features: List[pd.Da
     pred_list = []
     for i in range(0, features[0].shape[1]):
         start = time.time()
-        df = pd.DataFrame()
+        df = []
         k = 0
         for ff in features:
-            df[k] = ff.iloc[:,i]
+            df.append(ff.iloc[:,i])
             k = k + 1
         if verbose:
             print(str(i) + " - " + str(round(time.time()-start)))
+        df = pd.DataFrame(np.array(df).T)
         df.fillna(0, inplace=True)
         pred_list.append(model.predict(df))
     prism_temp = pd.DataFrame(pred_list).transpose()
