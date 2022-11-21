@@ -99,9 +99,12 @@ def benchmarkGMTfast(gmt_file: str, correlationFolder: str, predictionFolder: st
     return([geneAUC, setAUC])
 
 def benchmark_gmt_fast(gmt_file: str, workdir: str, prediction_file: str, intersect: bool=False, verbose: bool=False):
+    os.makedirs(workdir+"/aucs", exist_ok=True)
     genes = get_genes(workdir)
     library, rev_library, unique_genes = read_gmt(gmt_file, genes, verbose=verbose)
     prediction = pd.read_feather(prediction_file).set_index("index").loc[genes,:]
     geneAUC = calculate_gene_auc(prediction, rev_library, verbose=verbose)
     setAUC = calculate_set_auc(prediction, library, verbose=verbose)
+    geneAUC.to_csv(workdir+"/aucs/"+os.path.basename(gmt_file)+'_gene.tsv', sep="\t")
+    setAUC.to_csv(workdir+"/aucs/"+os.path.basename(gmt_file)+'_set.tsv', sep="\t")
     return(geneAUC, setAUC)
