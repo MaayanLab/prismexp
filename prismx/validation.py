@@ -56,11 +56,12 @@ def benchmark_gmt(gmt_file: str, workdir: str, prediction_file: str, intersect: 
         geneAUC.append(calculate_gene_auc(prediction, rev_library))
         setAUC.append(calculate_set_auc(prediction, library)[0])
     
-    geneAUC = pd.DataFrame(np.array(geneAUC).T, index=genes)
     prediction = pd.read_feather(prediction_file).set_index("index").loc[genes,:]
-    geneAUC["prismx"] = calculate_gene_auc(prediction, rev_library)
-    geneAUC.index = unique_genes
-    setAUC["prismx"] = calculate_set_auc(prediction, library)[0]
+    geneAUC.append(calculate_gene_auc(prediction, rev_library))
+    geneAUC = pd.concat(geneAUC, axis=1)
+    
+    setAUC.append(calculate_set_auc(prediction, library))
+    setAUC = pd.concat(geneAUC, axis=1)
     return([geneAUC, setAUC])
 
 def benchmarkGMTfast(gmt_file: str, correlationFolder: str, predictionFolder: str, prismxPrediction: str, minLibSize: int=1, intersect: bool=False, verbose=False):
@@ -83,19 +84,9 @@ def benchmarkGMTfast(gmt_file: str, correlationFolder: str, predictionFolder: st
     return([geneAUC, setAUC])
 
 def benchmark_gmt_fast(gmt_file: str, workdir: str, prediction_file: str, intersect: bool=False, verbose=False):
-    genes = [x.decode("UTF-8") for x in get_genes(workdir)]
+    genes = get_genes(workdir)
     library, rev_library, unique_genes = read_gmt(gmt_file, genes, verbose=verbose)
-    if intersect:
-        ugenes = list(set(sum(library.values(), [])))
-        genes = list(set(ugenes) & set(genes))
-    prediction_files = os.listdir(workdir+"/features")
-    lk = list(range(0, len(prediction_files)-1))
-    lk.append("global")
-    geneAUC = pd.DataFrame()
-    setAUC = pd.DataFrame()
-    genes = [x.encode("UTF-8") for x in genes]
     prediction = pd.read_feather(prediction_file).set_index("index").loc[genes,:]
-    geneAUC["prismx"] = calculate_gene_auc(prediction, rev_library)
-    geneAUC.index = unique_genes
-    setAUC["prismx"] = calculate_set_auc(prediction, library)[0]
+    geneAUC = calculate_gene_auc(prediction, rev_library)
+    setAUC = calculate_set_auc(prediction, library)
     return([geneAUC, setAUC])

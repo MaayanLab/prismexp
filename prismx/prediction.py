@@ -40,6 +40,7 @@ def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int
         prism = prism.apply(zscore)
     prism.reset_index().to_feather(workdir+"/predictions/"+prediction_name+".f")
 
+
 def make_predictions_range(model: str, prism: pd.DataFrame, features: List[pd.DataFrame], verbose: bool=False) -> pd.DataFrame:
     pred_list = []
     for i in range(0, features[0].shape[1]):
