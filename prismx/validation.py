@@ -26,7 +26,7 @@ def calculate_set_auc(prediction: pd.DataFrame, library: Dict, min_lib_size: int
 
 def calculate_gene_auc(prediction: pd.DataFrame, rev_library: Dict, min_lib_size: int=1) -> List[float]:
     aucs = []
-    setnames = []
+    genes = []
     gidx = prediction.index
     for se in rev_library:
         gold = [i in rev_library[se] for i in prediction.columns]
@@ -34,8 +34,8 @@ def calculate_gene_auc(prediction: pd.DataFrame, rev_library: Dict, min_lib_size
             fpr, tpr, _ = roc_curve(list(gold), list(prediction.loc[se,:]))
             roc_auc = auc(fpr, tpr)
             aucs.append(roc_auc)
-            setnames.append(se)
-    aucs = pd.DataFrame(aucs, index=setnames)
+            genes.append(se)
+    aucs = pd.DataFrame(aucs, index=genes)
     return(aucs)
 
 def benchmark_gmt(gmt_file: str, workdir: str, prediction_file: str, intersect: bool=False, verbose=False):

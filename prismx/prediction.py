@@ -28,7 +28,7 @@ def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int
     step_number = math.ceil(prediction_size/step_size)
     #if verbose: bar = Bar('Processing predictions', max=step_number)
     
-    for i in tqdm(range(0, step_number), desc="Load Features", disable=(not verbose)):
+    for i in tqdm(range(0, step_number), desc="Make Predictions", disable=(not verbose)):
         rfrom = i*step_size
         rto = min((i+1)*step_size, prediction_size)
         features = load_features_range(workdir, rfrom, rto)
