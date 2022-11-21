@@ -104,5 +104,4 @@ def benchmark_gmt_fast(gmt_file: str, workdir: str, prediction_file: str, inters
     prediction = pd.read_feather(prediction_file).set_index("index").loc[genes,:]
     geneAUC = calculate_gene_auc(prediction, rev_library, verbose=verbose)
     setAUC = calculate_set_auc(prediction, library, verbose=verbose)
-    setf1 = calculate_set_f1(prediction, library, verbose=verbose)
-    return(geneAUC, setAUC, setf1)
+    return(geneAUC, setAUC)
