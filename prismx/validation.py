@@ -8,6 +8,7 @@ import os
 import pickle
 from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.loaddata import get_genes
+from sklearn.metrics import f1_score
 
 def calculate_set_auc(prediction: pd.DataFrame, library: Dict, min_lib_size: int=1, verbose: bool=False) -> pd.DataFrame:
     aucs = []
@@ -37,6 +38,20 @@ def calculate_gene_auc(prediction: pd.DataFrame, rev_library: Dict, min_lib_size
             genes.append(se)
     aucs = pd.DataFrame(aucs, index=genes)
     return(aucs)
+
+def calculate_set_f1(prediction: pd.DataFrame, library: Dict, min_lib_size: int=1, verbose: bool=False) -> pd.DataFrame:
+    f1s = []
+    setnames = []
+    gidx = prediction.index
+    for se in tqdm.tqdm(library, disable=(not verbose)):
+        if len(library[se]) >= min_lib_size:
+            lenc = library[se]
+            gold = [i in lenc for i in gidx]
+            f1 = f1_score(list(gold), list(prediction.loc[:,se]).round(), average='binary')
+            f1s.append(f1)
+            setnames.append(se)
+    f1s = pd.DataFrame(f1s, index=setnames)
+    return(f1s)
 
 def benchmark_gmt(gmt_file: str, workdir: str, prediction_file: str, intersect: bool=False, verbose=False):
     genes = get_genes(workdir)
@@ -89,4 +104,5 @@ def benchmark_gmt_fast(gmt_file: str, workdir: str, prediction_file: str, inters
     prediction = pd.read_feather(prediction_file).set_index("index").loc[genes,:]
     geneAUC = calculate_gene_auc(prediction, rev_library, verbose=verbose)
     setAUC = calculate_set_auc(prediction, library, verbose=verbose)
-    return(geneAUC, setAUC)
+    setf1 = calculate_set_f1(prediction, library, verbose=verbose)
+    return(geneAUC, setAUC, setf1)
