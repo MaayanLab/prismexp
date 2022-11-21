@@ -9,11 +9,11 @@ import pickle
 from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.loaddata import get_genes
 
-def calculate_set_auc(prediction: pd.DataFrame, library: Dict, min_lib_size: int=1) -> pd.DataFrame:
+def calculate_set_auc(prediction: pd.DataFrame, library: Dict, min_lib_size: int=1, verbose: bool=False) -> pd.DataFrame:
     aucs = []
     setnames = []
     gidx = prediction.index
-    for se in library:
+    for se in tqdm.tqdm(library, disable=(not verbose)):
         if len(library[se]) >= min_lib_size:
             lenc = library[se]
             gold = [i in lenc for i in gidx]
@@ -24,11 +24,11 @@ def calculate_set_auc(prediction: pd.DataFrame, library: Dict, min_lib_size: int
     aucs = pd.DataFrame(aucs, index=setnames)
     return(aucs)
 
-def calculate_gene_auc(prediction: pd.DataFrame, rev_library: Dict, min_lib_size: int=1) -> List[float]:
+def calculate_gene_auc(prediction: pd.DataFrame, rev_library: Dict, min_lib_size: int=1, verbose: bool=False) -> List[float]:
     aucs = []
     genes = []
     gidx = prediction.index
-    for se in rev_library:
+    for se in tqdm.tqdm(rev_library, disable=(not verbose)):
         gold = [i in rev_library[se] for i in prediction.columns]
         if len(rev_library[se]) >= min_lib_size and se in gidx:
             fpr, tpr, _ = roc_curve(list(gold), list(prediction.loc[se,:]))
@@ -83,10 +83,10 @@ def benchmarkGMTfast(gmt_file: str, correlationFolder: str, predictionFolder: st
     setAUC["prismx"] = calculate_set_auc(prediction, library)[0]
     return([geneAUC, setAUC])
 
-def benchmark_gmt_fast(gmt_file: str, workdir: str, prediction_file: str, intersect: bool=False, verbose=False):
+def benchmark_gmt_fast(gmt_file: str, workdir: str, prediction_file: str, intersect: bool=False, verbose: bool=False):
     genes = get_genes(workdir)
     library, rev_library, unique_genes = read_gmt(gmt_file, genes, verbose=verbose)
     prediction = pd.read_feather(prediction_file).set_index("index").loc[genes,:]
-    geneAUC = calculate_gene_auc(prediction, rev_library)
-    setAUC = calculate_set_auc(prediction, library)
-    return([geneAUC, setAUC])
+    geneAUC = calculate_gene_auc(prediction, rev_library, verbose=verbose)
+    setAUC = calculate_set_auc(prediction, library, verbose=verbose)
+    return(geneAUC, setAUC)
