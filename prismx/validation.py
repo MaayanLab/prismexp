@@ -47,7 +47,7 @@ def calculate_set_f1(prediction: pd.DataFrame, library: Dict, min_lib_size: int=
         if len(library[se]) >= min_lib_size:
             lenc = library[se]
             gold = [i in lenc for i in gidx]
-            f1 = f1_score(list(gold), list(prediction.loc[:,se]).round(), average='binary')
+            f1 = f1_score(list(gold), np.array(list(prediction.loc[:,se]).round()), average='binary')
             f1s.append(f1)
             setnames.append(se)
     f1s = pd.DataFrame(f1s, index=setnames)
