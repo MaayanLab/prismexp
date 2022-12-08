@@ -40,7 +40,7 @@ def calculate_correlation(h5file: str, clustering: pd.DataFrame, geneidx: List[i
     exp = 0
 
     if method == "spearman":
-        cc = stats.spearmanr(qq.T)
+        cc = stats.spearmanr(qq.T)[0]
     else:
         cc = np.corrcoef(qq)
     cc = np.nan_to_num(cc)
