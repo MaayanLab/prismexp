@@ -90,7 +90,7 @@ def train(workdir: str, gmt_file: str, training_size: int=200000, test_train_spl
     false_count = len(y)-true_count
     if verbose: print("positive samples: "+str(round(true_count))+"\nnegative samples: "+str(round(false_count)))
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_train_split, random_state=random_state)
-    model = LGBMRegressor(seed=42)
+    model = LGBMRegressor(boosting_type="dart", learning_rate=0.05, seed=42)
     model.fit(X_train, y_train)
     pickle.dump(model, open(workdir+"/model.pkl", 'wb'))
     #model = RandomForestClassifier(random_state=random_state)
