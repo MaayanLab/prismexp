@@ -19,7 +19,7 @@ from prismx.prediction import predict, prismx_predictions
 from prismx.validation import benchmark_gmt, benchmarkGMTfast, benchmark_gmt_fast
 from prismx.bridgegsea import bridge_gsea, plot_enrichment, plot_gsea, nes
 
-def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, reuseClustering: bool=False, verbose: bool=True):
+def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: int=50, readThreshold: int=20, sampleThreshold: float=0.01, filterSamples: int=2000, correlationMatrixCount: int=50, clusterGeneCount: int=1000, sampleCount: int=5000, reuseClustering: bool=False, correlationMethod: str="pearson", verbose: bool=True):
     '''
     Write a set of correlation matrices, by partitioning gene expression into clusters and applying Pearson
     correlation for pairs of genes. It will also create an additional matrix for global correlation.
@@ -54,7 +54,7 @@ def create_correlation_matrices(h5file: str, outputFolder: str, clusterCount: in
     os.makedirs(outputFolder+"/correlation", exist_ok=True)
     if verbose: bar = Bar('Processing correlation', max=len(mats))
     for i in range(0, len(mats)):
-        cor_mat = calculate_correlation(h5file, clustering, filtered_genes, clusterID=mats[i], maxSampleCount=sampleCount)
+        cor_mat = calculate_correlation(h5file, clustering, filtered_genes, clusterID=mats[i], maxSampleCount=sampleCount, method=correlationMethod)
         cor_mat.columns = cor_mat.columns.astype(str)
         cor_mat.reset_index().to_feather(outputFolder+"/correlation/correlation_"+str(mats[i])+".f")
         j = j+1

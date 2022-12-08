@@ -1,4 +1,5 @@
 from sklearn.cluster import KMeans
+from scipy import stats
 from scipy.stats import zscore
 import h5py as h5
 import numpy as np
@@ -12,7 +13,7 @@ from prismx.utils import quantile_normalize, normalize
 
 np.seterr(divide='ignore', invalid='ignore')
 
-def calculate_correlation(h5file: str, clustering: pd.DataFrame, geneidx: List[int], clusterID: str="global", maxSampleCount: int=2000) -> pd.DataFrame:
+def calculate_correlation(h5file: str, clustering: pd.DataFrame, geneidx: List[int], clusterID: str="global", maxSampleCount: int=2000, method: str="pearson") -> pd.DataFrame:
     '''
     Returns correlation matrix for specified samples
 
@@ -37,7 +38,11 @@ def calculate_correlation(h5file: str, clustering: pd.DataFrame, geneidx: List[i
     exp = a4.data.index(h5file, samplesidx, gene_idx=geneidx, silent=True)
     qq = normalize(exp, transpose=False)
     exp = 0
-    cc = np.corrcoef(qq)
+
+    if method == "spearman":
+        cc = stats.spearmanr(qq.T)
+    else:
+        cc = np.corrcoef(qq)
     cc = np.nan_to_num(cc)
     qq = 0
     correlation = pd.DataFrame(cc, index=genes[geneidx], columns=genes[geneidx], dtype=np.float16)
