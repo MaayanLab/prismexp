@@ -37,18 +37,18 @@ def calculate_correlation(h5file: str, clustering: pd.DataFrame, geneidx: List[i
     
     exp = a4.data.index(h5file, samplesidx, gene_idx=geneidx, silent=True)
     qq = normalize(exp, transpose=False)
-    exp = 0
+    del exp
 
     if method == "spearman":
         cc = stats.spearmanr(qq.T)[0]
     else:
         cc = np.corrcoef(qq)
     cc = np.nan_to_num(cc)
-    qq = 0
+    del qq
     correlation = pd.DataFrame(cc, index=genes[geneidx], columns=genes[geneidx], dtype=np.float16)
     correlation.index = genes[geneidx]
     correlation.columns = genes[geneidx]
-    cc = 0
+    del cc
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
     return correlation
 
@@ -83,10 +83,10 @@ def create_clustering(h5file: str, workdir, geneidx: List[int], geneCount: int=5
 
     qq = normalize(exp, transpose=False)
     qq = pd.DataFrame(zscore(qq, axis=1)).fillna(0)
-    exp = 0
+    del exp
     kmeans = KMeans(n_clusters=clusterCount, random_state=42).fit(qq.transpose())
-    qq = 0      # keep memory footprint low
+    del qq      # keep memory footprint low
     clustering = kmeans.labels_
-    kmeans = 0  # keep memory footprint low
+    del kmeans  # keep memory footprint low
     clusterMapping = pd.DataFrame({'sampleID': samples, 'clusterID': clustering}, index = samples, columns=["sampleID", "clusterID"])
     return clusterMapping
