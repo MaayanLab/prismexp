@@ -49,12 +49,15 @@ def get_average_correlation(workdir: str, i: int, library: Dict, intersect: bool
             preds.append(correlation.loc[:, library[ll]].loc[ugenes,:].mean(axis=1))
         else:
             preds.append(correlation.loc[:, library[ll]].mean(axis=1))
+    del correlation
     features = pd.concat(preds, axis=1)
+    del preds
     features.columns = list(library.keys())
     features = pd.DataFrame(features.fillna(0), dtype=np.float16)
     features = features.reset_index()
     features.columns = features.columns.astype(str)
     features.to_feather(workdir+"/features/features_"+str(i)+".f")
+    del features
     return 1
 
 def load_features(workdir: str, verbose: bool=False): 
