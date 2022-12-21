@@ -8,6 +8,7 @@ import pickle
 import os
 from progress.bar import Bar
 from typing import List
+import tqdm
 
 from prismx.filter import filterGenes
 from prismx.correlation import create_clustering, calculate_correlation
@@ -19,20 +20,42 @@ from prismx.prediction import predict, prismx_predictions
 from prismx.validation import benchmark_gmt, benchmarkGMTfast, benchmark_gmt_fast
 from prismx.bridgegsea import bridge_gsea, plot_enrichment, plot_gsea, nes
 
-def create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=50, read_threshold: int=20, sample_threshold: float=0.01, filter_samples: int=2000, correlation_matrix_count: int=50, cluster_method: str="minibatch", cluster_gene_count: int=1000, sample_count: int=5000, reuse_clustering: bool=False, correlation_method: str="pearson", verbose: bool=True):
-    '''
-    Write a set of correlation matrices, by partitioning gene expression into clusters and applying Pearson
-    correlation for pairs of genes. It will also create an additional matrix for global correlation.
+def create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=100, read_threshold: int=20, sample_threshold: float=0.01, filter_samples: int=2000, cluster_method: str="minibatch", cluster_gene_count: int=1000, sample_count: int=5000, reuse_clustering: bool=False, correlation_method: str="pearson", verbose: bool=True):
+    """
+    Calculate clustering and correlation matrices for the samples in the specified h5 file.
 
-            Parameters:
-                    h5file (string): path to expression h5 file
-                    geneidx (array type int): indices of genes
-                    geneCount (int): number of genes to be selected
-                    clusterCount (int): number of clusters
-                    sampleCount (int): number of samples used for correlation
-            Returns:
-                    gene cluster mapping (pandas.DataFrame)
-    '''
+    Parameters
+    ----------
+    h5_file : str
+        The path to the h5 file containing the gene expression data.
+    work_dir : str
+        The directory to save the resulting clustering and correlation matrices.
+    cluster_count : int, optional
+        The number of clusters to use for the sample clustering. Default is 100.
+    read_threshold : int, optional
+        The minimum number of reads a gene must have in a fraction of total reads to keep. Default is 20.
+    sample_threshold : float, optional
+        The minimum fraction of samples that contain read_threshold reads of a gene to keep. Default is 0.01.
+    filter_samples : int, optional
+        The maximum number of samples to use for gene filtering. Default is 2000.
+    cluster_method : str, optional
+        The clustering method to use. Options are "minibatch" and "kmeans". Default is "minibatch".
+    cluster_gene_count : int, optional
+        The number of genes to use for the sample clustering. Default is 1000.
+    sample_count : int, optional
+        The maximum number of samples to use for calculating the correlation matrices. Default is 5000.
+    reuse_clustering : bool, optional
+        Whether to reuse the existing clustering results in the work directory. Default is False.
+    correlation_method : str, optional
+        The correlation method to use. Options are "pearson" and "spearman". Default is "pearson".
+    verbose : bool, optional
+        Whether to print progress messages. Default is True.
+
+    Returns
+    -------
+    None
+        The resulting clustering and correlation matrices are saved in the specified work directory.
+    """
     os.makedirs(work_dir, exist_ok=True)
     if verbose: print("1. Filter genes")
     tstart = time.time()
@@ -52,13 +75,12 @@ def create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=
     mats.append("global")
     j = 0
     os.makedirs(work_dir+"/correlation", exist_ok=True)
-    if verbose: bar = Bar('Processing correlation', max=len(mats))
-    for i in range(0, len(mats)):
-        cor_mat = calculate_correlation(h5_file, clustering, filtered_genes, cluster_id=mats[i], max_sample_count=sample_count, method=correlation_method)
+    for i in tqdm.tqdm(range(0, len(mats)), disable=not verbose):
+        cor_mat = calculate_correlation(h5_file, clustering, filtered_genes, cluster_id=mats[i], max_sample_count=sample_count, method=correlation_method, verbose=verbose)
         cor_mat.columns = cor_mat.columns.astype(str)
         cor_mat.reset_index().to_feather(work_dir+"/correlation/correlation_"+str(mats[i])+".f")
         j = j+1
-        if verbose: bar.next()
+
     elapsed = round((time.time()-tstart)/60,2)
     if verbose: print("   -> completed in "+str(elapsed)+"min")
     if verbose: bar.finish()
