@@ -83,7 +83,6 @@ def create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=
 
     elapsed = round((time.time()-tstart)/60,2)
     if verbose: print("   -> completed in "+str(elapsed)+"min")
-    if verbose: bar.finish()
 
 def test_data() -> str:
     path = os.path.join(
