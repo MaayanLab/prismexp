@@ -62,14 +62,13 @@ def get_average_correlation(workdir: str, i: int, library: Dict, intersect: bool
 
 def get_average_correlation_gpt(workdir: str, i: int, library: Dict, intersect: bool=False, ugenes: List=[]):
     correlation = load_correlation(workdir, i)
-    final_genes = ugenes if intersect else correlation.index
+    if intersect:
+        correlation = correlation.loc[ugenes, :]
+    final_genes = correlation.index
     preds = []
     set_names = list(library.keys())
     for ll in set_names:
-        if intersect:
-            preds.append(np.mean(correlation.loc[:, library[ll]][ugenes,:].values, axis=1))
-        else:
-            preds.append(np.mean(correlation.loc[:, library[ll]].values, axis=1))
+        preds.append(np.mean(correlation.loc[:, library[ll]].values, axis=1))
     correlation = None
     features = np.concatenate(preds, axis=1)
     preds = None
