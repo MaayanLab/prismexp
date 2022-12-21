@@ -99,7 +99,6 @@ def get_average_correlation(workdir: str, i: int, library: Dict, intersect: bool
     features = None
     return 1
 
-@numba.jit(nopython=True)
 def get_average_correlation_gpt(workdir: str, i: int, gene_set_library: Dict, intersect: bool=False, unique_genes: List=[]):
     """
     Calculate the average correlation of each gene with a set of genes in a gene set library, and create a feature matrix with genes as rows and gene sets as columns. 
