@@ -37,7 +37,7 @@ def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=5,
 
     PROCESSES = threads
     with multiprocessing.Pool(PROCESSES) as pool:
-        results = [pool.apply_async(get_average_correlation, i) for i in params]
+        results = [pool.apply_async(get_average_correlation_gpt, i) for i in params]
         for r in tqdm(results, disable=(not verbose)):
             res = r.get()
 
@@ -49,16 +49,38 @@ def get_average_correlation(workdir: str, i: int, library: Dict, intersect: bool
             preds.append(correlation.loc[:, library[ll]].loc[ugenes,:].mean(axis=1))
         else:
             preds.append(correlation.loc[:, library[ll]].mean(axis=1))
-    del correlation
+    correlation = None
     features = pd.concat(preds, axis=1)
-    del preds
+    preds = None
     features.columns = list(library.keys())
     features = pd.DataFrame(features.fillna(0), dtype=np.float16)
     features = features.reset_index()
     features.columns = features.columns.astype(str)
     features.to_feather(workdir+"/features/features_"+str(i)+".f")
-    del features
+    features = None
     return 1
+
+def get_average_correlation_gpt(workdir: str, i: int, library: Dict, intersect: bool=False, ugenes: List=[]):
+    correlation = load_correlation(workdir, i)
+    final_genes = ugenes if intersect else correlation.index
+    preds = []
+    set_names = list(library.keys())
+    for ll in set_names:
+        if intersect:
+            preds.append(np.mean(correlation.loc[:, library[ll]][ugenes,:].values, axis=1))
+        else:
+            preds.append(np.mean(correlation.loc[:, library[ll]].values, axis=1))
+    correlation = None
+    features = np.concatenate(preds, axis=1)
+    preds = None
+    features = np.fillna(features, 0)
+    features = pd.DataFrame(features, columns=set_names, index=final_genes).reset_index()
+    features.columns = features.columns.astype(str)
+    features.to_feather(workdir+"/features/features_"+str(i)+".f")
+    features = None
+    return 1
+
+
 
 def load_features(workdir: str, verbose: bool=False): 
     features = []
