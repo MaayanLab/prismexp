@@ -12,34 +12,17 @@ from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.loaddata import get_genes
 
 
-def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=5, verbose: bool=False):
-    os.makedirs(workdir+"/features", exist_ok=True)
-    correlation_files = os.listdir(workdir+"/correlation")
-    cct = load_correlation(workdir, 0)
-    background_genes = cct.columns
-    cct = None
-    ugenes = []
-    library, rev_library, unique_genes = read_gmt(gmt_file, background_genes, verbose=verbose)
-    if intersect:
-        ugenes = list(set(sum(library.values(), [])))
-        ugenes = list(set(ugenes) & set(background_genes))
-        ugenes = [x.encode("UTF-8") for x in ugenes]
-        if verbose:
-            print("overlapping genes: "+str(len(ugenes)))
-    lk = list(range(0, len(correlation_files)-1))
-    lk.append("global")
+def features(gmt_file: str, workdir: str, intersect: bool=False, threads: int=2, verbose: bool=False):
+    """
+    Creates a feature matrix for each correlation matrix in the given directory, using the gene set library in the given gmt file.
     
-    params = list()
-    for ll in lk:
-        params.append((workdir, ll, library, intersect, ugenes))
-    
-    PROCESSES = threads
-    with multiprocessing.Pool(PROCESSES) as pool:
-        results = [pool.apply_async(get_average_correlation_gpt, i) for i in params]
-        for r in tqdm(results, disable=(not verbose)):
-            res = r.get()
-
-def features_gpt(gmt_file: str, workdir: str, intersect: bool=False, threads: int=5, verbose: bool=False):
+    Parameters:
+    gmt_file (str): Path to the gmt file containing the gene set library.
+    workdir (str): Path to the directory containing the correlation matrices.
+    intersect (bool, optional): If True, only includes unique genes present in all gene sets in the feature matrix. Defaults to False.
+    threads (int, optional): Number of threads to use for parallel processing. Defaults to 5.
+    verbose (bool, optional): If True, prints progress information. Defaults to False.
+    """
     # Create the features directory if it does not already exist
     os.makedirs(workdir+"/features", exist_ok=True)
 
@@ -50,18 +33,18 @@ def features_gpt(gmt_file: str, workdir: str, intersect: bool=False, threads: in
     background_genes = load_correlation(workdir, 0).columns
 
     # Initialize an empty list of unique genes
-    ugenes = []
+    unique_genes = []
 
     # Read the gene set library and get the list of unique genes
     library, rev_library, unique_genes = read_gmt(gmt_file, background_genes, verbose=verbose)
 
     # If the intersect flag is set, get the list of unique genes that are present in all gene sets
     if intersect:
-        ugenes = list(set(sum(library.values(), [])))
-        ugenes = list(set(ugenes) & set(background_genes))
-        ugenes = [x.encode("UTF-8") for x in ugenes]
+        unique_genes = list(set(sum(library.values(), [])))
+        unique_genes = list(set(unique_genes) & set(background_genes))
+        unique_genes = [x.encode("UTF-8") for x in unique_genes]
         if verbose:
-            print("overlapping genes: "+str(len(ugenes)))
+            print("overlapping genes: "+str(len(unique_genes)))
 
     # Create a list of integers representing the correlation files to process
     file_indices = list(range(0, len(correlation_files)-1))
@@ -71,35 +54,15 @@ def features_gpt(gmt_file: str, workdir: str, intersect: bool=False, threads: in
     with concurrent.futures.ProcessPoolExecutor(max_workers=threads) as executor:
         if verbose:
             # Submit the function calls and iterate over the completed tasks in the order that they complete
-            futures = [executor.submit(get_average_correlation_gpt, workdir, i, library, intersect, ugenes) for i in file_indices]
+            futures = [executor.submit(get_average_correlation, workdir, i, library, intersect, unique_genes) for i in file_indices]
             for future in tqdm(concurrent.futures.as_completed(futures), total=len(futures)):
                 res = future.result()
         else:
             # Submit the function calls and ignore the results
             for i in file_indices:
-                executor.submit(get_average_correlation_gpt, workdir, i, library, intersect, ugenes)
+                executor.submit(get_average_correlation, workdir, i, library, intersect, unique_genes)
 
-
-def get_average_correlation(workdir: str, i: int, library: Dict, intersect: bool=False, ugenes: List=[]):
-    correlation = load_correlation(workdir, i)
-    preds = []
-    for ll in list(library.keys()):
-        if intersect:
-            preds.append(correlation.loc[:, library[ll]].loc[ugenes,:].mean(axis=1))
-        else:
-            preds.append(correlation.loc[:, library[ll]].mean(axis=1))
-    correlation = None
-    features = pd.concat(preds, axis=1)
-    preds = None
-    features.columns = list(library.keys())
-    features = pd.DataFrame(features.fillna(0), dtype=np.float16)
-    features = features.reset_index()
-    features.columns = features.columns.astype(str)
-    features.to_feather(workdir+"/features/features_"+str(i)+".f")
-    features = None
-    return 1
-
-def get_average_correlation_gpt(workdir: str, i: int, gene_set_library: Dict, intersect: bool=False, unique_genes: List=[]):
+def get_average_correlation(workdir: str, i: int, gene_set_library: Dict, intersect: bool=False, unique_genes: List=[]):
     """
     Calculate the average correlation of each gene with a set of genes in a gene set library, and create a feature matrix with genes as rows and gene sets as columns. 
     
@@ -155,8 +118,6 @@ def get_average_correlation_gpt(workdir: str, i: int, gene_set_library: Dict, in
     feature_matrix = None
 
     return 1
-
-
 
 def load_features(workdir: str, verbose: bool=False): 
     features = []

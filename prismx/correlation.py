@@ -1,4 +1,4 @@
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MiniBatchKMeans
 from scipy import stats
 from scipy.stats import zscore
 import h5py as h5
@@ -52,7 +52,7 @@ def calculate_correlation(h5file: str, clustering: pd.DataFrame, geneidx: List[i
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
     return correlation
 
-def create_clustering(h5file: str, workdir, geneidx: List[int], geneCount: int=500, clusterCount: int=50, deterministic: bool=True, reuseClustering=False) -> pd.DataFrame:
+def create_clustering(h5file: str, workdir, geneidx: List[int], geneCount: int=1000, clusterCount: int=50, deterministic: bool=True, reuseClustering=False, method: str="minibatch") -> pd.DataFrame:
     '''
     Returns cluster association for all samples in input expression h5 file
 
@@ -61,6 +61,7 @@ def create_clustering(h5file: str, workdir, geneidx: List[int], geneCount: int=5
                     geneIndices (array type int): indices of genes
                     geneCount (int) count of genes used for clustering
                     clusterCount (int): number of clusters
+                    method (str): clustering method minibatch/kmeans (default: minibatch)
             Returns:
                     sample cluster mapping (pandas.DataFrame)
     '''
@@ -83,10 +84,18 @@ def create_clustering(h5file: str, workdir, geneidx: List[int], geneCount: int=5
 
     qq = normalize(exp, transpose=False)
     qq = pd.DataFrame(zscore(qq, axis=1)).fillna(0)
-    del exp
-    kmeans = KMeans(n_clusters=clusterCount, random_state=42).fit(qq.transpose())
-    del qq      # keep memory footprint low
-    clustering = kmeans.labels_
-    del kmeans  # keep memory footprint low
+    exp = None
+
+    clustering = [] 
+    if method == "minibatch":
+        clustering = MiniBatchKMeans(init ='k-means++',
+                        n_clusters = clusterCount,
+                        batch_size = 2500,
+                        n_init = 10,
+                        max_no_improvement = 500).fit(qq.transpose()).labels_
+    else:
+        clustering = KMeans(n_clusters=clusterCount, random_state=42).fit(qq.transpose()).labels_
+    qq = None     # keep memory footprint low
+
     clusterMapping = pd.DataFrame({'sampleID': samples, 'clusterID': clustering}, index = samples, columns=["sampleID", "clusterID"])
     return clusterMapping
