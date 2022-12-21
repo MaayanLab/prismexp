@@ -13,13 +13,13 @@ from sklearn.ensemble import RandomForestClassifier
 from scipy.stats import zscore
 
 from prismx.utils import read_gmt, load_correlation, load_feature
-from prismx.feature import features, load_features_range
+from prismx.feature import features_gpt, load_features_range
 
 def predict(workdir: str, gmt_file: str, model=0, step_size: int=1000, intersect: bool=False, normalize:bool=False, verbose: bool=False, skip_features: bool=False, threads: int=5):
     if model == 0:
         model = pickle.load(open(workdir+"/model.pkl", "rb"))
     if not skip_features:
-        features(gmt_file, workdir, intersect=intersect, threads=threads, verbose=verbose)
+        features_gpt(gmt_file, workdir, intersect=intersect, threads=threads, verbose=verbose)
     prismx_predictions(model, workdir, os.path.basename(gmt_file), step_size, normalize=normalize, verbose=verbose)
 
 def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int=1000, verbose: bool=False, normalize=False):

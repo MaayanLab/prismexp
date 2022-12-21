@@ -6,7 +6,7 @@ import os
 from progress.bar import Bar
 from tqdm import tqdm
 import multiprocessing
-import numba
+import concurrent
 
 from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.loaddata import get_genes
