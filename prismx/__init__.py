@@ -54,7 +54,7 @@ def create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=
     os.makedirs(work_dir+"/correlation", exist_ok=True)
     if verbose: bar = Bar('Processing correlation', max=len(mats))
     for i in range(0, len(mats)):
-        cor_mat = calculate_correlation(h5_file, clustering, filtered_genes, clusterID=mats[i], max_sample_count=sample_count, method=correlation_method)
+        cor_mat = calculate_correlation(h5_file, clustering, filtered_genes, cluster_id=mats[i], max_sample_count=sample_count, method=correlation_method)
         cor_mat.columns = cor_mat.columns.astype(str)
         cor_mat.reset_index().to_feather(work_dir+"/correlation/correlation_"+str(mats[i])+".f")
         j = j+1

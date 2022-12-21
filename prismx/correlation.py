@@ -92,6 +92,7 @@ def create_clustering(h5_file: str, work_dir, gene_idx: List[int], gene_count: i
                         n_clusters = cluster_count,
                         batch_size = 2500,
                         n_init = 10,
+                        random_state=42,
                         max_no_improvement = 500).fit(qq.transpose()).labels_
     else:
         clustering = KMeans(n_clusters=cluster_count, random_state=42).fit(qq.transpose()).labels_
