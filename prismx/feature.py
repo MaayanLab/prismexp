@@ -70,7 +70,7 @@ def get_average_correlation_gpt(workdir: str, i: int, library: Dict, intersect: 
     for ll in set_names:
         preds.append(np.mean(correlation.loc[:, library[ll]].values, axis=1))
     correlation = None
-    features = np.concatenate(preds, axis=1)
+    features = np.vstack(preds).T
     preds = None
     features = np.fillna(features, 0)
     features = pd.DataFrame(features, columns=set_names, index=final_genes).reset_index()
