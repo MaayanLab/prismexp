@@ -20,7 +20,7 @@ from prismx.prediction import predict, prismx_predictions
 from prismx.validation import benchmark_gmt, benchmarkGMTfast, benchmark_gmt_fast
 from prismx.bridgegsea import bridge_gsea, plot_enrichment, plot_gsea, nes
 
-def create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=100, read_threshold: int=20, sample_threshold: float=0.01, filter_samples: int=2000, cluster_method: str="minibatch", cluster_gene_count: int=1000, sample_count: int=5000, reuse_clustering: bool=False, correlation_method: str="pearson", verbose: bool=True):
+def create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=100, read_threshold: int=20, sample_threshold: float=0.01, filter_samples: int=2000, min_avg_reads_per_gene: int=2, cluster_method: str="minibatch", cluster_gene_count: int=1000, sample_count: int=5000, reuse_clustering: bool=False, correlation_method: str="pearson", verbose: bool=True):
     """
     Calculate clustering and correlation matrices for the samples in the specified h5 file.
 
@@ -38,6 +38,8 @@ def create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=
         The minimum fraction of samples that contain read_threshold reads of a gene to keep. Default is 0.01.
     filter_samples : int, optional
         The maximum number of samples to use for gene filtering. Default is 2000.
+    min_avg_reads_per_gene : int, optional
+        The average number of reads per gene for a sample to be considered in the clustering
     cluster_method : str, optional
         The clustering method to use. Options are "minibatch" and "kmeans". Default is "minibatch".
     cluster_gene_count : int, optional

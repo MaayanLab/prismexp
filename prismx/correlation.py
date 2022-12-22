@@ -52,19 +52,25 @@ def calculate_correlation(h5_file: str, clustering: pd.DataFrame, gene_idx: List
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
     return correlation
 
-def create_clustering(h5_file: str, work_dir, gene_idx: List[int], gene_count: int=1000, cluster_count: int=50, deterministic: bool=True, reuse_clustering=False, method: str="minibatch") -> pd.DataFrame:
-    '''
-    Returns cluster association for all samples in input expression h5 file
-
-            Parameters:
-                    h5file (string): path to expression h5 file
-                    geneIndices (array type int): indices of genes
-                    geneCount (int) count of genes used for clustering
-                    clusterCount (int): number of clusters
-                    method (str): clustering method minibatch/kmeans (default: minibatch)
-            Returns:
-                    sample cluster mapping (pandas.DataFrame)
-    '''
+def create_clustering(h5_file: str, work_dir, gene_idx: List[int], gene_count: int=1000, cluster_count: int=50, deterministic: bool=True, random_state: int=1, min_reads: int=2000, reuse_clustering=False, method: str="minibatch") -> pd.DataFrame:
+    """
+    Returns cluster association for all samples in input expression h5 file.
+    
+    Parameters:
+        h5_file (str): path to expression h5 file
+        work_dir (str): path to directory where clustering results will be stored
+        gene_idx (List[int]): indices of genes to use for clustering
+        gene_count (int): count of genes to use for clustering (default: 1000)
+        cluster_count (int): number of clusters to generate (default: 50)
+        min_reads (int): minimu number of reads for a sample to be considered in clustering
+        deterministic (bool): whether to set the random seed to ensure reproducibility (default: True)
+        random_state (int): random seed to use (default: 1)
+        reuse_clustering (bool): whether to reuse previous clustering results stored in work_dir if available (default: False)
+        method (str): clustering method to use, either "minibatch" or "kmeans" (default: "minibatch")
+    
+    Returns:
+        sample cluster mapping (pandas.DataFrame)
+    """
     if deterministic:
         random.seed(42)
     
@@ -81,7 +87,9 @@ def create_clustering(h5_file: str, work_dir, gene_idx: List[int], gene_count: i
     samples = a4.meta.get_meta_sample_field(h5_file,'geo_accession')
 
     exp = a4.data.index(h5_file, list(range(len(samples))), gene_idx=sorted(random.sample(gene_idx, gene_count)))
-
+    exp = exp.iloc[: np.where(np.sum(exp, axis=0) > min_reads)]
+    print("Number of samples used in clustering:", exp.shape[1])
+    
     qq = normalize(exp, transpose=False)
     qq = pd.DataFrame(zscore(qq, axis=1)).fillna(0)
     exp = None
@@ -92,7 +100,7 @@ def create_clustering(h5_file: str, work_dir, gene_idx: List[int], gene_count: i
                         n_clusters = cluster_count,
                         batch_size = 2500,
                         n_init = 10,
-                        random_state=42,
+                        random_state=random_state,
                         max_no_improvement = 500).fit(qq.transpose()).labels_
     else:
         clustering = KMeans(n_clusters=cluster_count, random_state=42).fit(qq.transpose()).labels_
