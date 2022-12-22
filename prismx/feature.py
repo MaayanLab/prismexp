@@ -97,14 +97,14 @@ def get_average_correlation(workdir: str, i: int, gene_set_library: Dict, inters
 
     # Calculate the average correlation for each gene set
     for gene_set_name in gene_set_names:
-        gene_set_average_correlations.append(np.mean(correlation_matrix.loc[:, gene_set_library[gene_set_name]].values, axis=1))
+        gene_set_average_correlations.append(np.nanmean(correlation_matrix.loc[:, gene_set_library[gene_set_name]].values, axis=1))
 
     correlation_matrix = None
 
     # Stack the average correlations for each gene set vertically to create the feature matrix
     feature_matrix = np.vstack(gene_set_average_correlations).T
 
-    # Replace any NaN values in the feature matrix with 0
+    # Replace any NaN values in the feature matrix with 0, should not exist
     np.nan_to_num(feature_matrix, copy=False)
 
     # Convert the feature matrix to a pandas DataFrame with the gene names as the index and the gene set names as the column names
