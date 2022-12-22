@@ -107,5 +107,5 @@ def create_clustering(h5_file: str, work_dir, gene_idx: List[int], gene_count: i
         clustering = KMeans(n_clusters=cluster_count, random_state=42).fit(qq.transpose()).labels_
     qq = None     # keep memory footprint low
 
-    cluster_mapping = pd.DataFrame({'sampleID': samples, 'clusterID': clustering}, index = samples[filtered_sample_idx], columns=["sampleID", "clusterID"])
+    cluster_mapping = pd.DataFrame({'sampleID': samples[filtered_sample_idx], 'clusterID': clustering}, index = samples[filtered_sample_idx], columns=["sampleID", "clusterID"])
     return cluster_mapping
