@@ -87,7 +87,7 @@ def create_clustering(h5_file: str, work_dir, gene_idx: List[int], gene_count: i
     samples = a4.meta.get_meta_sample_field(h5_file,'geo_accession')
 
     exp = a4.data.index(h5_file, list(range(len(samples))), gene_idx=sorted(random.sample(gene_idx, gene_count)))
-    exp = exp.iloc[: np.array(np.where(np.sum(exp, axis=0) > min_reads)[0][0])]
+    exp = exp.iloc[:, np.array(np.where(np.sum(exp, axis=0) > min_reads)[0])]
     print("Number of samples used in clustering:", exp.shape[1])
 
     qq = normalize(exp, transpose=False)
