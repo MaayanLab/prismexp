@@ -87,7 +87,8 @@ def create_clustering(h5_file: str, work_dir, gene_idx: List[int], gene_count: i
     samples = a4.meta.get_meta_sample_field(h5_file,'geo_accession')
 
     exp = a4.data.index(h5_file, list(range(len(samples))), gene_idx=sorted(random.sample(gene_idx, gene_count)))
-    exp = exp.iloc[:, np.array(np.where(np.sum(exp, axis=0) > min_reads)[0])]
+    filtered_sample_idx = np.array(np.where(np.sum(exp, axis=0) > min_reads)[0])
+    exp = exp.iloc[:, filtered_sample_idx]
     print("Number of samples used in clustering:", exp.shape[1])
 
     qq = normalize(exp, transpose=False)
@@ -106,5 +107,5 @@ def create_clustering(h5_file: str, work_dir, gene_idx: List[int], gene_count: i
         clustering = KMeans(n_clusters=cluster_count, random_state=42).fit(qq.transpose()).labels_
     qq = None     # keep memory footprint low
 
-    cluster_mapping = pd.DataFrame({'sampleID': samples, 'clusterID': clustering}, index = samples, columns=["sampleID", "clusterID"])
+    cluster_mapping = pd.DataFrame({'sampleID': samples, 'clusterID': clustering}, index = samples[filtered_sample_idx], columns=["sampleID", "clusterID"])
     return cluster_mapping
