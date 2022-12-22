@@ -37,18 +37,18 @@ def calculate_correlation(h5_file: str, clustering: pd.DataFrame, gene_idx: List
     
     exp = a4.data.index(h5_file, samples_idx, gene_idx=gene_idx, silent=True)
     qq = normalize(exp, transpose=False)
-    del exp
+    exp = None
 
     if method == "spearman":
         cc = stats.spearmanr(qq.T)[0]
     else:
         cc = np.corrcoef(qq)
     cc = np.nan_to_num(cc)
-    del qq
+    qq = None
     correlation = pd.DataFrame(cc, index=genes[gene_idx], columns=genes[gene_idx], dtype=np.float16)
     correlation.index = genes[gene_idx]
     correlation.columns = genes[gene_idx]
-    del cc
+    cc = None
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
     return correlation
 
