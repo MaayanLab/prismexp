@@ -93,6 +93,4 @@ def train(workdir: str, gmt_file: str, training_size: int=200000, test_train_spl
     model = LGBMRegressor(seed=42)
     model.fit(X_train, y_train)
     pickle.dump(model, open(workdir+"/model.pkl", 'wb'))
-    #model = RandomForestClassifier(random_state=random_state)
-    #model.fit(X_train, y_train)
     return(model)
