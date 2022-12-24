@@ -35,7 +35,7 @@ $ pip install git+https://github.com/MaayanLab/prismexp.git
 
 ### Create gene correlation matrices
 Creating gene-gene correlation matrices requires 4 steps
-1. Download ARCHS4 gene expression: https://mssm-seq-matrix.s3.amazonaws.com/mouse_matrix.h5 (there is test data included in the package)
+1. Download ARCHS4 gene expression: [https://mssm-seq-matrix.s3.amazonaws.com/mouse_matrix.h5](https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5) (there is test data included in the package)
 2. filter genes with low expression
 3. partition gene expression profiles into a set of distinct clusters
 4. calculate gene-gene correlation within each cluster
