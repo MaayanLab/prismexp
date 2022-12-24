@@ -31,6 +31,26 @@ Install the python package directly from Github using PIP.
 $ pip install git+https://github.com/MaayanLab/prismexp.git
 ```
 
+## Quick Usage Example
+
+```python
+import urllib.request
+import prismx as px
+
+urllib.request.urlretrieve("https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5", "human_matrix.h5")
+
+work_dir = "/home/maayanlab/code/prismexp"
+h5_file = "human_matrix.h5"
+gmt_file = px.load_library("GO_Biological_Process_2021")
+
+cluster_number = 100
+
+px.create_correlation_matrices(h5_file, work_dir, cluster_count=cluster_number, verbose=True)
+px.features(gmt_file, work_dir, threads=4, verbose=True)
+px.train(work_dir, gmt_file, verbose=True)
+px.predict(work_dir, gmt_file, verbose=True)
+```
+
 ## Usage
 
 ### Create gene correlation matrices
@@ -160,7 +180,7 @@ Once the model is trained it can be applied on any gene set library of choice. M
 
 ### IV) Predict gene functions
 
-For the prediction step the model can be used across different libraries. There is also very low risk of overfitting the model so it can be trained and applied on the same gene set library. In this example the model was trained in BO Biological Processes, but applied on KEGG pathways. The prediction step will recompute the features, unless explicitly instructed to reuse the features. The prediction is saved as feather file at `{work_dir}/{gmt_file}.f`
+For the prediction step the model can be used across different libraries. There is also very low risk of overfitting the model so it can be trained and applied on the same gene set library. In this example the model was trained in BO Biological Processes, but applied on KEGG pathways. The prediction step will recompute the features, unless explicitly instructed to reuse the features. The prediction is saved as feather file at `{work_dir}/predictions/{gmt_file}.f`
 
 ```python
 import prismx as px
@@ -170,6 +190,17 @@ work_dir = "/home/maayanlab/code/prismexp/"
 gmt_file = px.load_library("KEGG_2021_Human")
 
 px.predict(work_dir, gmt_file, step_size=500, verbose=True)
+```
+
+To read the prediction matrix (genes as rows and gene sets as columns):
+
+```python3
+import pandas as pd
+import feather
+
+work_dir = "/home/maayanlab/code/prismexp/"
+
+predictions = pd.read_feather(work_dir+"/predictions/KEGG_2021_Human.f").set_index("index")
 ```
 
 #### predict
@@ -195,6 +226,10 @@ import prismx as px
 import prismx.gsea as pxgsea
 import blitzgsea as blitz
 import urllib.request
+import feather
+import pandas as pd
+
+work_dir = "/home/maayanlab/code/prismexp/"
 
 url = "https://github.com/MaayanLab/blitzgsea/raw/main/testing/ageing_muscle_gtex.tsv"
 urllib.request.urlretrieve(url, "ageing_muscle_gtex.tsv")
@@ -204,6 +239,9 @@ signature = pd.read_csv("ageing_muscle_gtex.tsv")
 
 # use enrichr submodule to retrieve gene set library
 library = blitz.enrichr.get_library("GO_Biological_Process_2021")
+
+# load PrismExp predictions
+predictions = pd.read_feather(work_dir+"/predictions/GO_Biological_Process_2021.f").set_index("index")
 
 result = px.bridgegsea.bridge_gsea(signature, library, predictions)
 ```
