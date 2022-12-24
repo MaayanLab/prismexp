@@ -1,6 +1,8 @@
 ![prismxsmall](https://user-images.githubusercontent.com/32603869/209446641-47383bdd-95a5-4dd9-b6ca-50d5f3b82936.png#gh-dark-mode-only)
 ![prismxsmall_light](https://user-images.githubusercontent.com/32603869/209446724-d5bf8be7-6d74-466b-9684-fc49007383d5.png#gh-light-mode-only)
 
+<img src="https://user-images.githubusercontent.com/32603869/209446641-47383bdd-95a5-4dd9-b6ca-50d5f3b82936.png#gh-light-mode-only" alt="PrismExp" align="left" width="200" id="gh-dark-mode-only" class="gh-dark-mode-only"/>
+
 <img src="https://user-images.githubusercontent.com/32603869/209446641-47383bdd-95a5-4dd9-b6ca-50d5f3b82936.png#gh-light-mode-only" alt="PrismExp" align="left" width="200" id="gh-light-mode-only" class="gh-light-mode-only"/>
 
 # PrismEXP
