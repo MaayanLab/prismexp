@@ -96,12 +96,12 @@ px.create_correlation_matrices(h5_file,
 | read_threshold | int | 20 | The minimum number of reads a gene must have in a fraction of total reads to keep. |
 | sample_threshold | float | 0.01 | The minimum fraction of samples that contain `read_threshold` reads of a gene to keep. |
 | filter_samples | int | 2000 | The maximum number of samples to use for gene filtering. |
-| min_avg_reads_per_gene | int | 2 | The average number of reads per gene for a sample to be considered in the clustering. |
-| cluster_method | str | "minibatch" | The clustering method to use. Options are "minibatch" and "kmeans". |
+| min_avg_reads_per_gene | int | 2 | The average number of reads per gene for a sample to be considered in the clustering. Can be used to remove samples with very low library size. |
+| cluster_method | str | "minibatch" | The clustering method to use. Options are "minibatch" and "kmeans". minibatch is much faster.|
 | cluster_gene_count | int | 1000 | The number of genes to use for the sample clustering. |
 | sample_count | int | 5000 | The maximum number of samples to use for calculating the correlation matrices. |
 | reuse_clustering | bool | False | Whether to reuse the existing clustering results in the work directory. |
-| correlation_method | str | "pearson" | The correlation method to use. Options are "pearson" and "spearman". |
+| correlation_method | str | "pearson" | The correlation method to use. Options are "pearson" and "spearman". Pearsons correlation is faster and requires less memory. |
 | verbose | bool | True | Whether to print progress messages. |
 
 
