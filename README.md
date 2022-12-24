@@ -17,8 +17,7 @@ The PrismExp Appyter for all Enrichr libraries can be accessed here: https://app
 
 ---
 **NOTE**
-javascript:downloadFile('https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5','human_matrix_v2.1.2.h5','2.1.2')
-PrismEXP requires a large gene expression repository. The code expects gene expression as gene counts. Data compatible with PrismX can be downloaded from the ARCHS4 website.<br><br>
+PrismEXP requires a large gene expression repository. The code expects gene expression as gene counts. Data compatible with PrismEXP can be downloaded from the [ARCHS4 website](https://maayanlab.cloud/archs4/download.html).<br><br>
 Mouse Data (717,966 samples): https://s3.dev.maayanlab.cloud/archs4/archs4_gene_mouse_v2.1.2.h5<br>
 Human Data (620,825 samples): https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5
 
