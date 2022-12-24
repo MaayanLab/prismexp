@@ -63,18 +63,17 @@ This is the first step of PrismExp. We first identify N = cluster_numer clusters
 ```python
 import urllib.request
 import prismx as px
-import os
 
 urllib.request.urlretrieve("https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5", "human_matrix.h5")
 
 work_dir = "/home/maayanlab/code/prismexp/"
-h5_file = "/human_matrix.h5"
+h5_file = "human_matrix.h5"
 
-clusterNumber = 100
+cluster_number = 100
 
 px.create_correlation_matrices(h5_file,
                                work_dir,
-                               cluster_count=cluster=_number, 
+                               cluster_count=cluster_number, 
                                sample_count=5000, 
                                cluster_gene_count=1000,
                                reuse_clustering=False,
@@ -108,6 +107,8 @@ This is the feature generation step. PrismExp will iterate over the previously g
 ```python
 import prismx as px
 
+work_dir = "/home/maayanlab/code/prismexp/"
+
 # load Enrichr library to use
 gmt_file = px.load_library("GO_Biological_Process_2021")
 
@@ -132,6 +133,10 @@ The gene set library needs to be the same as the one used in the prior feature g
 ```python
 import prismx as px
 
+work_dir = "/home/maayanlab/code/prismexp/"
+
+gmt_file = px.load_library("GO_Biological_Process_2021")
+
 # build a training data set and train model
 model = px.train(work_dir, gmt_file, training_size=300000, 
             test_train_split=0.1, sample_positive=40000,
@@ -155,23 +160,31 @@ Once the model is trained it can be applied on any gene set library of choice. M
 
 ### IV) Predict gene functions
 
+For the prediction step the model can be used across different libraries. There is also very low risk of overfitting the model so it can be trained and applied on the same gene set library. In this example the model was trained in BO Biological Processes, but applied on KEGG pathways. The prediction step will recompute the features, unless explicitly instructed to reuse the features.
+
 ```python
 import prismx as px
 
-# reuse matrices from step I and step II
-correlationFolder = "correlation_folder"
-predictionFolder = "prediction_folder"
-libs = px.list_libraries()
+work_dir = "/home/maayanlab/code/prismexp/"
 
-# choose a gene set library from Enrichr
-i = 1
-outname = libs[i]
-gmt_file = px.load_library(libs[i])
+gmt_file = px.load_library("GO_Biological_Process_2021")
 
-outfolder = "prismxresult"
-
-px.predict_gmt("gobp_model.pkl", gmt_file, correlationFolder, predictionFolder, outfolder, outname, step_size=200, intersect=False, verbose=True)
+px.predict(work_dir, gmt_file, step_size=500, verbose=True)
 ```
+
+#### predict
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| work_dir | str | | Path to the directory containing the correlation matrices and precomputed model. |
+| gmt_file | str | | Path to the gmt file containing the gene set library. |
+| model | lightGBM model | `None` | The prediction model to use. If `None`, loads the model from the workdir. |
+| step_size | int | 1000 | The number of samples to process at a time. |
+| intersect | bool | False | If True, only includes unique genes present in all gene sets in the feature matrix. |
+| normalize | bool | False | If True, normalizes the final prediction values using a z-score. |
+| verbose | bool | False | If True, prints progress information. |
+| skip_features | bool | False | If True, skips the feature computation step. |
+| threads | int | 2 | Number of threads to use for parallel processing. |
 
 ## Bridge Gene Set Enrichment Analysis (bridgeGSEA)
 
