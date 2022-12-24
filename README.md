@@ -63,7 +63,7 @@ import urllib.request
 import prismx as px
 import os
 
-urllib.request.urlretrieve("https://mssm-seq-matrix.s3.amazonaws.com/mouse_matrix.h5", "mouse_matrix.h5")
+urllib.request.urlretrieve("https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5", "human_matrix.h5")
 
 correlationFolder = "correlation_folder"
 clusterNumber = 200
