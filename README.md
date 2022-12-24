@@ -1,4 +1,5 @@
 <img align="left" width="200" src="https://mssm-prismx.s3.amazonaws.com/images/prismxsmall.png">
+![PrismExp](https://mssm-prismx.s3.amazonaws.com/images/prismxsmall.png#gh-dark-mode-only)
 
 # PrismEXP
 
