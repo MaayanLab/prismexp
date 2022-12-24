@@ -10,16 +10,15 @@ This Python3 package allows the generation of correlation matrices needed for th
 
 Default settings and ARCHS4 mouse gene expression should require less than 8GB of memory. The file formats used are hdf5 and feather. Gene expression has to be provided in H5 format. Gene expression should be stored as a matrix under "data/expression", gene symbols under "meta/genes", and sample identifieres under "meta/Sample_geo_accession"
 
-Precomputed PrismExp predictions for popular Enrichr gene set libraries can be accessed here: https://maayanlab.cloud/prismexp
-
+Precomputed PrismExp predictions for popular Enrichr gene set libraries can be accessed here: https://maayanlab.cloud/prismexp<br>
 The PrismExp Appyter for all Enrichr libraries can be accessed here: https://appyters.maayanlab.cloud/PrismEXP/
 
 ---
 **NOTE**
-
+javascript:downloadFile('https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5','human_matrix_v2.1.2.h5','2.1.2')
 PrismEXP requires a large gene expression repository. The code expects gene expression as gene counts. Data compatible with PrismX can be downloaded from the ARCHS4 website.<br><br>
-Mouse Data (284907 samples): https://mssm-seq-matrix.s3.amazonaws.com/mouse_matrix.h5<br>
-Human Data (238522 samples): https://mssm-seq-matrix.s3.amazonaws.com/human_matrix.h5
+Mouse Data (717,966 samples): https://s3.dev.maayanlab.cloud/archs4/archs4_gene_mouse_v2.1.2.h5<br>
+Human Data (620,825 samples): https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5
 
 ---
 
