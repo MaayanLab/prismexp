@@ -108,11 +108,6 @@ This is the feature generation step. PrismExp will iterate over the previously g
 ```python
 import prismx as px
 
-# download/initialize gmt file
-
-# Enrichr libraries can be listed like this
-libs = px.list_libraries()
-
 # load Enrichr library to use
 gmt_file = px.load_library("GO_Biological_Process_2021")
 
@@ -132,17 +127,29 @@ px.features(gmt_file, work_dir, threads=4, verbose=True)
 
 ### III) Train model on GO: Biological Processes gene set library
 
+The gene set library needs to be the same as the one used in the prior feature generation step.
+
 ```python
 import prismx as px
-import pickle
 
 # build a training data set and train model
 model = px.train(work_dir, gmt_file, training_size=300000, 
             test_train_split=0.1, sample_positive=40000,
             sample_negative=200000, random_state=1, verbose=True)
-
-pickle.dump(model, open("gobp_model_"+str(clusterCount)+".pkl", 'wb'))
 ```
+
+### train
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| work_dir | str | | Path to the directory containing the correlation matrices. |
+| gmt_file | str | | Path to the gmt file containing the gene set library. |
+| training_size | int | 200000 | The number of gene sets to use for training. |
+| test_train_split | float | 0.1 | The proportion of the training data to use for testing. |
+| sample_positive | int | 20000 | The number of positive samples to use in the balanced training data. |
+| sample_negative | int | 80000 | The number of negative samples to use in the balanced training data. |
+| random_state | int | 42 | The seed for the random number generator. |
+| verbose | bool | False | If True, prints progress information. |
 
 Once the model is trained it can be applied on any gene set library of choice. Models trained with GO: BP were tested on all gene set libraries in Enrichr and show on average for all gene set libraries.
 
