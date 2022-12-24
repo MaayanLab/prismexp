@@ -160,14 +160,14 @@ Once the model is trained it can be applied on any gene set library of choice. M
 
 ### IV) Predict gene functions
 
-For the prediction step the model can be used across different libraries. There is also very low risk of overfitting the model so it can be trained and applied on the same gene set library. In this example the model was trained in BO Biological Processes, but applied on KEGG pathways. The prediction step will recompute the features, unless explicitly instructed to reuse the features.
+For the prediction step the model can be used across different libraries. There is also very low risk of overfitting the model so it can be trained and applied on the same gene set library. In this example the model was trained in BO Biological Processes, but applied on KEGG pathways. The prediction step will recompute the features, unless explicitly instructed to reuse the features. The prediction is saved as feather file at `{work_dir}/{gmt_file}.f`
 
 ```python
 import prismx as px
 
 work_dir = "/home/maayanlab/code/prismexp/"
 
-gmt_file = px.load_library("GO_Biological_Process_2021")
+gmt_file = px.load_library("KEGG_2021_Human")
 
 px.predict(work_dir, gmt_file, step_size=500, verbose=True)
 ```
