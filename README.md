@@ -12,7 +12,6 @@ Default settings and ARCHS4 mouse gene expression should require less than 8GB o
 
 Precomputed PrismExp predictions for popular Enrichr gene set libraries can be accessed here:
 https://maayanlab.cloud/prismexp
-
 The PrismExp Appyter for all Enrichr libraries can be accessed here:
 https://appyters.maayanlab.cloud/PrismEXP/
 
