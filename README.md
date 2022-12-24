@@ -4,16 +4,18 @@
 
 # PrismEXP
 
-## Package for gene function predictions by unsupervised gene expression partitioning
+## Gene annotations predictions by unsupervised learning using gene expression partitioning
 
-Gene co-expression is a commonly used feature in many machine learning applications. The elucidation of gene function frequently relies on the use of correlation structures, and the performance of the predictions relies on the chosen gene expression data. In some applications, correlations derived from tissue-specific gene expression outperform correlations derived from global gene expression. However, the identification of the optimal tissue may not always be trivial, and the constraint of a single tissue might be too limiting in some circumstances. To address this problem, we introduce and validate a new statistical approach, Automated Sharding of Massive Co-expression RNA-seq Data (PrismEXP), for accurate gene function prediction. We apply PrismEXP on ARCHS4 gene expression to predict a wide variety of gene properties, such as pathway memberships, phenotype associations, and protein-protein interactions. PrismEXP outperforms single correlation matrix approaches on all tested domains. The proposed method can enhance existing machine learning methods using gene correlation information and will require only minor adjustments to existing algorithms.
+Gene-gene co-expression can be effectively applied to impute gene functional annotations with machine learning. The elucidation of gene annotations relies on the correlation structure within gene-gene co-expression matrices. The performance of the predictions relies on the chosen gene expression data. In some applications, correlations derived from tissue-specific or cell-type-specific gene expression outperform correlations derived from global cross-tissue cross-cell-type gene expression. However, the identification of the optimal tissue and cell type is not trivial. Since tissues are made of multiple cell type, the constraint of a single tissue might be limiting in some circumstances. Here we introduce and validate a statistical approach called Partitioning RNA-seq data Into Segments for Massive co-EXpression-based gene annotations Predictions (PrismEXP), for accurate gene annotation prediction. We apply PrismEXP using the ARCHS4 gene expression compendium to predict a wide variety of gene annotations such as pathway memberships, phenotype associations, and regulation by transcription factors. PrismEXP outperforms single correlation matrix approaches on all tested domains. PrismEXP can enhance existing machine learning methods that use correlation matrices from other domains such as proteomics and metabolomics requiring only minor adjustments to the existing algorithm.
 
-This Python3 package allows the generation of correlation matrices needed for the prediction of gene function from GMT files. The memory requirements depend on the number of genes used and the number of gene expression profiles.
+## Python package
 
-Default settings and ARCHS4 mouse gene expression should require less than 8GB of memory. The file formats used are hdf5 and feather. Gene expression has to be provided in H5 format. Gene expression should be stored as a matrix under "data/expression", gene symbols under "meta/genes", and sample identifieres under "meta/Sample_geo_accession"
+The PrismEXP Python3 package enables the generation of correlation matrices needed for the prediction of gene annotations from GMT files. The memory requirement depends on the number of genes and the number of gene expression profiles used.
 
-Precomputed PrismExp predictions for popular Enrichr gene set libraries can be accessed here: https://maayanlab.cloud/prismexp<br>
-The PrismExp Appyter for all Enrichr libraries can be accessed here: https://appyters.maayanlab.cloud/PrismEXP/
+Default settings with the ARCHS4 mouse gene expression matrix should require less than 8GB of memory. The file formats used are hdf5 and feather. Gene expression has to be provided in H5 format. Gene expression should be stored as a matrix under "data/expression", gene symbols under "meta/genes", and sample identifieres under "meta/Sample_geo_accession"
+
+Precomputed PrismEXP predictions for annotation from [Enrichr](https://maayanlab.cloud/Enrichr) gene set libraries can be accessed from here: https://maayanlab.cloud/prismexp<br>
+The [PrismExp Appyter](https://appyters.maayanlab.cloud/PrismEXP/) for all Enrichr libraries can be accessed here: https://appyters.maayanlab.cloud/PrismEXP/.
 
 ---
 **NOTE**
@@ -32,7 +34,7 @@ Install the python package directly from Github using PIP.
 $ pip install git+https://github.com/MaayanLab/prismexp.git
 ```
 
-## Quick Usage Example
+## Quick usage example
 
 ```python
 import urllib.request
@@ -55,31 +57,31 @@ px.predict(work_dir, gmt_file, verbose=True)
 ## Usage
 
 ### Create gene correlation matrices
-Creating gene-gene correlation matrices requires 4 steps
-1. Download ARCHS4 gene expression: [https://mssm-seq-matrix.s3.amazonaws.com/mouse_matrix.h5](https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5) (there is test data included in the package)
-2. filter genes with low expression
-3. partition gene expression profiles into a set of distinct clusters
-4. calculate gene-gene correlation within each cluster
+Creating gene-gene correlation matrices requires 4 steps:
+1. Download the ARCHS4 gene expression data: [https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5](https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5) (there is test data included in the package)
+2. Filter genes with low expression
+3. Partition gene expression profiles into a set of distinct clusters
+4. Calculate gene-gene correlation within each cluster
 
-### Create gene function predictions
-Creating the predictions requires the gene-gene correlation matrices as a prerequisite
+### Create gene annotation predictions
+Creating the predictions requires the gene-gene correlation matrices as a prerequisite.
 1. Provide a GMT file. (Samples of GMT file can be found at: https://maayanlab.cloud/Enrichr/#stats)
     * each line of a GMT is tab separated and starts with a gene set name followed by a description, followed by gene symbols. Example: potassium ion import (GO:0010107) \t description \t SLC12A3 \t KCNJ5 \t SLC12A4 \t KCNJ6 \t ...
-2. Create gene expression cluster wise predictions
+2. Create gene expression cluster-wise predictions
 3. Assemble cluster based predictions
-4. Apply trained PRISMX machine learning model
+4. Apply the trained PrismEXP machine learning model
 
 ## Code example
 
-The following example will download the ARCHS4 gene expression and build 50 gene expression clusters. This process will, depending on the used hardware, take considerable amount of time. It also requires about 1GB of diskspace per gene expression cluster. Additional to the 50 gene-gene matrices the algorithm will also compute a correlation matrix across clusters. Memory consumption will depend on clustering, but should stay below 8GB.
+The following example will download the ARCHS4 gene expression compendium and build 50 gene expression clusters. This process will, depending on the used hardware, take considerable amount of time. It also requires about 1GB of diskspace per gene expression cluster. Additional to the 50 gene-gene matrices, the algorithm will also compute a correlation matrix across clusters. Memory consumption depends on the number of clusters, but should stay below 8GB.
 
 ### Python3
 
 ### I) Compute correlation matrices
 
-The choice of clusters will impact the overall quality of gene function predictions. The predictions improve proportional to the log of the number of clusters. Adding more clusters will increase the runtime of the algorithm. If possible we recommend 200-300 clusters. Beyond 300 clusters improvements are marginal.
+The choice of number of clusters will impact the overall quality of gene annotations predictions. The predictions improve proportional to the log of the number of clusters. Adding more clusters will increase the runtime of the algorithm. If possible, we recommend 200-300 clusters. Beyond 300 clusters improvements are marginal.
 
-This is the first step of PrismExp. We first identify N = cluster_numer clusters of samples for the ARCHS4 gene expression. We then limit each cluster to maximally sample_count = 5000 samples. After normalizing the gene expression PrismExp computes the pairwise correlation of genes in each cluster resulting in N correlation matrices.
+This is the first step taken by PrismEXP. We first identify N = cluster_number clusters of samples to partition the ARCHS4 gene expression compendium. We then limit each cluster to a maximum of sample_count = 5,000 samples. After normalizing the gene expression, PrismEXP computes the pairwise correlations between all gene pairs in each cluster resulting in N correlation matrices.
 
 ```python
 import urllib.request
@@ -102,7 +104,7 @@ px.create_correlation_matrices(h5_file,
                                
 ```
 
-### create_correlation_matrices
+### Create correlation matrices
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -121,9 +123,9 @@ px.create_correlation_matrices(h5_file,
 | verbose | bool | True | Whether to print progress messages. |
 
 
-### II) Calculate average correlation of genes to gene sets for given gene set library
+### II) Calculate average correlations between a gene and a gene set for given gene set library
 
-This is the feature generation step. PrismExp will iterate over the previously generated correlation matrices and compute the average correlation (features) for the given gene set library. Features are required for model training and also prediction. For training a good library is GO Biological Processes.
+This is the feature step. PrismEXP will iterate over the previously generated correlation matrices and compute the average correlation (features) for the given gene set library. Features are required for model training and also for making prediction. For example, training with the GO Biological Processes library is demostarted below:
 
 ```python
 import prismx as px
@@ -147,7 +149,7 @@ px.features(gmt_file, work_dir, threads=4, verbose=True)
 | threads | int | 2 | Number of threads to use for parallel processing. |
 | verbose | bool | False | If True, prints progress information. |
 
-### III) Train model on GO: Biological Processes gene set library
+### III) Train a prediction model with the GO Biological Processes gene set library
 
 The gene set library needs to be the same as the one used in the prior feature generation step.
 
@@ -177,11 +179,11 @@ model = px.train(work_dir, gmt_file, training_size=300000,
 | random_state | int | 42 | The seed for the random number generator. |
 | verbose | bool | False | If True, prints progress information. |
 
-Once the model is trained it can be applied on any gene set library of choice. Models trained with GO: BP were tested on all gene set libraries in Enrichr and show on average for all gene set libraries.
+Once the model is trained it can be applied on any gene set library of choice. Models trained with the GO BP library were tested on all other gene set libraries in Enrichr.
 
 ### IV) Predict gene functions
 
-For the prediction step the model can be used across different libraries. There is also very low risk of overfitting the model so it can be trained and applied on the same gene set library. In this example the model was trained in BO Biological Processes, but applied on KEGG pathways. The prediction step will recompute the features, unless explicitly instructed to reuse the features. The prediction is saved as feather file at `{work_dir}/predictions/{gmt_file}.f`
+The prediction step of the model can be used across different libraries. There is also low risk of overfitting the model, so it can be trained and applied to the same gene set library. In this example the model was trained in GO Biological Processes, but applied to the KEGG pathways library. The prediction step will recompute the features, unless explicitly instructed, to reuse the features. The prediction is saved as a feather file at `{work_dir}/predictions/{gmt_file}.f`
 
 ```python
 import prismx as px
@@ -218,9 +220,9 @@ predictions = pd.read_feather(work_dir+"/predictions/KEGG_2021_Human.f").set_ind
 | skip_features | bool | False | If True, skips the feature computation step. |
 | threads | int | 2 | Number of threads to use for parallel processing. |
 
-## Bridge Gene Set Enrichment Analysis (bridgeGSEA)
+## Bridge gene set enrichment analysis (bridgeGSEA)
 
-Use PrismEXP gene set predictions in enrichment analysis to identify novel genes in enriched pathways and biological processes.
+PrismEXP gene set predictions can be used to enahnce gene set enrichment analysis to identify novel genes in enriched pathways and biological processes.
 
 ```python
 import prismx as px
