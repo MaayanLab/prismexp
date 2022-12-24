@@ -58,6 +58,8 @@ The following example will download the ARCHS4 gene expression and build 50 gene
 
 The choice of clusters will impact the overall quality of gene function predictions. The predictions improve proportional to the log of the number of clusters. Adding more clusters will increase the runtime of the algorithm. If possible we recommend 200-300 clusters. Beyond 300 clusters improvements are marginal.
 
+This is the first step of PrismExp. We first identify N = cluster_numer clusters of samples for the ARCHS4 gene expression. We then limit each cluster to maximally sample_count = 5000 samples. After normalizing the gene expression PrismExp computes the pairwise correlation of genes in each cluster resulting in N correlation matrices.
+
 ```python
 import urllib.request
 import prismx as px
@@ -65,12 +67,43 @@ import os
 
 urllib.request.urlretrieve("https://s3.dev.maayanlab.cloud/archs4/archs4_gene_human_v2.1.2.h5", "human_matrix.h5")
 
-correlationFolder = "correlation_folder"
-clusterNumber = 200
+work_dir = "/home/maayanlab/code/prismexp/"
+h5_file = "/human_matrix.h5"
 
-os.mkdir(correlationFolder)
-px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=clusterNumber, sampleCount=5000, verbose=True)
+# download/initialize gmt file
+libs = px.list_libraries()
+gmt_file = px.load_library("GO_Biological_Process_2021")
+
+clusterNumber = 100
+
+px.create_correlation_matrices(h5_file,
+                               work_dir,
+                               cluster_count=cluster=_number, 
+                               sample_count=5000, 
+                               cluster_gene_count=1000,
+                               reuse_clustering=False,
+                               verbose=True)
+                               
 ```
+
+### create_correlation_matrices
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| h5_file | str | | The path to the h5 file containing the gene expression data. |
+| work_dir | str | | The directory to save the resulting clustering and correlation matrices. |
+| cluster_count | int | 100 | The number of clusters to use for the sample clustering. |
+| read_threshold | int | 20 | The minimum number of reads a gene must have in a fraction of total reads to keep. |
+| sample_threshold | float | 0.01 | The minimum fraction of samples that contain `read_threshold` reads of a gene to keep. |
+| filter_samples | int | 2000 | The maximum number of samples to use for gene filtering. |
+| min_avg_reads_per_gene | int | 2 | The average number of reads per gene for a sample to be considered in the clustering. |
+| cluster_method | str | "minibatch" | The clustering method to use. Options are "minibatch" and "kmeans". |
+| cluster_gene_count | int | 1000 | The number of genes to use for the sample clustering. |
+| sample_count | int | 5000 | The maximum number of samples to use for calculating the correlation matrices. |
+| reuse_clustering | bool | False | Whether to reuse the existing clustering results in the work directory. |
+| correlation_method | str | "pearson" | The correlation method to use. Options are "pearson" and "spearman". |
+| verbose | bool | True | Whether to print progress messages. |
+
 
 ### II) Calculate average correlation of genes to gene sets for given gene set library
 
@@ -78,14 +111,14 @@ px.createCorrelationMatrices("mouse_matrix.h5", correlationFolder, clusterCount=
 import prismx as px
 
 # reuse correlation matrices from first step
-correlationFolder = "correlation_folder"
-predictionFolder = "prediction_folder"
+correlation_folder = "correlation_folder"
+prediction_folder = "prediction_folder"
 libs = px.list_libraries()
 
 # select GO: Biological Processes
 gmt_file = px.load_library(libs[110])
 
-px.correlation_scores(gmt_file, correlationFolder, predictionFolder, verbose=True)
+px.correlation_scores(gmt_file, correlation_folder, predictionolder, verbose=True)
 ```
 
 ### III) Train model on GO: Biological Processes gene set library
