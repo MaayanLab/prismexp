@@ -1,6 +1,10 @@
 <img align="left" width="200" src="https://mssm-prismx.s3.amazonaws.com/images/prismxsmall.png">
 ![PrismExp](https://mssm-prismx.s3.amazonaws.com/images/prismxsmall.png#gh-dark-mode-only)
 
+![prismxsmall](https://user-images.githubusercontent.com/32603869/209446641-47383bdd-95a5-4dd9-b6ca-50d5f3b82936.png#gh-dark-mode-only)
+
+
+
 # PrismEXP
 
 ## Package for gene function predictions by unsupervised gene expression partitioning
