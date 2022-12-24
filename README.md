@@ -70,10 +70,6 @@ urllib.request.urlretrieve("https://s3.dev.maayanlab.cloud/archs4/archs4_gene_hu
 work_dir = "/home/maayanlab/code/prismexp/"
 h5_file = "/human_matrix.h5"
 
-# download/initialize gmt file
-libs = px.list_libraries()
-gmt_file = px.load_library("GO_Biological_Process_2021")
-
 clusterNumber = 100
 
 px.create_correlation_matrices(h5_file,
@@ -107,19 +103,32 @@ px.create_correlation_matrices(h5_file,
 
 ### II) Calculate average correlation of genes to gene sets for given gene set library
 
+This is the feature generation step. PrismExp will iterate over the previously generated correlation matrices and compute the average correlation (features) for the given gene set library. Features are required for model training and also prediction. For training a good library is GO Biological Processes.
+
 ```python
 import prismx as px
 
-# reuse correlation matrices from first step
-correlation_folder = "correlation_folder"
-prediction_folder = "prediction_folder"
+# download/initialize gmt file
+
+# Enrichr libraries can be listed like this
 libs = px.list_libraries()
 
-# select GO: Biological Processes
-gmt_file = px.load_library(libs[110])
+# load Enrichr library to use
+gmt_file = px.load_library("GO_Biological_Process_2021")
 
-px.correlation_scores(gmt_file, correlation_folder, predictionolder, verbose=True)
+# calculate the features that are used for model training and prediction
+px.features(gmt_file, work_dir, threads=4, verbose=True)
 ```
+
+#### features
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| gmt_file | str | | Path to the gmt file containing the gene set library. |
+| work_dir | str | | Path to the directory containing the correlation matrices. |
+| intersect | bool | False | If True, only includes unique genes present in all gene sets in the feature matrix. |
+| threads | int | 2 | Number of threads to use for parallel processing. |
+| verbose | bool | False | If True, prints progress information. |
 
 ### III) Train model on GO: Biological Processes gene set library
 
@@ -127,16 +136,12 @@ px.correlation_scores(gmt_file, correlation_folder, predictionolder, verbose=Tru
 import prismx as px
 import pickle
 
-# reuse matrices from step I and step II
-correlationFolder = "correlation_folder"
-predictionFolder = "prediction_folder"
-libs = px.list_libraries()
+# build a training data set and train model
+model = px.train(work_dir, gmt_file, training_size=300000, 
+            test_train_split=0.1, sample_positive=40000,
+            sample_negative=200000, random_state=1, verbose=True)
 
-# select GO: Biological Processes (same as last step)
-gmt_file = px.load_library(libs[110])
-
-model = px.trainModel(predictionFolder, correlationFolder, gmt_file, training_size=300000, test_train_split=0.1, sample_positive=40000, sample_negative=200000, random_state=42, verbose=True)
-pickle.dump(model, open("gobp_model.pkl", 'wb'))
+pickle.dump(model, open("gobp_model_"+str(clusterCount)+".pkl", 'wb'))
 ```
 
 Once the model is trained it can be applied on any gene set library of choice. Models trained with GO: BP were tested on all gene set libraries in Enrichr and show on average for all gene set libraries.
