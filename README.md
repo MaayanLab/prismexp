@@ -64,7 +64,7 @@ Creating gene-gene correlation matrices requires 4 steps
 
 ### Create gene function predictions
 Creating the predictions requires the gene-gene correlation matrices as a prerequisite
-1. Provide a GMT file. (Samples of GMT file can be found at: https://amp.pharm.mssm.edu/Enrichr/#stats)
+1. Provide a GMT file. (Samples of GMT file can be found at: https://maayanlab.cloud/Enrichr/#stats)
     * each line of a GMT is tab separated and starts with a gene set name followed by a description, followed by gene symbols. Example: potassium ion import (GO:0010107) \t description \t SLC12A3 \t KCNJ5 \t SLC12A4 \t KCNJ6 \t ...
 2. Create gene expression cluster wise predictions
 3. Assemble cluster based predictions
