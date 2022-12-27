@@ -49,7 +49,7 @@ gmt_file = px.load_library("GO_Biological_Process_2021")
 cluster_number = 100
 
 px.create_correlation_matrices(h5_file, work_dir, cluster_count=cluster_number, verbose=True)
-px.features(gmt_file, work_dir, threads=4, verbose=True)
+px.features(work_dir, gmt_file, threads=4, verbose=True)
 px.train(work_dir, gmt_file, verbose=True)
 px.predict(work_dir, gmt_file, verbose=True)
 ```
@@ -136,15 +136,15 @@ work_dir = "/home/maayanlab/code/prismexp/"
 gmt_file = px.load_library("GO_Biological_Process_2021")
 
 # calculate the features that are used for model training and prediction
-px.features(gmt_file, work_dir, threads=4, verbose=True)
+px.features(work_dir, gmt_file, threads=4, verbose=True)
 ```
 
 #### features
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| gmt_file | str | | Path to the gmt file containing the gene set library. |
 | work_dir | str | | Path to the directory containing the correlation matrices. |
+| gmt_file | str | | Path to the gmt file containing the gene set library. |
 | intersect | bool | False | If True, only includes unique genes present in all gene sets in the feature matrix. |
 | threads | int | 2 | Number of threads to use for parallel processing. |
 | verbose | bool | False | If True, prints progress information. |
@@ -206,7 +206,7 @@ work_dir = "/home/maayanlab/code/prismexp/"
 predictions = pd.read_feather(work_dir+"/predictions/KEGG_2021_Human.f").set_index("index")
 ```
 
-#### predict
+#### `predict(work_dir: str, gmt_file: str, model=None, step_size: int=1000, intersect: bool=False, normalize:bool=False, verbose: bool=False, skip_features: bool=False, threads: int=2)`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
