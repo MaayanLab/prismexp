@@ -104,7 +104,7 @@ px.create_correlation_matrices(h5_file,
                                
 ```
 
-### Create correlation matrices
+#### `create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=100, read_threshold: int=20, sample_threshold: float=0.01, filter_samples: int=2000, min_avg_reads_per_gene: int=2, cluster_method: str="minibatch", cluster_gene_count: int=1000, sample_count: int=5000, reuse_clustering: bool=False, correlation_method: str="pearson", verbose: bool=True)`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -139,7 +139,7 @@ gmt_file = px.load_library("GO_Biological_Process_2021")
 px.features(work_dir, gmt_file, threads=4, verbose=True)
 ```
 
-#### features
+#### `features(work_dir: str, gmt_file: str, intersect: bool=False, threads: int=2, verbose: bool=False)`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -166,7 +166,7 @@ model = px.train(work_dir, gmt_file, training_size=300000,
             sample_negative=200000, random_state=1, verbose=True)
 ```
 
-### train
+#### `train(work_dir: str, gmt_file: str, training_size: int=200000, test_train_split: float=0.1, sample_positive: int=20000, sample_negative: int=80000, random_state: int=42, verbose: bool=False)`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
