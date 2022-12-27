@@ -15,14 +15,14 @@ from scipy.stats import zscore
 from prismx.utils import read_gmt, load_correlation, load_feature
 from prismx.feature import features, load_features_range
 
-def predict(workdir: str, gmt_file: str, model=0, step_size: int=1000, intersect: bool=False, normalize:bool=False, verbose: bool=False, skip_features: bool=False, threads: int=2):
+def predict(work_dir: str, gmt_file: str, model=None, step_size: int=1000, intersect: bool=False, normalize:bool=False, verbose: bool=False, skip_features: bool=False, threads: int=2):
     """
     Computes the feature matrices for the given gmt file and directory, and then runs the prediction algorithm using the features.
     
     Parameters:
-    workdir (str): Path to the directory containing the correlation matrices and precomputed model.
+    work_dir (str): Path to the directory containing the correlation matrices and precomputed model.
     gmt_file (str): Path to the gmt file containing the gene set library.
-    model (int, optional): The prediction model to use. Defaults to 0, which loads the model from the workdir.
+    model (lightGBM model, optional): The prediction model to use. Defaults to None, which loads the model from the work_dir.
     step_size (int, optional): The number of samples to process at a time. Defaults to 1000.
     intersect (bool, optional): If True, only includes unique genes present in all gene sets in the feature matrix. Defaults to False.
     normalize (bool, optional): If True, normalizes the final prediction values using a z-score. Defaults to False.
@@ -32,38 +32,38 @@ def predict(workdir: str, gmt_file: str, model=0, step_size: int=1000, intersect
     """
     
     if model == 0:
-        model = pickle.load(open(workdir+"/model.pkl", "rb"))
+        model = pickle.load(open(work_dir+"/model.pkl", "rb"))
     if not skip_features:
-        features(gmt_file, workdir, intersect=intersect, threads=threads, verbose=verbose)
-    prismx_predictions(model, workdir, os.path.basename(gmt_file), step_size, normalize=normalize, verbose=verbose)
+        features(work_dir, gmt_file, intersect=intersect, threads=threads, verbose=verbose)
+    prismx_predictions(model, work_dir, os.path.basename(gmt_file), step_size, normalize=normalize, verbose=verbose)
 
-def prismx_predictions(model, workdir: str, prediction_name: str, step_size: int=1000, verbose: bool=False, normalize=False):
+def prismx_predictions(model, work_dir: str, prediction_name: str, step_size: int=1000, verbose: bool=False, normalize=False):
     """
     Makes predictions using the given model and feature matrices, and saves the predictions to the given directory.
     
     Parameters:
     model: The model to use for making predictions.
-    workdir (str): Path to the directory containing the feature matrices.
+    work_dir (str): Path to the directory containing the feature matrices.
     prediction_name (str): Name to use for the prediction file.
     step_size (int, optional): The number of samples to process at a time. Defaults to 1000.
     verbose (bool, optional): If True, prints progress information. Defaults to False.
     normalize (bool, optional): If True, normalizes the predictions before saving them using z-score. Defaults to False.
     """
-    os.makedirs(workdir+"/predictions", exist_ok=True)
-    prediction_size = load_feature(workdir, 0).shape[1]
+    os.makedirs(work_dir+"/predictions", exist_ok=True)
+    prediction_size = load_feature(work_dir, 0).shape[1]
     prism = pd.DataFrame()
     step_number = math.ceil(prediction_size/step_size)
     
     for i in tqdm(range(0, step_number), desc="Make Predictions", disable=(not verbose)):
         rfrom = i*step_size
         rto = min((i+1)*step_size, prediction_size)
-        features = load_features_range(workdir, rfrom, rto)
+        features = load_features_range(work_dir, rfrom, rto)
         prism = make_predictions_range(model, prism, features)
         features = 0
 
     if normalize:
         prism = prism.apply(zscore)
-    prism.reset_index().to_feather(workdir+"/predictions/"+prediction_name+".f")
+    prism.reset_index().to_feather(work_dir+"/predictions/"+prediction_name+".f")
 
 
 def make_predictions_range(model: str, prism: pd.DataFrame, features: List[pd.DataFrame], verbose: bool=False) -> pd.DataFrame:
