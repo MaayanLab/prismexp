@@ -48,7 +48,7 @@ gmt_file = px.load_library("GO_Biological_Process_2021")
 
 cluster_number = 100
 
-px.create_correlation_matrices(h5_file, work_dir, cluster_count=cluster_number, verbose=True)
+px.create_correlation_matrices(work_dir, h5_file, cluster_count=cluster_number, verbose=True)
 px.features(work_dir, gmt_file, threads=4, verbose=True)
 px.train(work_dir, gmt_file, verbose=True)
 px.predict(work_dir, gmt_file, verbose=True)
@@ -94,8 +94,8 @@ h5_file = "human_matrix.h5"
 
 cluster_number = 100
 
-px.create_correlation_matrices(h5_file,
-                               work_dir,
+px.create_correlation_matrices(work_dir,
+                               h5_file,
                                cluster_count=cluster_number, 
                                sample_count=5000, 
                                cluster_gene_count=1000,
@@ -108,8 +108,8 @@ px.create_correlation_matrices(h5_file,
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| h5_file | str | | The path to the h5 file containing the gene expression data. |
 | work_dir | str | | The directory to save the resulting clustering and correlation matrices. |
+| h5_file | str | | The path to the h5 file containing the gene expression data. |
 | cluster_count | int | 100 | The number of clusters to use for the sample clustering. |
 | read_threshold | int | 20 | The minimum number of reads a gene must have in a fraction of total reads to keep. |
 | sample_threshold | float | 0.01 | The minimum fraction of samples that contain `read_threshold` reads of a gene to keep. |
