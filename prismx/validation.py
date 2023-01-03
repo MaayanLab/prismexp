@@ -53,7 +53,7 @@ def calculate_set_f1(prediction: pd.DataFrame, library: Dict, min_lib_size: int=
     f1s = pd.DataFrame(f1s, index=setnames)
     return(f1s)
 
-def benchmark_gmt(gmt_file: str, workdir: str, prediction_file: str, intersect: bool=False, verbose=False):
+def benchmark_gmt(workdir: str, gmt_file: str, prediction_file: str, intersect: bool=False, verbose=False):
     genes = get_genes(workdir)
     library, rev_library, unique_genes = read_gmt(gmt_file, genes, verbose=verbose)
     if intersect:
@@ -98,7 +98,7 @@ def benchmarkGMTfast(gmt_file: str, correlationFolder: str, predictionFolder: st
     setAUC["prismx"] = calculate_set_auc(prediction, library)[0]
     return([geneAUC, setAUC])
 
-def benchmark_gmt_fast(gmt_file: str, workdir: str, prediction_file: str, intersect: bool=False, verbose: bool=False):
+def benchmark_gmt_fast(workdir: str, gmt_file: str, prediction_file: str, intersect: bool=False, verbose: bool=False):
     os.makedirs(workdir+"/aucs", exist_ok=True)
     genes = get_genes(workdir)
     library, rev_library, unique_genes = read_gmt(gmt_file, genes, verbose=verbose)

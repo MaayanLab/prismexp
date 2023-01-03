@@ -20,16 +20,16 @@ from prismx.prediction import predict, prismx_predictions
 from prismx.validation import benchmark_gmt, benchmarkGMTfast, benchmark_gmt_fast
 from prismx.bridgegsea import bridge_gsea, plot_enrichment, plot_gsea, nes
 
-def create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=100, read_threshold: int=20, sample_threshold: float=0.01, filter_samples: int=2000, min_avg_reads_per_gene: int=2, cluster_method: str="minibatch", cluster_gene_count: int=1000, sample_count: int=5000, reuse_clustering: bool=False, correlation_method: str="pearson", verbose: bool=True):
+def create_correlation_matrices(work_dir: str, h5_file: str, cluster_count: int=100, read_threshold: int=20, sample_threshold: float=0.01, filter_samples: int=2000, min_avg_reads_per_gene: int=2, cluster_method: str="minibatch", cluster_gene_count: int=1000, sample_count: int=5000, reuse_clustering: bool=False, correlation_method: str="pearson", verbose: bool=True):
     """
     Calculate clustering and correlation matrices for the samples in the specified h5 file.
 
     Parameters
     ----------
-    h5_file : str
-        The path to the h5 file containing the gene expression data.
     work_dir : str
         The directory to save the resulting clustering and correlation matrices.
+    h5_file : str
+        The path to the h5 file containing the gene expression data.
     cluster_count : int, optional
         The number of clusters to use for the sample clustering. Default is 100.
     read_threshold : int, optional
@@ -66,7 +66,7 @@ def create_correlation_matrices(h5_file: str, work_dir: str, cluster_count: int=
     if verbose: print("   -> completed in "+str(elapsed)+"min / #genes="+str(len(filtered_genes)))
     if verbose: print("2. Cluster samples")
     tstart = time.time()
-    clustering = create_clustering(h5_file, work_dir, filtered_genes, cluster_gene_count, cluster_count, reuse_clustering=reuse_clustering, method=cluster_method)
+    clustering = create_clustering(work_dir, h5_file, filtered_genes, cluster_gene_count, cluster_count, min_reads=len(filtered_genes)*min_avg_reads_per_gene, reuse_clustering=reuse_clustering, method=cluster_method)
     tclust = clustering.iloc[:,1]
     tclust.to_csv(work_dir+"/clustering.tsv", sep="\t")
     elapsed = round((time.time()-tstart)/60,2)

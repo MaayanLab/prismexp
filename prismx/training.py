@@ -83,8 +83,21 @@ def balance_data(df_true: pd.DataFrame, df_false: pd.DataFrame, true_count: int,
     y = df_combined.iloc[:,df_combined.shape[1]-1]
     return(X, y)
 
-def train(workdir: str, gmt_file: str, training_size: int=200000, test_train_split: float=0.1, sample_positive: int=20000, sample_negative: int=80000, random_state: int=42, verbose: bool=False):
-    df_true, df_false = create_training_data(workdir, gmt_file, training_size, verbose=verbose)
+def train(work_dir: str, gmt_file: str, training_size: int=200000, test_train_split: float=0.1, sample_positive: int=20000, sample_negative: int=80000, random_state: int=42, verbose: bool=False):
+    """
+    Trains a model for predicting gene set enrichments based on gene correlations.
+    
+    Parameters:
+    work_dir (str): Path to the directory containing the correlation matrices.
+    gmt_file (str): Path to the gmt file containing the gene set library.
+    training_size (int, optional): The number of gene sets to use for training. Defaults to 200000.
+    test_train_split (float, optional): The proportion of the training data to use for testing. Defaults to 0.1.
+    sample_positive (int, optional): The number of positive samples to use in the balanced training data. Defaults to 20000.
+    sample_negative (int, optional): The number of negative samples to use in the balanced training data. Defaults to 80000.
+    random_state (int, optional): The seed for the random number generator. Defaults to 42.
+    verbose (bool, optional): If True, prints progress information. Defaults to False.
+    """
+    df_true, df_false = create_training_data(work_dir, gmt_file, training_size, verbose=verbose)
     X, y = balance_data(df_true, df_false, sample_positive, sample_negative)
     true_count = np.sum(y)
     false_count = len(y)-true_count
@@ -92,5 +105,4 @@ def train(workdir: str, gmt_file: str, training_size: int=200000, test_train_spl
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_train_split, random_state=random_state)
     model = LGBMRegressor(seed=42)
     model.fit(X_train, y_train)
-    pickle.dump(model, open(workdir+"/model.pkl", 'wb'))
-    return(model)
+    pickle.dump(model, open(work_dir+"/model.pkl", 'wb'))

@@ -52,13 +52,13 @@ def calculate_correlation(h5_file: str, clustering: pd.DataFrame, gene_idx: List
     np.fill_diagonal(correlation.to_numpy(), float('nan'))
     return correlation
 
-def create_clustering(h5_file: str, work_dir, gene_idx: List[int], gene_count: int=1000, cluster_count: int=50, deterministic: bool=True, random_state: int=1, min_reads: int=2000, reuse_clustering=False, method: str="minibatch") -> pd.DataFrame:
+def create_clustering(work_dir: str, h5_file: str, gene_idx: List[int], gene_count: int=1000, cluster_count: int=50, deterministic: bool=True, random_state: int=1, min_reads: int=2000, reuse_clustering=False, method: str="minibatch") -> pd.DataFrame:
     """
     Returns cluster association for all samples in input expression h5 file.
     
     Parameters:
-        h5_file (str): path to expression h5 file
         work_dir (str): path to directory where clustering results will be stored
+        h5_file (str): path to expression h5 file
         gene_idx (List[int]): indices of genes to use for clustering
         gene_count (int): count of genes to use for clustering (default: 1000)
         cluster_count (int): number of clusters to generate (default: 50)
