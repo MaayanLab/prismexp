@@ -1,0 +1,16 @@
+blitzgsea==1.2.9
+feather==0.1.2
+feather_format==0.4.1
+h5py==3.7.0
+lightgbm==3.3.4
+matplotlib==3.6.0
+numpy==1.23.3
+pandas==1.5.0
+polars==0.15.16
+progress==1.6
+qnorm==0.8.1
+requests==2.28.1
+scikit_learn==1.2.0
+scipy==1.9.1
+seaborn==0.12.2
+tqdm==4.64.1
