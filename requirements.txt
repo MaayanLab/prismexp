@@ -1,6 +1,5 @@
 blitzgsea==1.2.9
-feather==0.1.2
-feather_format==0.4.1
+feather-format==0.4.1
 h5py==3.7.0
 lightgbm==3.3.4
 matplotlib==3.6.0
