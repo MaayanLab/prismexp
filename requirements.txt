@@ -1,4 +1,4 @@
--e git+https://github.com/maayanlab/blitzgsea
+git+https://github.com/maayanlab/blitzgsea
 feather-format==0.4.1
 h5py==3.8.0
 lightgbm==3.3.4
