@@ -6,7 +6,6 @@ import feather
 import time
 import pickle
 import os
-from progress.bar import Bar
 from typing import List
 import tqdm
 

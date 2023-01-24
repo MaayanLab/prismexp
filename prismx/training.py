@@ -8,7 +8,6 @@ from typing import List, Tuple
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from lightgbm import LGBMRegressor
-from progress.bar import Bar
 import tqdm
 
 from prismx.utils import read_gmt, load_correlation, load_feature

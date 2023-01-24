@@ -77,7 +77,6 @@ import pandas as pd
 import feather
 from prismx.utils import load_json, get_config, get_data_path, read_gmt
 from prismx.loaddata import get_genes
-from progress.bar import Bar
 import numpy as np
 
 px.print_libraries()

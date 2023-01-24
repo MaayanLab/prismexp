@@ -7,7 +7,6 @@ import pickle
 import time
 import multiprocessing
 from typing import List
-from progress.bar import Bar
 from tqdm import tqdm
 from sklearn.ensemble import RandomForestClassifier
 from scipy.stats import zscore

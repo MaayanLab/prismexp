@@ -2,7 +2,6 @@ from sklearn.metrics import roc_auc_score, roc_curve, auc
 import pandas as pd
 import numpy as np
 from typing import Dict, List
-from progress.bar import Bar
 import tqdm
 import os
 import pickle

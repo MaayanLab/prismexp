@@ -3,7 +3,6 @@ import time
 import pandas as pd
 import numpy as np
 import os
-from progress.bar import Bar
 from tqdm import tqdm
 import multiprocessing
 import concurrent
