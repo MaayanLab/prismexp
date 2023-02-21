@@ -9,7 +9,7 @@ from prismx.utils import normalize
 import archs4py as a4
 
 
-def filterGenes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.02, filterSamples: int=2000, deterministic: bool=True) -> List[int]:
+def filter_genes(h5file: str, readThreshold: int=20, sampleThreshold: float=0.02, filterSamples: int=2000, deterministic: bool=True) -> List[int]:
     '''
     Returns filtered genes with sufficient read support
         Parameters:

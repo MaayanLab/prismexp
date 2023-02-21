@@ -68,7 +68,7 @@ for i in rr:
     rr2 = np.array(range(1, 10))/250
     for j in rr2:
         print(j)
-        filteredGenes = px.filterGenes(h5file, readThreshold=i, sampleThreshold=j, filterSamples=5000)
+        filteredGenes = px.filter_genes(h5file, readThreshold=i, sampleThreshold=j, filterSamples=5000)
         count2.append(len(filteredGenes))
     count.append(count2)
 
@@ -104,7 +104,7 @@ for i in rr:
     rr2 = np.power(np.array(range(1, 5)), 2)/500
     for j in rr2:
         print(j)
-        filteredGenes = px.filterGenes(h5file, readThreshold=i, sampleThreshold=j, filterSamples=5000)
+        filteredGenes = px.filter_genes(h5file, readThreshold=i, sampleThreshold=j, filterSamples=5000)
         count2.append(len(filteredGenes))
     count.append(count2)
 

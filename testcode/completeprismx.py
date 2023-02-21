@@ -61,7 +61,7 @@ plt.legend(framealpha=0, frameon=False, fontsize=14)
 f.savefig("memroy_profiler_100.pdf", bbox_inches='tight')
 
 
-filteredGenes = filterGenes("mouse_matrix.h5", 20, 0.01, 5000)
+filteredGenes = filter_genes("mouse_matrix.h5", 20, 0.01, 5000)
 genes = hykGeneSelection("mouse_matrix.h5", filteredGenes)
 
 

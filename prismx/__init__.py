@@ -9,7 +9,7 @@ import os
 from typing import List
 import tqdm
 
-from prismx.filter import filterGenes
+from prismx.filter import filter_genes
 from prismx.correlation import create_clustering, calculate_correlation
 from prismx.feature import features
 from prismx.training import train
@@ -60,7 +60,7 @@ def create_correlation_matrices(work_dir: str, h5_file: str, cluster_count: int=
     os.makedirs(work_dir, exist_ok=True)
     if verbose: print("1. Filter genes")
     tstart = time.time()
-    filtered_genes = filterGenes(h5_file, read_threshold, sample_threshold, filter_samples)
+    filtered_genes = filter_genes(h5_file, read_threshold, sample_threshold, filter_samples)
     elapsed = round((time.time()-tstart)/60, 2)
     if verbose: print("   -> completed in "+str(elapsed)+"min / #genes="+str(len(filtered_genes)))
     if verbose: print("2. Cluster samples")
