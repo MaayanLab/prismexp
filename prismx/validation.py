@@ -13,7 +13,7 @@ def calculate_set_auc(prediction: pd.DataFrame, library: Dict, min_lib_size: int
     aucs = []
     setnames = []
     gidx = prediction.index
-    for se in tqdm.tqdm(library, disable=(not verbose)):
+    for se in tqdm.tqdm(list(library.keys()), disable=(not verbose)):
         if len(library[se]) >= min_lib_size:
             lenc = library[se]
             gold = [i in lenc for i in gidx]
@@ -28,7 +28,7 @@ def calculate_gene_auc(prediction: pd.DataFrame, rev_library: Dict, min_lib_size
     aucs = []
     genes = []
     gidx = prediction.index
-    for se in tqdm.tqdm(rev_library, disable=(not verbose)):
+    for se in tqdm.tqdm(list(rev_library.keys()), disable=(not verbose)):
         gold = [i in rev_library[se] for i in prediction.columns]
         if len(rev_library[se]) >= min_lib_size and se in gidx:
             fpr, tpr, _ = roc_curve(list(gold), list(prediction.loc[se,:]))
