@@ -30,7 +30,7 @@ def predict(work_dir: str, gmt_file: str, model=None, step_size: int=1000, inter
     threads (int, optional): Number of threads to use for parallel processing. Defaults to 2.
     """
     
-    if model == 0:
+    if model == None:
         model = pickle.load(open(work_dir+"/model.pkl", "rb"))
     if not skip_features:
         features(work_dir, gmt_file, intersect=intersect, threads=threads, verbose=verbose)

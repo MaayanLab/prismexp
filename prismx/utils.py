@@ -9,7 +9,6 @@ import re
 import math
 import feather
 import qnorm
-import polars as pl
 
 def quantile_normalize(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -97,12 +96,6 @@ def load_correlation(workdir: str, suffix: int) -> pd.DataFrame:
     cc = pd.DataFrame(pd.read_feather(workdir+"/correlation/correlation_"+str(suffix)+".f").set_index("index"), dtype=np.float16)
     cc.index = [g.upper() for g in cc.index]
     cc.columns = [g.upper() for g in cc.columns]
-    return(cc)
-
-def load_correlation_polars(workdir: str, suffix: int) -> pd.DataFrame:
-    cc = pl.read_ipc(workdir+"/correlation/correlation_"+str(suffix)+".f")
-    cc.index = cc["index"]
-    cc.drop_in_place("index")
     return(cc)
 
 def load_feature(workdir: str, i: int) -> pd.DataFrame:
